@@ -9,8 +9,7 @@ Contributors:
 ---------------------------------------------------------------------------
 Izaak Coleman	
 Anthony Flynn	
-Samuel Martinet	
-Christopher Smallwood
-Jukka Soikkeli
-Zoe Vance
-
+Samuel Martinet	    
+Christopher Smallwood   
+Jukka Soikkeli  
+Zoe Vance   
