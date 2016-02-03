@@ -1,6 +1,3 @@
-#########################################################################
-# Imperial autoadded bash scripts
-#########################################################################
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
@@ -18,15 +15,6 @@ alias rm="rm -i"
 export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
 
-#########################################################################
-# OpenCV compilation PATHs
-# Added by Izaak Coleman (ic711), MSc Computing Science
-# izaak.coleman11@imperial.ac.uk
-# 
-# We are required to add the following script to the .bashrc
-# of any lab computer we wish to compile/run programs 
-# requiring OpenCV 3.1.0.
-
 #extend executable search path
 #export PATH=$PATH:/vol/bitbucket/ic711/usr/local/include/opencv2
 
@@ -36,7 +24,18 @@ export LSCOLORS=ExFxBxDxCxegedabagacad
 #extend PKG_CONFIG_PATH to include opencv.pc dir
 export PKG_CONFIG_PATH=/vol/bitbucket/ic711/usr/local/lib/pkgconfig
 
-#extend ld (library dynamic path) library path
-export LD_LIBRARY_PATH=/vol/bitbucket/ic711/usr/local/lib/
+#extend ld (library dynamic path) library path to include the opencv locatoin
+export LD_LIBRARY_PATH=/vol/bitbucket/ic711/usr/local/lib/:/vol/cuda/6.5.14/lib64:/vol/cuda/6.5.14/lib
 
-##########################################################################
+
+#path to bash bin dir
+export PATH=$PATH:/vol/cuda/6.5.14/bin
+
+
+
+# run the set up script 
+if [ -f /vol/cuda/6.5.14/setup.sh ]
+  then
+	. /vol/cuda/6.5.14/setup.sh
+fi
+
