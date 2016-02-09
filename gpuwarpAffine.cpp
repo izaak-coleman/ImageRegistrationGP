@@ -21,15 +21,15 @@ int main (int argc, char* argv[])
         cv::Mat src_host = cv::imread("castle.jpg", CV_LOAD_IMAGE_GRAYSCALE);
         cv::cuda::GpuMat dst, src, xmap, ymap;
         src.upload(src_host);
-		
-				cv::Mat M = (cv::Mat_<double>(2,3) << 1.0, 0.0, 50.0, 0.0, 1.0, 50.0);
+    
+        cv::Mat M = (cv::Mat_<double>(2,3) << 1.0, 0.0, 50.0, 0.0, 1.0, 50.0);
 //        cv::cuda::buildWarpAffineMaps(M, false, src_host.size(), xmap, ymap);
 
-				cv::cuda::warpAffine(src, dst, M, src_host.size());
+        cv::cuda::warpAffine(src, dst, M, src_host.size());
 
 
-				cv::Mat result_host;
-				dst.download(result_host);
+        cv::Mat result_host;
+        dst.download(result_host);
         cv::imshow("Result", result_host);
         cv::waitKey();
     }
