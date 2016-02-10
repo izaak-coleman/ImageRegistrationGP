@@ -19,31 +19,31 @@
 
 int main (int argc, char* argv[])
 {
-	char src[] = "castle.jpg";
-	char dest[] = "result.jpg";
+  char src[] = "castle.jpg";
+  char dest[] = "result.jpg";
 
-	for(int i=0; i < 1000; i++{
+  for(int i=0; i < 1000; i++){
 
-		char temp[20];
-		if(1 % 2){
-			strcpy(temp, src);
-			strcpy(src, dest);
-			strcpy(dest, temp);
-		}
+    char temp[20];
+    if(1 % 2){
+      strcpy(temp, src);
+      strcpy(src, dest);
+      strcpy(dest, temp);
+    }
     try
     {
         cv::Mat src_host = cv::imread(src, CV_LOAD_IMAGE_GRAYSCALE);
         cv::cuda::GpuMat dst, src, xmap, ymap;
         src.upload(src_host);
-				int t;
-				if (i % 2){
-					t = -1;
-				}
-				else{
-					t = 1;
-				}
+        int t;
+        if (i % 2){
+          t = -1;
+        }
+        else{
+          t = 1;
+        }
     
-        cv::Mat M = (cv::Mat_<double>(2,3) << 1.0, 0.0, (t*50.0), 0.0, 1.0, (t*50.0);
+        cv::Mat M = (cv::Mat_<double>(2,3) << 1.0, 0.0, (t*50.0), 0.0, 1.0, (t*50.0));
 //        cv::cuda::buildWarpAffineMaps(M, false, src_host.size(), xmap, ymap);
 
         cv::cuda::warpAffine(src, dst, M, src_host.size());
@@ -51,12 +51,12 @@ int main (int argc, char* argv[])
 
         cv::Mat result_host;
         dst.download(result_host);
-				imwrite(dest, result_host);
+        imwrite(dest, result_host);
     }
     catch(const cv::Exception& ex)
     {
         std::cout << "Error: " << ex.what() << std::endl;
     }
-	}
+  }
     return 0;
 }
