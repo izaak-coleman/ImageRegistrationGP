@@ -30,7 +30,7 @@ int main( int argc, char** argv )
   // Load template image and input image into CV matrices
   template_image = cv::imread( templateImageName, 0 );
   input_image = cv::imread( inputImageName , 0 );
-  
+
   // Define motion model
   const int warp_mode = cv::MOTION_AFFINE;
  
