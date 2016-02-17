@@ -1,45 +1,13 @@
-/*M///////////////////////////////////////////////////////////////////////////////////////
-//
-//  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING.
-//
-//  By downloading, copying, installing or using the software you agree to this license.
-//  If you do not agree to this license, do not download, install,
-//  copy or use the software.
-//
-//
-//                        Intel License Agreement
-//                For Open Source Computer Vision Library
-//
-// Copyright (C) 2000, Intel Corporation, all rights reserved.
-// Third party copyrights are property of their respective owners.
-//
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
-//
-//   * Redistribution's of source code must retain the above copyright notice,
-//     this list of conditions and the following disclaimer.
-//
-//   * Redistribution's in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation
-//     and/or other materials provided with the distribution.
-//
-//   * The name of Intel Corporation may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-// This software is provided by the copyright holders and contributors "as is" and
-// any express or implied warranties, including, but not limited to, the implied
-// warranties of merchantability and fitness for a particular purpose are disclaimed.
-// In no event shall the Intel Corporation or contributors be liable for any direct,
-// indirect, incidental, special, exemplary, or consequential damages
-// (including, but not limited to, procurement of substitute goods or services;
-// loss of use, data, or profits; or business interruption) however caused
-// and on any theory of liability, whether in contract, strict liability,
-// or tort (including negligence or otherwise) arising in any way out of
-// the use of this software, even if advised of the possibility of such damage.
-//
-//M*/
+// findTransform.cpp
+// Anthony Flynn
+// (12/02/16)
+// Input: <TemplateImage> <InputImage> <OutputWarp>
+// Takes a template image and input image as alignment, and outputs the
+// warp matrix needed to transform the input image to the same coordinates
+// as the template image, and also applies the transform to the input image
 
-#include "precomp.hpp"
+#include <fstream>
+#include "opencv2/opencv.hpp"
 
 //cuda include files
 #include "opencv2/cudacodec.hpp"
@@ -53,14 +21,138 @@
 #include "opencv2/cudastereo.hpp"
 #include "opencv2/cudawarping.hpp"
 
-
-/****************************************************************************************\
-*                                       Image Alignment (ECC algorithm)                  *
-\****************************************************************************************/
-
 using namespace cv;
+ 
+static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType);
 
-static void Warp::image_jacobian_homo_ECC(const Mat& src1, const Mat& src2,
+static void image_jacobian_homo_ECC(const Mat& src1, const Mat& src2,
+                                    const Mat& src3, const Mat& src4,
+					  const Mat& src5, Mat& dst);
+
+static void image_jacobian_euclidean_ECC(const Mat& src1, const Mat& src2,
+                                         const Mat& src3, const Mat& src4,
+					       const Mat& src5, Mat& dst);
+
+
+static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
+                                      const Mat& src3, const Mat& src4,
+					    Mat& dst);
+
+  static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat& dst);
+
+  static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst);
+
+  static void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const int motionType);
+
+double modified_findTransformECC(InputArray templateImage,
+				 InputArray inputImage,
+				 InputOutputArray warpMatrix,
+				 int motionType,
+				 TermCriteria criteria,
+				 Mat inputMask
+				 );
+
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
+int main( int argc, char** argv )
+{
+  // Check correct number of command line arguments
+  if( argc != 4)
+    {
+      std::cout << " Usage: findTransform <TemplateImage> <InputImage> <OutputWarp.cpp>" << std::endl;
+      return -1;
+    }
+  
+  // Save file names provided on command line.
+  const char* templateImageName = argv[1];
+  const char* inputImageName = argv[2];
+  const char* outputWarpMatrix = argv[3];
+
+  cv::Mat template_image, input_image;
+
+  // Load template image and input image into CV matrices
+  template_image = cv::imread( templateImageName, 0 );
+  input_image = cv::imread( inputImageName , 0 );
+  
+  // Define motion model
+  const int warp_mode = cv::MOTION_AFFINE;
+ 
+  // Set space for warp matrix.
+  cv::Mat warp_matrix = cv::Mat::eye(2, 3, CV_32F);
+ 
+  // Set the stopping criteria for the algorithm
+  int number_of_iterations = 3000;
+  double termination_eps = 1e-10;
+  cv::TermCriteria criteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS,
+			number_of_iterations, termination_eps);
+
+  Mat inputMask;
+ 
+  // Run find_transformECC to find the warp matrix
+  double cc = modified_findTransformECC (
+					 template_image,
+					 input_image,
+					 warp_matrix,
+					 warp_mode,
+					 criteria,
+					 inputMask);
+ 
+  // Reserve a matrix to store the warped image
+  cv::Mat warped_image = cv::Mat(template_image.rows, template_image.cols, CV_32FC1);
+
+  // Apply the warp matrix to the input image to produce a warped image 
+  // (i.e. aligned to the template image)
+  cv::warpAffine(input_image, warped_image, warp_matrix, warped_image.size(), cv::INTER_LINEAR + cv::WARP_INVERSE_MAP);
+ 
+  // Save values in the warp matrix to the filename provided on command-line
+  saveWarp(outputWarpMatrix, warp_matrix, warp_mode);
+
+  std::cout << "Enhanced correlation coefficient between the template image and the final warped input image = " << cc << std::endl; 
+
+  // Show final output
+  cv::namedWindow( "Warped Image", CV_WINDOW_AUTOSIZE );
+  cv::namedWindow( "Template Image", CV_WINDOW_AUTOSIZE );
+  cv::namedWindow( "Input Image", CV_WINDOW_AUTOSIZE );
+  cv::imshow( "Template Image", template_image );
+  cv::imshow( "Input Image", input_image );
+  cv::imshow( "Warped Image", warped_image);
+  cv::waitKey(0);
+
+  return 0;
+}
+
+/* function to save the final values in the warp matrix to fileName */
+static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType)
+{
+  // it saves the raw matrix elements in a file
+  CV_Assert(warp.type()==CV_32FC1);
+
+  const float* matPtr = warp.ptr<float>(0);
+  int ret_value;
+
+  std::ofstream outfile(fileName.c_str());
+  if( !outfile ) {
+    std::cerr << "error in saving "
+	      << "Couldn't open file '" << fileName.c_str() << "'!" << std::endl;
+    ret_value = 0;
+  }
+  else {//save the warp's elements
+    outfile << matPtr[0] << " " << matPtr[1] << " " << matPtr[2] << std::endl;
+    outfile << matPtr[3] << " " << matPtr[4] << " " << matPtr[5] << std::endl;
+
+    ret_value = 1;
+  }
+  return ret_value;
+
+}
+
+
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+
+
+static void image_jacobian_homo_ECC(const Mat& src1, const Mat& src2,
                                     const Mat& src3, const Mat& src4,
                                     const Mat& src5, Mat& dst)
 {
@@ -134,7 +226,7 @@ static void Warp::image_jacobian_homo_ECC(const Mat& src1, const Mat& src2,
     src2Divided_.copyTo(dst.colRange(7*w, 8*w));//8
 }
 
-static void Warp::image_jacobian_euclidean_ECC(const Mat& src1, const Mat& src2,
+static void image_jacobian_euclidean_ECC(const Mat& src1, const Mat& src2,
                                          const Mat& src3, const Mat& src4,
                                          const Mat& src5, Mat& dst)
 {
@@ -171,7 +263,7 @@ static void Warp::image_jacobian_euclidean_ECC(const Mat& src1, const Mat& src2,
 }
 
 
-static void Warp::image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
+static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
                                       const Mat& src3, const Mat& src4,
                                       Mat& dst)
 {
@@ -199,7 +291,7 @@ static void Warp::image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
 }
 
 
-static void Warp::image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat& dst)
+static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat& dst)
 {
 
     CV_Assert( src1.size()==src2.size());
@@ -216,7 +308,7 @@ static void Warp::image_jacobian_translation_ECC(const Mat& src1, const Mat& src
 }
 
 
-static void Warp::project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst)
+static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst)
 {
     /* this functions is used for two types of projections. If src1.cols ==src.cols
     it does a blockwise multiplication (like in the outer product of vectors)
@@ -259,7 +351,7 @@ static void Warp::project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Ma
 }
 
 
-static void Warp::update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const int motionType)
+static void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const int motionType)
 {
     CV_Assert (map_matrix.type() == CV_32FC1);
     CV_Assert (update.type() == CV_32FC1);
@@ -321,12 +413,12 @@ static void Warp::update_warping_matrix_ECC (Mat& map_matrix, const Mat& update,
 }
 
 
-double Warp::findTransformECC(InputArray templateImage,
-                            InputArray inputImage,
-                            InputOutputArray warpMatrix,
-                            int motionType,
-                            TermCriteria criteria,
-                            InputArray inputMask)
+double modified_findTransformECC(InputArray templateImage,
+				 InputArray inputImage,
+				 InputOutputArray warpMatrix,
+				 int motionType,
+				 TermCriteria criteria,
+				 Mat inputMask)
 {
 
 
@@ -407,8 +499,8 @@ double Warp::findTransformECC(InputArray templateImage,
     Mat imageFloat    = Mat(hd, wd, CV_32F);// to store the (smoothed) input image
     Mat imageWarped   = Mat(hs, ws, CV_32F);// to store the warped zero-mean input image
     Mat imageMask		= Mat(hs, ws, CV_8U); //to store the final mask
-
-    Mat inputMaskMat = inputMask.getMat();
+    
+    Mat inputMaskMat = inputMask;
     //to use it for mask warping
     Mat preMask;
     if(inputMask.empty())
@@ -423,12 +515,14 @@ double Warp::findTransformECC(InputArray templateImage,
     Mat preMaskFloat;
     preMask.convertTo(preMaskFloat, CV_32F);
     GaussianBlur(preMaskFloat, preMaskFloat, Size(5, 5), 0, 0);
+    
     // Change threshold.
     preMaskFloat *= (0.5/0.95);
+    
     // Rounding conversion.
     preMaskFloat.convertTo(preMask, preMask.type());
     preMask.convertTo(preMaskFloat, preMaskFloat.type());
-
+    
     dst.convertTo(imageFloat, imageFloat.type());
     GaussianBlur(imageFloat, imageFloat, Size(5, 5), 0, 0);
 
