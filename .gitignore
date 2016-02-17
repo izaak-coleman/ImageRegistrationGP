@@ -6,3 +6,7 @@ DisplayImage.o
 DisplayImage.d
 Makefile
 *.*~
+
+*.elf
+*.srec
+Parallella/hello/main
