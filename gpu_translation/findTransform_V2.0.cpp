@@ -277,17 +277,33 @@ static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
 
     CV_Assert(dst.type() == CV_32FC1);
 
+    cuda::GpuMat gpu_src1, gpu_src2, gpu_src3, gpu_src4, gpu_dst;
+
+		gpu_src1.upload(src1);
+		gpu_src2.upload(src2);
+		gpu_src3.upload(src3);
+		gpu_src4.upload(src4);
+		gpu_dst.upload(dst);
 
     const int w = src1.cols;
 
     //compute Jacobian blocks (6 blocks)
+		
+    // gpu_dst.colRange(0,w) = gpu_src1.mul(gpu_src3);//1
+    cuda::multiply(gpu_src1, gpu_src3, gpu_dst.colRange(0,w));//1
+		cuda::multiply(gpu_src2, gpu_src3, gpu_dst.colRange(w,2*w));
+		cuda::multiply(gpu_src1, gpu_src4, gpu_dst.colRange(2*w, 3*w));
+		cuda::multiply(gpu_src2, gpu_src4, gpu_dst.colRange(3*w,4*w));
+		gpu_src1.copyTo(gpu_dst.colRange(4*w,5*w));
+		gpu_src2.copyTo(gpu_dst.colRange(5*w,6*w));
 
-    dst.colRange(0,w) = src1.mul(src3);//1
-    dst.colRange(w,2*w) = src2.mul(src3);//2
-    dst.colRange(2*w,3*w) = src1.mul(src4);//3
-    dst.colRange(3*w,4*w) = src2.mul(src4);//4
-    src1.copyTo(dst.colRange(4*w,5*w));//5
-    src2.copyTo(dst.colRange(5*w,6*w));//6
+
+		gpu_src1.download(src1);
+		gpu_src2.download(src2);
+		gpu_src3.download(src3);
+		gpu_src4.download(src4);
+		gpu_dst.download(dst);
+		
 }
 
 
@@ -569,44 +585,68 @@ double modified_findTransformECC(InputArray templateImage,
 
     for (int i = 1; (i <= numberOfIterations) && (fabs(rho-last_rho)>= termination_eps); i++)
     {
-	// upload Mats to gpu 
-	gpu_imageFloat.upload(imageFloat);
-	gpu_imageWarped.upload(imageWarped);
-	gpu_gradientX.upload(gradientX);
-	gpu_gradientY.upload(gradientY);
-	gpu_gradientXWarped.upload(gradientXWarped);
-	gpu_gradientYWarped.upload(gradientYWarped);
-	gpu_preMask.upload(preMask);
-	gpu_imageMask.upload(imageMask);
+			// upload Mats to gpu 
+			gpu_imageFloat.upload(imageFloat);
+			gpu_imageMask.upload(imageMask);
+			gpu_imageWarped.upload(imageWarped);
+			gpu_gradientX.upload(gradientX);
+			gpu_gradientY.upload(gradientY);
+			gpu_gradientXWarped.upload(gradientXWarped);
+			gpu_gradientYWarped.upload(gradientYWarped);
+			gpu_preMask.upload(preMask);
 
         // warp-back portion of the inputImage and gradients to the coordinate space of the templateImage
         
-	cuda::warpAffine(gpu_imageFloat, gpu_imageWarped,     map, imageWarped.size(),     imageFlags);
-	cuda::warpAffine(gpu_gradientX,  gpu_gradientXWarped, map, gradientXWarped.size(), imageFlags);
-	cuda::warpAffine(gpu_gradientY,  gpu_gradientYWarped, map, gradientYWarped.size(), imageFlags);
-	cuda::warpAffine(gpu_preMask,    gpu_imageMask,       map, imageMask.size(),       maskFlags);
+			cuda::warpAffine(gpu_imageFloat, gpu_imageWarped,     map, imageWarped.size(),     imageFlags);
+			cuda::warpAffine(gpu_gradientX,  gpu_gradientXWarped, map, gradientXWarped.size(), imageFlags);
+			cuda::warpAffine(gpu_gradientY,  gpu_gradientYWarped, map, gradientYWarped.size(), imageFlags);
+			cuda::warpAffine(gpu_preMask,    gpu_imageMask,       map, imageMask.size(),       maskFlags);
         
-
+			// download modified Mats to cpu versions for subsequent analysis
+			gpu_imageWarped.download(imageWarped);
+			gpu_imageMask.download(imageMask);
+	
+			//TODO cuda::meanStdDev does not take in imageMask parameter, need to understand what that costs us
         Scalar imgMean, imgStd, tmpMean, tmpStd;
-				cuda::meanStdDev(imageWarped,   imgMean, imgStd, imageMask);
-				cuda::meanStdDev(templateFloat, tmpMean, tmpStd, imageMask);
+				meanStdDev(imageWarped,   imgMean, imgStd, imageMask);  // need to reupload imageMask ?
+				meanStdDev(templateFloat, tmpMean, tmpStd, imageMask);
 
-	// download modified Mats to cpu versions for subsequent analysis
-	gpu_imageFloat.download(imageFloat);
-	gpu_imageWarped.download(imageWarped);
-	gpu_gradientX.download(gradientX);
-	gpu_gradientY.download(gradientY);
-	gpu_gradientXWarped.download(gradientXWarped);
-	gpu_gradientYWarped.download(gradientYWarped);
-	gpu_preMask.download(preMask);
-	gpu_imageMask.download(imageMask);
+			gpu_imageWarped.upload(imageWarped);
+			gpu_imageMask.upload(imageMask);
 
-        subtract(imageWarped,   imgMean, imageWarped, imageMask);//zero-mean input
-        templateZM = Mat::zeros(templateZM.rows, templateZM.cols, templateZM.type());
-        subtract(templateFloat, tmpMean, templateZM,  imageMask);//zero-mean template
+			// Should scalars be on the GPU? img Mean here 
+			cuda::subtract(gpu_imageWarped, imgMean, gpu_imageWarped, gpu_imageMask);//zero-mean input
+			
+			cuda::GpuMat gpu_templateZM;
+			// Create templateFloat matrix on the GPU
+			cuda::GpuMat gpu_templateFloat;
 
-        const double tmpNorm = std::sqrt(countNonZero(imageMask)*(tmpStd.val[0])*(tmpStd.val[0]));
-        const double imgNorm = std::sqrt(countNonZero(imageMask)*(imgStd.val[0])*(imgStd.val[0]));
+			gpu_templateFloat.upload(templateFloat);
+			
+			// Initialize templateZM on the CPU
+			// subtract(imageWarped,   imgMean, imageWarped, imageMask);//zero-mean input
+      templateZM = Mat::zeros(templateZM.rows, templateZM.cols, templateZM.type());
+      //subtract(templateFloat, tmpMean, templateZM,  imageMask);//zero-mean template
+			
+			gpu_templateZM.upload(templateZM);
+			// gpu_templateZM.setTo(Scalar::all(0));			
+			
+			cuda::subtract(gpu_templateFloat, tmpMean, gpu_templateZM,  gpu_imageMask);//zero-mean template
+		
+			gpu_gradientX.download(gradientX);
+			gpu_gradientY.download(gradientY);
+			gpu_gradientXWarped.download(gradientXWarped);
+			gpu_gradientYWarped.download(gradientYWarped);
+			gpu_imageFloat.download(imageFloat);
+			gpu_imageMask.download(imageMask);
+			gpu_imageFloat.download(imageWarped);
+			gpu_preMask.download(preMask);
+			gpu_templateZM.download(templateZM);
+			gpu_templateFloat.download(templateFloat);
+			
+			// CUDA sqrt not needed as it does not include  matrix-computation
+			const double tmpNorm = std::sqrt(countNonZero(imageMask)*(tmpStd.val[0])*(tmpStd.val[0]));
+			const double imgNorm = std::sqrt(countNonZero(imageMask)*(imgStd.val[0])*(imgStd.val[0]));
 
         // calculate jacobian of image wrt parameters
         switch (motionType){
@@ -622,7 +662,7 @@ double modified_findTransformECC(InputArray templateImage,
             case MOTION_EUCLIDEAN:
                 image_jacobian_euclidean_ECC(gradientXWarped, gradientYWarped, Xgrid, Ygrid, map, jacobian);
                 break;
-        }
+				}
 
         // calculate Hessian and its inverse
         project_onto_jacobian_ECC(jacobian, jacobian, hessian);

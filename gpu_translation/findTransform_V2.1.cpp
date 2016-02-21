@@ -22,7 +22,7 @@
 #include "opencv2/cudawarping.hpp"
 
 using namespace cv;
- 
+
 static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType);
 
 static void image_jacobian_homo_ECC(const Mat& src1, const Mat& src2,
@@ -38,11 +38,11 @@ static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
                                       const Mat& src3, const Mat& src4,
 					    Mat& dst);
 
-  static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat& dst);
+static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat& dst);
 
-  static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst);
+static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst);
 
-  static void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const int motionType);
+static void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const int motionType);
 
 double modified_findTransformECC(InputArray templateImage,
 				 InputArray inputImage,
@@ -51,6 +51,8 @@ double modified_findTransformECC(InputArray templateImage,
 				 TermCriteria criteria,
 				 Mat inputMask
 				 );
+
+/** static float cuda_dot(const cuda::GpuMat& src1, const cuda::GpuMat& src2); **/
 
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
@@ -184,7 +186,7 @@ static void image_jacobian_homo_ECC(const Mat& src1, const Mat& src2,
 
 
     //create denominator for all points as a block
-    Mat den_ = src3*h2_ + src4*h5_ + 1.0;//check the time of this! otherwise use addWeighted
+    Mat den_ = src3*h2_ + src4*h5_ + 1.0;//check the time nt i = 0; i < dst.rows; i++){
 
     //create projected points
     Mat hatX_ = -src3*h0_ - src4*h3_ - h6_;
@@ -277,17 +279,33 @@ static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
 
     CV_Assert(dst.type() == CV_32FC1);
 
+    cuda::GpuMat gpu_src1, gpu_src2, gpu_src3, gpu_src4, gpu_dst;
+
+		gpu_src1.upload(src1);
+		gpu_src2.upload(src2);
+		gpu_src3.upload(src3);
+		gpu_src4.upload(src4);
+		gpu_dst.upload(dst);
 
     const int w = src1.cols;
 
     //compute Jacobian blocks (6 blocks)
+		
+    // gpu_dst.colRange(0,w) = gpu_src1.mul(gpu_src3);//1
+    cuda::multiply(gpu_src1, gpu_src3, gpu_dst.colRange(0,w));//1
+		cuda::multiply(gpu_src2, gpu_src3, gpu_dst.colRange(w,2*w));
+		cuda::multiply(gpu_src1, gpu_src4, gpu_dst.colRange(2*w, 3*w));
+		cuda::multiply(gpu_src2, gpu_src4, gpu_dst.colRange(3*w,4*w));
+		gpu_src1.copyTo(gpu_dst.colRange(4*w,5*w));
+		gpu_src2.copyTo(gpu_dst.colRange(5*w,6*w));
 
-    dst.colRange(0,w) = src1.mul(src3);//1
-    dst.colRange(w,2*w) = src2.mul(src3);//2
-    dst.colRange(2*w,3*w) = src1.mul(src4);//3
-    dst.colRange(3*w,4*w) = src2.mul(src4);//4
-    src1.copyTo(dst.colRange(4*w,5*w));//5
-    src2.copyTo(dst.colRange(5*w,6*w));//6
+
+		gpu_src1.download(src1);
+		gpu_src2.download(src2);
+		gpu_src3.download(src3);
+		gpu_src4.download(src4);
+		gpu_dst.download(dst);
+		
 }
 
 
@@ -308,6 +326,32 @@ static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat
 }
 
 
+/*
+static double cuda_dot(const cuda::GpuMat& src1, const cuda::GpuMat& src2){
+	double r = 0;
+
+	cuda::GpuMat dst;
+
+	// add cassert to avoid this if mat is already continuous
+	cuda::createContinuous(src1.rows, src1.cols, src1.type, src1);
+	cuda::createContinuous(src2.rows, src2.cols, src2.type, src2);
+
+	size_t len =    
+		
+	// scale length 
+	// 
+
+	cuda::multiply(src1,src2,dst);
+
+	// figure out where/how this adds
+	for(int i = 0; i < dst.rows; i++){
+			r += (float) dst[i];
+	}
+
+	return r;
+} 
+*/
+
 static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst)
 {
     /* this functions is used for two types of projections. If src1.cols ==src.cols
@@ -325,12 +369,20 @@ static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst
     int w;
 
     float* dstPtr = dst.ptr<float>(0);
+/**
+    cuda::GpuMat gpu_src1, gpu_src2, gpu_src3, gpu_dst;
 
-    if (src1.cols !=src2.cols){//dst.cols==1
+		gpu_src1.upload(src1);
+		gpu_src2.upload(src2);
+		gpu_dst.upload(dst);
+**/    
+		if (src1.cols !=src2.cols){//dst.cols==1
         w  = src2.cols;
-        for (int i=0; i<dst.rows; i++){
+        for (int i=0; i < dst.rows; i++){
             dstPtr[i] = (float) src2.dot(src1.colRange(i*w,(i+1)*w));
-        }
+						std::cout << "This is the dest matrix: " << std::endl << dst << std::endl;
+					//	dstPtr[i] = (float) cuda_dot(gpu_src2, gpu_src1.colRange(i*w,(i+1)*w));
+				}
     }
 
     else {
@@ -569,46 +621,71 @@ double modified_findTransformECC(InputArray templateImage,
 
     for (int i = 1; (i <= numberOfIterations) && (fabs(rho-last_rho)>= termination_eps); i++)
     {
-	// upload Mats to gpu 
-	gpu_imageFloat.upload(imageFloat);
-	gpu_imageWarped.upload(imageWarped);
-	gpu_gradientX.upload(gradientX);
-	gpu_gradientY.upload(gradientY);
-	gpu_gradientXWarped.upload(gradientXWarped);
-	gpu_gradientYWarped.upload(gradientYWarped);
-	gpu_preMask.upload(preMask);
-	gpu_imageMask.upload(imageMask);
+			// upload Mats to gpu 
+			gpu_imageFloat.upload(imageFloat);
+			gpu_imageMask.upload(imageMask);
+			gpu_imageWarped.upload(imageWarped);
+			gpu_gradientX.upload(gradientX);
+			gpu_gradientY.upload(gradientY);
+			gpu_gradientXWarped.upload(gradientXWarped);
+			gpu_gradientYWarped.upload(gradientYWarped);
+			gpu_preMask.upload(preMask);
 
         // warp-back portion of the inputImage and gradients to the coordinate space of the templateImage
         
-	cuda::warpAffine(gpu_imageFloat, gpu_imageWarped,     map, imageWarped.size(),     imageFlags);
-	cuda::warpAffine(gpu_gradientX,  gpu_gradientXWarped, map, gradientXWarped.size(), imageFlags);
-	cuda::warpAffine(gpu_gradientY,  gpu_gradientYWarped, map, gradientYWarped.size(), imageFlags);
-	cuda::warpAffine(gpu_preMask,    gpu_imageMask,       map, imageMask.size(),       maskFlags);
+			cuda::warpAffine(gpu_imageFloat, gpu_imageWarped,     map, imageWarped.size(),     imageFlags);
+			cuda::warpAffine(gpu_gradientX,  gpu_gradientXWarped, map, gradientXWarped.size(), imageFlags);
+			cuda::warpAffine(gpu_gradientY,  gpu_gradientYWarped, map, gradientYWarped.size(), imageFlags);
+			cuda::warpAffine(gpu_preMask,    gpu_imageMask,       map, imageMask.size(),       maskFlags);
         
-
+			// download modified Mats to cpu versions for subsequent analysis
+			gpu_imageWarped.download(imageWarped);
+			gpu_imageMask.download(imageMask);
+	
+			//TODO cuda::meanStdDev does not take in imageMask parameter, need to understand what that costs us
         Scalar imgMean, imgStd, tmpMean, tmpStd;
-				cuda::meanStdDev(imageWarped,   imgMean, imgStd, imageMask);
-				cuda::meanStdDev(templateFloat, tmpMean, tmpStd, imageMask);
+				meanStdDev(imageWarped,   imgMean, imgStd, imageMask);  // need to reupload imageMask ?
+				meanStdDev(templateFloat, tmpMean, tmpStd, imageMask);
 
-	// download modified Mats to cpu versions for subsequent analysis
-	gpu_imageFloat.download(imageFloat);
-	gpu_imageWarped.download(imageWarped);
-	gpu_gradientX.download(gradientX);
-	gpu_gradientY.download(gradientY);
-	gpu_gradientXWarped.download(gradientXWarped);
-	gpu_gradientYWarped.download(gradientYWarped);
-	gpu_preMask.download(preMask);
-	gpu_imageMask.download(imageMask);
+			gpu_imageWarped.upload(imageWarped);
+			gpu_imageMask.upload(imageMask);
 
-        subtract(imageWarped,   imgMean, imageWarped, imageMask);//zero-mean input
-        templateZM = Mat::zeros(templateZM.rows, templateZM.cols, templateZM.type());
-        subtract(templateFloat, tmpMean, templateZM,  imageMask);//zero-mean template
+			// Should scalars be on the GPU? img Mean here 
+			cuda::subtract(gpu_imageWarped, imgMean, gpu_imageWarped, gpu_imageMask);//zero-mean input
+			
+			cuda::GpuMat gpu_templateZM;
+			// Create templateFloat matrix on the GPU
+			cuda::GpuMat gpu_templateFloat;
 
-        const double tmpNorm = std::sqrt(countNonZero(imageMask)*(tmpStd.val[0])*(tmpStd.val[0]));
-        const double imgNorm = std::sqrt(countNonZero(imageMask)*(imgStd.val[0])*(imgStd.val[0]));
+			gpu_templateFloat.upload(templateFloat);
+			
+			// Initialize templateZM on the CPU
+			// subtract(imageWarped,   imgMean, imageWarped, imageMask);//zero-mean input
+      templateZM = Mat::zeros(templateZM.rows, templateZM.cols, templateZM.type());
+      //subtract(templateFloat, tmpMean, templateZM,  imageMask);//zero-mean template
+			
+			gpu_templateZM.upload(templateZM);
+			// gpu_templateZM.setTo(Scalar::all(0));			
+			
+			cuda::subtract(gpu_templateFloat, tmpMean, gpu_templateZM,  gpu_imageMask);//zero-mean template
+		
+			gpu_gradientX.download(gradientX);
+			gpu_gradientY.download(gradientY);
+			gpu_gradientXWarped.download(gradientXWarped);
+			gpu_gradientYWarped.download(gradientYWarped);
+			gpu_imageFloat.download(imageFloat);
+			gpu_imageMask.download(imageMask);
+			gpu_imageFloat.download(imageWarped);
+			gpu_preMask.download(preMask);
+			gpu_templateZM.download(templateZM);
+			gpu_templateFloat.download(templateFloat);
+			
+			// CUDA sqrt not needed as it does not include  matrix-computation
+			const double tmpNorm = std::sqrt(countNonZero(imageMask)*(tmpStd.val[0])*(tmpStd.val[0]));
+			const double imgNorm = std::sqrt(countNonZero(imageMask)*(imgStd.val[0])*(imgStd.val[0]));
 
-        // calculate jacobian of image wrt parameters
+        // image_jacobian_affine has been switched to CUDA
+				// delete or upgrade others 
         switch (motionType){
             case MOTION_AFFINE:
                 image_jacobian_affine_ECC(gradientXWarped, gradientYWarped, Xgrid, Ygrid, jacobian);
@@ -622,7 +699,7 @@ double modified_findTransformECC(InputArray templateImage,
             case MOTION_EUCLIDEAN:
                 image_jacobian_euclidean_ECC(gradientXWarped, gradientYWarped, Xgrid, Ygrid, map, jacobian);
                 break;
-        }
+				}
 
         // calculate Hessian and its inverse
         project_onto_jacobian_ECC(jacobian, jacobian, hessian);
