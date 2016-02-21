@@ -1,7 +1,7 @@
-// findTransform.cpp
-// Anthony Flynn
+// lowres_findTransform.cpp
+// Christopher Smallwood
 // (12/02/16)
-// Input: <TemplateImage> <InputImage> <OutputWarp>
+// Input: <lowresTemplate> <lowresInput> <OutputWarp> <Template> <Input>
 // Takes a template image and input image as alignment, and outputs the
 // warp matrix needed to transform the input image to the same coordinates
 // as the template image, and also applies the transform to the input image
