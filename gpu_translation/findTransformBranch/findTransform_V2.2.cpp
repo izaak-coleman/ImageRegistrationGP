@@ -673,9 +673,9 @@ double modified_findTransformECC(InputArray templateImage,
 			gpu_imageMask.download(imageMask);
 			gpu_imageFloat.download(imageWarped);
 			gpu_preMask.download(preMask);
-			gpu_templateZM.download(templateZM);
 			gpu_templateFloat.download(templateFloat);
-			
+			gpu_templateZM.download(templateZM);
+
 			// CUDA sqrt not needed as it does not include  matrix-computation
 			// const double tmpNorm = std::sqrt(countNonZero(imageMask)*(tmpStd.val[0])*(tmpStd.val[0]));
 			// const double imgNorm = std::sqrt(countNonZero(imageMask)*(imgStd.val[0])*(imgStd.val[0]));
@@ -716,9 +716,6 @@ double modified_findTransformECC(InputArray templateImage,
 
         hessianInv = hessian.inv();
 
-				GpuMat gpu_hessianInv;
-				gpu_hessianInv.upload(hessianInv);
-
         const double correlation = templateZM.dot(imageWarped);
 
         // calculate enhanced correlation coefficiont (ECC)->rho
@@ -732,33 +729,55 @@ double modified_findTransformECC(InputArray templateImage,
         project_onto_jacobian_ECC( jacobian, imageWarped, imageProjection);
         project_onto_jacobian_ECC(jacobian, templateZM, templateProjection);
 
-				gpu_imageProjection.upload(imageProjection);
+				cuda::GpuMat gpu_hessianInv, gpu_imageProjection, gpu_imageProjectionHessian;
 				
-				GpuMat gpu_imageProjectionHessian;
-
-				gpu_imageProjectionHessian(imageProjectionHessian);
+				gpu_hessianInv.upload(hessianInv);
+				gpu_imageProjection.upload(imageProjection);
+				gpu_imageProjectionHessian.upload(imageProjectionHessian);
 
         // calculate the parameter lambda to account for illumination variation
-				// imageProjectionHessian = hessianInv*imageProjection;
-				cuda::multiply(gpu_hessianInv, gpu_imageProjection, gpu_imageProjectionHessian);
-				
-				gpu_imageProjectionHessian.download(imageProjectionHesian);
-				
+				imageProjectionHessian = hessianInv*imageProjection;
+				//cuda::gemm(gpu_hessianInv, gpu_imageProjection, gpu_imageProjectionHessian)
+
+				gpu_imageProjectionHessian.download(imageProjectionHessian);
+				gpu_imageProjection.download(imageProjection);
+				gpu_hessianInv.download(hessianInv);
+
 				const double lambda_n = (imgNorm*imgNorm) - imageProjection.dot(imageProjectionHessian);
         const double lambda_d = correlation - templateProjection.dot(imageProjectionHessian);
-        if (lambda_d <= 0.0)
+       
+			 	if (lambda_d <= 0.0)
         {
             rho = -1;
             CV_Error(Error::StsNoConv, "The algorithm stopped before its convergence. The correlation is going to be minimized. Images may be uncorrelated or non-overlapped");
 
         }
-        const double lambda = (lambda_n/lambda_d);
+      
+				const double lambda = (lambda_n/lambda_d);
 
-        // estimate the update step delta_p
-        error = lambda*templateZM - imageWarped;
+        //estimate the update step delta_p
+				//cuda::GpuMat gpu_error, gpu_errorInterim;
+				//gpu_error.upload(error);
+			
+				//cuda::multiply(gpu_templateZM, lambda, gpu_errorInterim);
+				//cuda::subtract(gpu_errorInterim, gpu_imageWarped, gpu_error);
+				
+				error = lambda*templateZM - imageWarped;
+				//gpu_error.download(error);
+					
         project_onto_jacobian_ECC(jacobian, error, errorProjection);
-        deltaP = hessianInv * errorProjection;
+        
+				deltaP = hessianInv * errorProjection;
+			/**	
+				cuda::GpuMat gpu_errorProjection, gpu_deltaP;
+				gpu_errorProjection.upload(errorProjection);
+				
+				cuda::multiply(gpu_hessianInv, gpu_errorProjection, gpu_deltaP);
 
+				gpu_errorProjection.download(errorProjection);
+
+				gpu_deltaP.download(deltaP);
+*/
         // update warping matrix
         update_warping_matrix_ECC( map, deltaP, motionType);
 
