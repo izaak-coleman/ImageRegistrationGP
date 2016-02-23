@@ -52,7 +52,7 @@ double modified_findTransformECC(InputArray templateImage,
 				 Mat inputMask
 				 );
 
-// static double cuda_dot(const cuda::GpuMat& src1, const cuda::GpuMat& src2);
+/** static float cuda_dot(const cuda::GpuMat& src1, const cuda::GpuMat& src2); **/
 
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
@@ -308,34 +308,6 @@ static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
 		
 }
 
-/**
-static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
-                                      const Mat& src3, const Mat& src4,
-                                      Mat& dst)
-{
-
-    CV_Assert(src1.size() == src2.size());
-    CV_Assert(src1.size() == src3.size());
-    CV_Assert(src1.size() == src4.size());
-
-    CV_Assert(src1.rows == dst.rows);
-    CV_Assert(dst.cols == (6*src1.cols));
-
-    CV_Assert(dst.type() == CV_32FC1);
-
-
-    const int w = src1.cols;
-
-    //compute Jacobian blocks (6 blocks)
-
-    dst.colRange(0,w) = src1.mul(src3);//1
-    dst.colRange(w,2*w) = src2.mul(src3);//2
-    dst.colRange(2*w,3*w) = src1.mul(src4);//3
-    dst.colRange(3*w,4*w) = src2.mul(src4);//4
-    src1.copyTo(dst.colRange(4*w,5*w));//5
-    src2.copyTo(dst.colRange(5*w,6*w));//6
-}
-**/
 
 static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat& dst)
 {
@@ -353,49 +325,32 @@ static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat
     src2.copyTo(dst.colRange(w, 2*w));
 }
 
-/**
 
+/*
 static double cuda_dot(const cuda::GpuMat& src1, const cuda::GpuMat& src2){
+	double r = 0;
 
-	// safety check
-	if(src2.empty()){
-		std::cout << "HELP ME IM AN EMPTY SCALAR" << std::endl;
-	} 
- 
-	if(src2.type() != src1.type()){
-		std::cout << "type mismatch btw " << src1.type() << " and " << src2.type() <<  std::endl;
-			if(src2.size() != src1.size()){
-				std::cout << "and a size mismatch btw " << src1.size() << " and " << src2.size() <<  std::endl;
-			}
+	cuda::GpuMat dst;
+
+	// add cassert to avoid this if mat is already continuous
+	cuda::createContinuous(src1.rows, src1.cols, src1.type, src1);
+	cuda::createContinuous(src2.rows, src2.cols, src2.type, src2);
+
+	size_t len =    
+		
+	// scale length 
+	// 
+
+	cuda::multiply(src1,src2,dst);
+
+	// figure out where/how this adds
+	for(int i = 0; i < dst.rows; i++){
+			r += (float) dst[i];
 	}
 
-	// initialze dotproduct vars
-	double dotProduct = 0;
-	double elem = 0;
-
-	// make dst same size and type as src Mats
-	cuda::GpuMat gpu_dst;
-	gpu_dst = src1.clone();
-
-	// peform the per-element product of Mats and load to gpu_dst
-	cuda::multiply(src1,src2, gpu_dst);
-
-
-
-	// sum elements of multiplication result to get dot product
-	Mat result;
-	gpu_dst.download(result);
-
-	for(int row = 0; row < result.rows; row++){
-		for(int col = 0; col < result.cols; col++){
-			elem = result.at<double>(row,col);
-			dotProduct += elem;
-		}
-	}
-	std::cout << "dot product: " << dotProduct << std::endl;
-	return dotProduct;   // return dotproduct
+	return r;
 } 
-**/
+*/
 
 static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst)
 {
@@ -414,14 +369,22 @@ static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst
     int w;
 
     float* dstPtr = dst.ptr<float>(0);
+/**
+    cuda::GpuMat gpu_src1, gpu_src2, gpu_src3, gpu_dst;
 
+		gpu_src1.upload(src1);
+		gpu_src2.upload(src2);
+		gpu_dst.upload(dst);
+**/    
 		if (src1.cols !=src2.cols){//dst.cols==1
         w  = src2.cols;
         for (int i=0; i < dst.rows; i++){
             dstPtr[i] = (float) src2.dot(src1.colRange(i*w,(i+1)*w));
+					//	dstPtr[i] = (float) cuda_dot(gpu_src2, gpu_src1.colRange(i*w,(i+1)*w));
 				}
     }
-		else {
+
+    else {
         CV_Assert(dst.cols == dst.rows); //dst is square (and symmetric)
         w = src2.cols/dst.cols;
         Mat mat;
@@ -642,8 +605,6 @@ double modified_findTransformECC(InputArray templateImage,
     Mat deltaP = Mat(numberOfParameters, 1, CV_32F);//transformation parameter correction
     Mat error = Mat(hs, ws, CV_32F);//error as 2D matrix
 
-		cuda::GpuMat gpu_hessianInv, gpu_deltaP, gpu_imageProjection, gpu_imageProjectionHessian;
-
     const int imageFlags = INTER_LINEAR  + WARP_INVERSE_MAP;
     const int maskFlags  = INTER_NEAREST + WARP_INVERSE_MAP;
 
@@ -713,10 +674,10 @@ double modified_findTransformECC(InputArray templateImage,
 			gpu_gradientYWarped.download(gradientYWarped);
 			gpu_imageFloat.download(imageFloat);
 			gpu_imageMask.download(imageMask);
+			gpu_imageFloat.download(imageWarped);
 			gpu_preMask.download(preMask);
-			gpu_templateFloat.download(templateFloat);
-			gpu_imageWarped.download(imageWarped);
 			gpu_templateZM.download(templateZM);
+			gpu_templateFloat.download(templateFloat);
 			
 			// CUDA sqrt not needed as it does not include  matrix-computation
 			const double tmpNorm = std::sqrt(countNonZero(imageMask)*(tmpStd.val[0])*(tmpStd.val[0]));
@@ -740,16 +701,12 @@ double modified_findTransformECC(InputArray templateImage,
 				}
 
         // calculate Hessian and its inverse
-				//std::cout << jacobian << std::endl;
         project_onto_jacobian_ECC(jacobian, jacobian, hessian);
-				
-				
-        hessianInv = hessian.inv();
-	
-				const double correlation = templateZM.dot(imageWarped);
-			
 
-				
+        hessianInv = hessian.inv();
+
+        const double correlation = templateZM.dot(imageWarped);
+
         // calculate enhanced correlation coefficiont (ECC)->rho
         last_rho = rho;
         rho = correlation/(imgNorm*tmpNorm);
@@ -760,25 +717,13 @@ double modified_findTransformECC(InputArray templateImage,
         // project images into jacobian
         project_onto_jacobian_ECC( jacobian, imageWarped, imageProjection);
         project_onto_jacobian_ECC(jacobian, templateZM, templateProjection);
-       // imageProjectionHessian = hessianInv*imageProjection;
 
-				gpu_hessianInv.upload(hessianInv);
-				gpu_imageProjection.upload(imageProjection);
-				gpu_imageProjectionHessian.upload(imageProjectionHessian);
 
         // calculate the parameter lambda to account for illumination variation
-        // imageProjectionHessian = hessianInv*imageProjection;
-				cuda::multiply(gpu_hessianInv, gpu_imageProjection, gpu_imageProjectionHessian);
-			
-				gpu_hessianInv.download(hessianInv);
-				gpu_imageProjection.download(imageProjection);
-				gpu_imageProjectionHessian.download(imageProjectionHessian);
-			
-
-				const double lambda_n = (imgNorm*imgNorm) - imageProjection.dot(imageProjectionHessian);
+        imageProjectionHessian = hessianInv*imageProjection;
+        const double lambda_n = (imgNorm*imgNorm) - imageProjection.dot(imageProjectionHessian);
         const double lambda_d = correlation - templateProjection.dot(imageProjectionHessian);
-      
-				if (lambda_d <= 0.0)
+        if (lambda_d <= 0.0)
         {
             rho = -1;
             CV_Error(Error::StsNoConv, "The algorithm stopped before its convergence. The correlation is going to be minimized. Images may be uncorrelated or non-overlapped");
@@ -789,9 +734,7 @@ double modified_findTransformECC(InputArray templateImage,
         // estimate the update step delta_p
         error = lambda*templateZM - imageWarped;
         project_onto_jacobian_ECC(jacobian, error, errorProjection);
-        
-
-				deltaP = hessianInv * errorProjection;
+        deltaP = hessianInv * errorProjection;
 
         // update warping matrix
         update_warping_matrix_ECC( map, deltaP, motionType);
