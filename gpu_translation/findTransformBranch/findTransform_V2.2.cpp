@@ -25,20 +25,19 @@ using namespace cv;
 
 static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType);
 
-static void image_jacobian_homo_ECC(const Mat& src1, const Mat& src2,
+/**static void image_jacobian_homo_ECC(const Mat& src1, const Mat& src2,
                                     const Mat& src3, const Mat& src4,
 					  const Mat& src5, Mat& dst);
 
 static void image_jacobian_euclidean_ECC(const Mat& src1, const Mat& src2,
                                          const Mat& src3, const Mat& src4,
 					       const Mat& src5, Mat& dst);
-
-
+*/
 static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
                                       const Mat& src3, const Mat& src4,
-					    Mat& dst);
+                                      Mat& gpu_dst);
 
-static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat& dst);
+//static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat& dst);
 
 static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst);
 
@@ -267,7 +266,7 @@ static void image_jacobian_euclidean_ECC(const Mat& src1, const Mat& src2,
 
 static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
                                       const Mat& src3, const Mat& src4,
-                                      Mat& dst)
+																			Mat& dst)
 {
 
     CV_Assert(src1.size() == src2.size());
@@ -279,7 +278,7 @@ static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
 
     CV_Assert(dst.type() == CV_32FC1);
 
-    cuda::GpuMat gpu_src1, gpu_src2, gpu_src3, gpu_src4, gpu_dst;
+		cuda::GpuMat gpu_src1, gpu_src2, gpu_src3, gpu_src4, gpu_dst;
 
 		gpu_src1.upload(src1);
 		gpu_src2.upload(src2);
@@ -299,13 +298,11 @@ static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
 		gpu_src1.copyTo(gpu_dst.colRange(4*w,5*w));
 		gpu_src2.copyTo(gpu_dst.colRange(5*w,6*w));
 
-
 		gpu_src1.download(src1);
 		gpu_src2.download(src2);
 		gpu_src3.download(src3);
 		gpu_src4.download(src4);
 		gpu_dst.download(dst);
-		
 }
 
 
@@ -680,11 +677,24 @@ double modified_findTransformECC(InputArray templateImage,
 			gpu_templateFloat.download(templateFloat);
 			
 			// CUDA sqrt not needed as it does not include  matrix-computation
-			const double tmpNorm = std::sqrt(countNonZero(imageMask)*(tmpStd.val[0])*(tmpStd.val[0]));
-			const double imgNorm = std::sqrt(countNonZero(imageMask)*(imgStd.val[0])*(imgStd.val[0]));
+			// const double tmpNorm = std::sqrt(countNonZero(imageMask)*(tmpStd.val[0])*(tmpStd.val[0]));
+			// const double imgNorm = std::sqrt(countNonZero(imageMask)*(imgStd.val[0])*(imgStd.val[0]));
 
-        // image_jacobian_affine has been switched to CUDA
-				// delete or upgrade others 
+
+			const double tmpNorm = std::sqrt(cuda::countNonZero(gpu_imageMask)*(tmpStd.val[0])*(tmpStd.val[0]));
+			const double imgNorm = std::sqrt(cuda::countNonZero(gpu_imageMask)*(imgStd.val[0])*(imgStd.val[0]));
+			
+			//cuda::GpuMat gpu_jacobian, gpu_Xgrid, gpu_Ygrid;
+			//gpu_jacobian.upload(jacobian);	
+			//gpu_Xgrid.upload(Xgrid);
+			//gpu_Ygrid.upload(Ygrid);
+     
+			image_jacobian_affine_ECC(gradientXWarped, gradientYWarped, Xgrid, Ygrid, jacobian);
+
+			// image_jacobian_affine has been switched to CUDA
+				// delete or upgrade others
+
+		/**	
         switch (motionType){
             case MOTION_AFFINE:
                 image_jacobian_affine_ECC(gradientXWarped, gradientYWarped, Xgrid, Ygrid, jacobian);
@@ -699,11 +709,15 @@ double modified_findTransformECC(InputArray templateImage,
                 image_jacobian_euclidean_ECC(gradientXWarped, gradientYWarped, Xgrid, Ygrid, map, jacobian);
                 break;
 				}
+				*/
 
         // calculate Hessian and its inverse
         project_onto_jacobian_ECC(jacobian, jacobian, hessian);
 
         hessianInv = hessian.inv();
+
+				GpuMat gpu_hessianInv;
+				gpu_hessianInv.upload(hessianInv);
 
         const double correlation = templateZM.dot(imageWarped);
 
@@ -718,10 +732,19 @@ double modified_findTransformECC(InputArray templateImage,
         project_onto_jacobian_ECC( jacobian, imageWarped, imageProjection);
         project_onto_jacobian_ECC(jacobian, templateZM, templateProjection);
 
+				gpu_imageProjection.upload(imageProjection);
+				
+				GpuMat gpu_imageProjectionHessian;
+
+				gpu_imageProjectionHessian(imageProjectionHessian);
 
         // calculate the parameter lambda to account for illumination variation
-        imageProjectionHessian = hessianInv*imageProjection;
-        const double lambda_n = (imgNorm*imgNorm) - imageProjection.dot(imageProjectionHessian);
+				// imageProjectionHessian = hessianInv*imageProjection;
+				cuda::multiply(gpu_hessianInv, gpu_imageProjection, gpu_imageProjectionHessian);
+				
+				gpu_imageProjectionHessian.download(imageProjectionHesian);
+				
+				const double lambda_n = (imgNorm*imgNorm) - imageProjection.dot(imageProjectionHessian);
         const double lambda_d = correlation - templateProjection.dot(imageProjectionHessian);
         if (lambda_d <= 0.0)
         {
