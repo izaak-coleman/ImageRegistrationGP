@@ -539,18 +539,9 @@ double modified_findTransformECC(InputArray templateImage,
 
     //gaussian filtering is optional
     src.convertTo(templateFloat, templateFloat.type());
-    //GaussianBlur(templateFloat, templateFloat, Size(5, 5), 0, 0);
+    GaussianBlur(templateFloat, templateFloat, Size(5, 5), 0, 0);
 
-		cuda::GpuMat gpu_templateFloat;
-		gpu_templateFloat.upload(templateFloat);
-
-		Ptr<Filter> tempGaussFilter = cuda::createGaussianFilter(gpu_templateFloat, gpu_templateFloat, Size(5,5), 0,0);
-
-		tempGaussFilter->apply(gpu_templateFloat, gpu_templateFloat);
-
-    gpu_templateFloat.download(templateFloat);
-		
-		Mat preMaskFloat;
+    Mat preMaskFloat;
     preMask.convertTo(preMaskFloat, CV_32F);
     GaussianBlur(preMaskFloat, preMaskFloat, Size(5, 5), 0, 0);
     
@@ -641,6 +632,8 @@ double modified_findTransformECC(InputArray templateImage,
 			
 			cuda::GpuMat gpu_templateZM;
 			// Create templateFloat matrix on the GPU
+			cuda::GpuMat gpu_templateFloat;
+
 			gpu_templateFloat.upload(templateFloat);
 			
 			// Initialize templateZM on the CPU
