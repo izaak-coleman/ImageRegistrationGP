@@ -323,32 +323,6 @@ static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat
 }
 
 
-/*
-static double cuda_dot(const cuda::GpuMat& src1, const cuda::GpuMat& src2){
-	double r = 0;
-
-	cuda::GpuMat dst;
-
-	// add cassert to avoid this if mat is already continuous
-	cuda::createContinuous(src1.rows, src1.cols, src1.type, src1);
-	cuda::createContinuous(src2.rows, src2.cols, src2.type, src2);
-
-	size_t len =    
-		
-	// scale length 
-	// 
-
-	cuda::multiply(src1,src2,dst);
-
-	// figure out where/how this adds
-	for(int i = 0; i < dst.rows; i++){
-			r += (float) dst[i];
-	}
-
-	return r;
-} 
-*/
-
 static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst)
 {
     /* this functions is used for two types of projections. If src1.cols ==src.cols
@@ -366,9 +340,11 @@ static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst
     int w;
 
     float* dstPtr = dst.ptr<float>(0);
-/**
-    cuda::GpuMat gpu_src1, gpu_src2, gpu_src3, gpu_dst;
 
+		cuda::GpuMat gpu_mat;
+		double norm;
+		/**
+    cuda::GpuMat gpu_src1, gpu_src2, gpu_src3, gpu_dst;
 		gpu_src1.upload(src1);
 		gpu_src2.upload(src2);
 		gpu_dst.upload(dst);
@@ -386,9 +362,12 @@ static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst
         w = src2.cols/dst.cols;
         Mat mat;
         for (int i=0; i<dst.rows; i++){
-
             mat = Mat(src1.colRange(i*w, (i+1)*w));
-            dstPtr[i*(dst.rows+1)] = (float) pow(norm(mat),2); //diagonal elements
+						//dstPtr[i*(dst.rows+1)] = (float) pow(norm(mat),2); //diagonal elements
+            gpu_mat.upload(mat);
+						norm = cuda::norm(gpu_mat, NORM_L2);
+						dstPtr[i*(dst.rows+1)] = (float) pow(norm,2); //diagonal elements
+						gpu_mat.download(mat);
 
             for (int j=i+1; j<dst.cols; j++){ //j starts from i+1
                 dstPtr[i*dst.cols+j] = (float) mat.dot(src2.colRange(j*w, (j+1)*w));
@@ -536,6 +515,7 @@ double modified_findTransformECC(InputArray templateImage,
     for (j=0; j<hs; j++)
         YcoPtr[j] = (float) j;
 
+		// cudamemcopy
     repeat(Xcoord, hs, 1, Xgrid);
     repeat(Ycoord, 1, ws, Ygrid);
 
@@ -551,16 +531,26 @@ double modified_findTransformECC(InputArray templateImage,
     Mat inputMaskMat = inputMask;
     //to use it for mask warping
     Mat preMask;
-    if(inputMask.empty())
+    
+		if(inputMask.empty())
         preMask = Mat::ones(hd, wd, CV_8U);
     else
         threshold(inputMask, preMask, 0, 1, THRESH_BINARY);
 
     //gaussian filtering is optional
     src.convertTo(templateFloat, templateFloat.type());
-    GaussianBlur(templateFloat, templateFloat, Size(5, 5), 0, 0);
+    //GaussianBlur(templateFloat, templateFloat, Size(5, 5), 0, 0);
 
-    Mat preMaskFloat;
+		cuda::GpuMat gpu_templateFloat;
+		gpu_templateFloat.upload(templateFloat);
+
+		Ptr<Filter> tempGaussFilter = cuda::createGaussianFilter(gpu_templateFloat, gpu_templateFloat, Size(5,5), 0,0);
+
+		tempGaussFilter->apply(gpu_templateFloat, gpu_templateFloat);
+
+    gpu_templateFloat.download(templateFloat);
+		
+		Mat preMaskFloat;
     preMask.convertTo(preMaskFloat, CV_32F);
     GaussianBlur(preMaskFloat, preMaskFloat, Size(5, 5), 0, 0);
     
@@ -651,8 +641,6 @@ double modified_findTransformECC(InputArray templateImage,
 			
 			cuda::GpuMat gpu_templateZM;
 			// Create templateFloat matrix on the GPU
-			cuda::GpuMat gpu_templateFloat;
-
 			gpu_templateFloat.upload(templateFloat);
 			
 			// Initialize templateZM on the CPU
@@ -671,7 +659,7 @@ double modified_findTransformECC(InputArray templateImage,
 			gpu_gradientYWarped.download(gradientYWarped);
 			gpu_imageFloat.download(imageFloat);
 			gpu_imageMask.download(imageMask);
-			gpu_imageFloat.download(imageWarped);
+			gpu_imageWarped.download(imageWarped);
 			gpu_preMask.download(preMask);
 			gpu_templateFloat.download(templateFloat);
 			gpu_templateZM.download(templateZM);
@@ -731,17 +719,17 @@ double modified_findTransformECC(InputArray templateImage,
 
 				cuda::GpuMat gpu_hessianInv, gpu_imageProjection, gpu_imageProjectionHessian;
 				
-				gpu_hessianInv.upload(hessianInv);
-				gpu_imageProjection.upload(imageProjection);
-				gpu_imageProjectionHessian.upload(imageProjectionHessian);
+				//gpu_hessianInv.upload(hessianInv);
+				//gpu_imageProjection.upload(imageProjection);
+			//	gpu_imageProjectionHessian.upload(imageProjectionHessian);
 
         // calculate the parameter lambda to account for illumination variation
 				imageProjectionHessian = hessianInv*imageProjection;
 				//cuda::gemm(gpu_hessianInv, gpu_imageProjection, gpu_imageProjectionHessian)
 
-				gpu_imageProjectionHessian.download(imageProjectionHessian);
-				gpu_imageProjection.download(imageProjection);
-				gpu_hessianInv.download(hessianInv);
+				//gpu_imageProjectionHessian.download(imageProjectionHessian);
+				//gpu_imageProjection.download(imageProjection);
+				//gpu_hessianInv.download(hessianInv);
 
 				const double lambda_n = (imgNorm*imgNorm) - imageProjection.dot(imageProjectionHessian);
         const double lambda_d = correlation - templateProjection.dot(imageProjectionHessian);
@@ -756,14 +744,21 @@ double modified_findTransformECC(InputArray templateImage,
 				const double lambda = (lambda_n/lambda_d);
 
         //estimate the update step delta_p
-				//cuda::GpuMat gpu_error, gpu_errorInterim;
-				//gpu_error.upload(error);
+				cuda::GpuMat gpu_error;
+				//	gpu_errorInterim;
 			
 				//cuda::multiply(gpu_templateZM, lambda, gpu_errorInterim);
-				//cuda::subtract(gpu_errorInterim, gpu_imageWarped, gpu_error);
 				
-				error = lambda*templateZM - imageWarped;
-				//gpu_error.download(error);
+				//error = lambda*templateZM - imageWarped;
+				error = lambda*templateZM;
+				
+				gpu_error.upload(error);
+				gpu_imageWarped.upload(imageWarped);
+				
+				cuda::subtract(gpu_error, gpu_imageWarped,gpu_error);
+				
+				gpu_imageWarped.download(imageWarped);
+				gpu_error.download(error);
 					
         project_onto_jacobian_ECC(jacobian, error, errorProjection);
         
@@ -771,11 +766,18 @@ double modified_findTransformECC(InputArray templateImage,
 			/**	
 				cuda::GpuMat gpu_errorProjection, gpu_deltaP;
 				gpu_errorProjection.upload(errorProjection);
-				
-				cuda::multiply(gpu_hessianInv, gpu_errorProjection, gpu_deltaP);
+				gpu_hessianInv.upload(hessianInv);
+				gpu_deltaP.upload(deltaP);		
+		
+				if(gpu_hessianInv.size() != gpu_errorProjection.size()){
+					std::cout << "HERE " ;
+				}
+
+
+				cuda::gemm(gpu_hessianInv, gpu_errorProjection,1, gpu_hessianInv, 0, gpu_deltaP);
 
 				gpu_errorProjection.download(errorProjection);
-
+				gpu_hessianInv.download(hessianInv);
 				gpu_deltaP.download(deltaP);
 */
         // update warping matrix
