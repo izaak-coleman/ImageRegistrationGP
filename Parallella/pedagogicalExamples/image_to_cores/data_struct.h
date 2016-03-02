@@ -61,7 +61,7 @@ typedef struct __attribute__((aligned(ALIGN8))) {
 typedef struct __attribute__((aligned(ALIGN8))) {
   //Mat whole_image = new Mat(Y_PIX,X_PIX,CV_8UC3); //CV_8UC3 -- 8-bit unsigned 3-channel
   //CHECK if that's enough for Mat, of if need to multiply by channels!
-  float whole_image[Y_PIX*3,X_PIX*3]; //check what the type should be!!!
+  int whole_image[Y_PIX*X_PIX]; //check what the type should be!!!
   //This might be enough, as we only want to use single-channel images (as
   //it makes no difference if we use rgb or grayscale for our purpose)
 } image_strt;

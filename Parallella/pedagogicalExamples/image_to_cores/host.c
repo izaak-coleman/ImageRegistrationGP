@@ -81,7 +81,17 @@ int main(int argc, char *argv[])
       return -1;
     }
 
-  image.copyTo(image_strt.whole_image); //copies "image" to "image_strt.whole_image"
+  //image.copyTo(image_strt.whole_image); //copies "image" to "image_strt.whole_image"
+
+
+  // Write image to shared memory
+  for(int i=0; i < image.rows; i++) {
+    for(int j=0; j < image.cols; j++) {
+      //msg.core_image[core];
+      //THIS IS NOT RIGHT _ NEED THE FULL MATRIX< SOMEHOW
+    }
+  }
+
 
 
   // ---- Connect to epiphany ----
@@ -103,7 +113,8 @@ int main(int argc, char *argv[])
   for (row = 0; row < ROWS; row++) {
     for (col = 0; col < COLS; col++)  {
       unsigned int core = row * COLS + col;
-      e_read(&emem, 0, 0, (off_t)((char *)&msg.all_text[core] - (char *)&msg), &msg.all_text[core], sizeof(text)); //reads data from external memory "emem" [using an offset to get the messages from different cores]
+      //e_read(&emem, 0, 0, (off_t)((char *)&msg.all_text[core] - (char *)&msg), &msg.all_text[core], sizeof(text)); //reads data from external memory "emem" [using an offset to get the messages from different cores]
+      e_read(&emem, 0, 0, (off_t)((char *)&msg.core_image[core] - (char *)&msg), &msg.core_image[core], sizeof(image_strt)); //reads data from external memory "emem" [using an offset to get the messages from different cores]
       printf(msg.all_text[core].string); //prints the message
     }
   }
