@@ -93,9 +93,9 @@ int main( int argc, char** argv ) {
   srcTri[2] = cv::Point2f( 0, src.rows - 1 ); // bottom left of image
 
   // Transforms of coordinates hardcoded - can adjust to change warp matrix
-  dstTri[0] = cv::Point2f( src.cols*0.0, src.rows*0.33 );
-  dstTri[1] = cv::Point2f( src.cols*0.85, src.rows*0.25 );
-  dstTri[2] = cv::Point2f( src.cols*0.15, src.rows*0.7 );
+  dstTri[0] = cv::Point2f( src.cols*0.0, src.rows*0.1 );
+  dstTri[1] = cv::Point2f( src.cols*0.85, src.rows*0.2 );
+  dstTri[2] = cv::Point2f( src.cols*0.15, src.rows*0.9 );
 
   // Get the Affine Transform from three pairs of corresponding points
   affine_mat = cv::getAffineTransform( srcTri, dstTri );
@@ -124,10 +124,10 @@ int main( int argc, char** argv ) {
   
   std::string filename = argv[1];
   filename = filename.substr(0, (filename.length()-4) ); // remove .extension
-  std::string translateFilename = filename + "_translate.jpg";
-  std::string rotateFilename = filename + "_rotate.jpg";
-  std::string scaleFilename = filename + "_scale.jpg";
-  std::string affineFilename = filename + "_affine.jpg";
+  std::string translateFilename = "lowdef_" + filename + "_translate.jpg";
+  std::string rotateFilename = "lowdef_" + filename + "_rotate.jpg";
+  std::string scaleFilename = "lowdef_" + filename + "_scale.jpg";
+  std::string affineFilename = "lowdef_" + filename + "_affine.jpg";
 
   cv::imwrite( translateFilename.c_str(), trans_dst );
   cv::imwrite( rotateFilename.c_str(), rotate_dst );

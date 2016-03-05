@@ -1,6 +1,6 @@
-#include "hello.hpp"
+#include "hello.h"
 
 void hello_world(std::ostream& stream)
 {
-    stream << "Hello, world!\n";
+    stream << "Hello, World!\n";
 }

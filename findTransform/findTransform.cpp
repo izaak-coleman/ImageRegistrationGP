@@ -7,8 +7,10 @@
 // as the template image, and also applies the transform to the input image
 
 #include <fstream>
+#include <ctime>
+#include <iostream>
 #include "opencv2/opencv.hpp"
- 
+
 static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType);
 
 int main( int argc, char** argv )
@@ -43,6 +45,10 @@ int main( int argc, char** argv )
   cv::TermCriteria criteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS,
 			number_of_iterations, termination_eps);
  
+
+  std::clock_t start;
+  start = std::clock();
+
   // Run find_transformECC to find the warp matrix
   double cc = cv::findTransformECC (
 				template_image,
@@ -51,6 +57,10 @@ int main( int argc, char** argv )
 				warp_mode,
 				criteria
 				);
+
+
+  std::cout << std::endl << "time taken = " << (std::clock() - start)/(double)CLOCKS_PER_SEC << std::endl;
+
  
   // Reserve a matrix to store the warped image
   cv::Mat warped_image = cv::Mat(template_image.rows, template_image.cols, CV_32FC1);
@@ -98,5 +108,4 @@ static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType)
     ret_value = 1;
   }
   return ret_value;
-
 }

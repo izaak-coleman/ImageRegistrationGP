@@ -7,6 +7,8 @@
 // as the template image, and also applies the transform to the input image
 
 #include <fstream>
+#include <iostream>
+#include <ctime>
 #include "opencv2/opencv.hpp"
  
 static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType);
@@ -19,7 +21,13 @@ int main( int argc, char** argv )
       std::cout << " Usage: findTransform <TemplateImage> <InputImage> <OutputWarp.cpp>" << std::endl;
       return -1;
     }
-  
+  //--------------------------------------------------------------
+  std::clock_t start;
+  double duration;
+
+  start = std::clock();
+  //-------------------------------------------------------------- 
+ 
   // Save file names provided on command line.
   const char* templateImageName = argv[1];
   const char* inputImageName = argv[2];
@@ -64,6 +72,70 @@ int main( int argc, char** argv )
   // (i.e. aligned to the template image)
   cv::warpAffine(highres_input, warped_image, warp_matrix, warped_image.size(), cv::INTER_LINEAR + cv::WARP_INVERSE_MAP);
  
+  //-------------------------------------------------------------- 
+  std::clock_t start;
+  double duration;
+
+  start = std::clock();
+  //-------------------------------------------------------------- 
+ 
+  // Save file names provided on command line.
+  const char* templateImageName = argv[1];
+  const char* inputImageName = argv[2];
+  const char* outputWarpMatrix = argv[3];
+  const char* highresTemplate = argv[4];
+  const char* highresInput = argv[5];
+
+  cv::Mat template_image, input_image;
+  cv::Mat highres_template, highres_input;
+
+  // Load template image and input image into CV matrices
+  template_image = cv::imread( templateImageName, 0 );
+  input_image = cv::imread( inputImageName , 0 );
+  highres_template = cv::imread( highresTemplate , 0 );
+  highres_input = cv::imread( highresInput , 0 );
+
+  // Define motion model
+  const int warp_mode = cv::MOTION_AFFINE;
+ 
+  // Set space for warp matrix.
+  cv::Mat warp_matrix = cv::Mat::eye(2, 3, CV_32F);
+ 
+  // Set the stopping criteria for the algorithm
+  int number_of_iterations = 3000;
+  double termination_eps = 1e-10;
+  cv::TermCriteria criteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS,
+			number_of_iterations, termination_eps);
+ 
+  // Run find_transformECC to find the warp matrix
+  double cc = cv::findTransformECC (
+				template_image,
+				input_image,
+				warp_matrix,
+				warp_mode,
+				criteria
+				);
+ 
+  // Reserve a matrix to store the warped image
+  cv::Mat warped_image = cv::Mat(highres_template.rows, highres_template.cols, CV_32FC1);
+
+  // Apply the warp matrix to the input image to produce a warped image 
+  // (i.e. aligned to the template image)
+  cv::warpAffine(highres_input, warped_image, warp_matrix, warped_image.size(), cv::INTER_LINEAR + cv::WARP_INVERSE_MAP);
+ 
+
+  //-------------------------------------------------------------- 
+  
+  duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+  
+  std::cout<<"printf: "<< duration <<'\n';
+
+  //-------------------------------------------------------------- 
+
+
+
+
+
   // Save values in the warp matrix to the filename provided on command-line
   saveWarp(outputWarpMatrix, warp_matrix, warp_mode);
 

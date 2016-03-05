@@ -1,0 +1,1 @@
+nvidia-smi --query-gpu=memory.used,clocks.current.memory,clocks.current.sm,clocks.current.graphics,memory.total,power.draw -l 1 --format=csv
