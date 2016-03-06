@@ -1,23 +1,4 @@
-//BASED ON:
-//http://opencvexamples.blogspot.com/2014/06/discrete-fourier-transform.html
-//http://docs.opencv.org/2.4/doc/tutorials/core/discrete_fourier_transform/discrete_fourier_transform.html
-
-//GPU based:
-//http://answers.opencv.org/question/11485/opencv-gpudft-distorted-image-after-inverse-transform/
-
-/*
-#include <opencv2/core/core.hpp>      // Basic OpenCV structures
-#include "opencv2/opencv.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include <iostream>
-
- 
-
-//#include <opencv2/gpu/gpu.hpp>        // GPU structures and methods
-
-#include <fstream>
-#include "opencv2/opencv.hpp"
-*/
+// Jukka Soikkeli, 6 March 2016 
 
 //#include <opencv2/core/core.hpp>      // Basic OpenCV structures
 #include "opencv2/opencv.hpp"
@@ -39,52 +20,73 @@
 using namespace std;
 using namespace cv;
  
-int main() {
-  // Read image from file
-  // Make sure that the image is in grayscale
-  //Mat img = imread("lenna.jpg",0);
-  Mat img = imread("lenna.jpg",CV_LOAD_IMAGE_GRAYSCALE);
-  
-  //-------------- CPU version ------------------------------ 
-  //Make space for complex components
-  //Mat planes[] = {Mat_<float>(img), Mat::zeros(img.size(), CV_32F)};
-  Mat planes[] = {Mat_<float>(img), Mat::zeros(img.size(), CV_32FC1)};
-  Mat complexI;    //Complex plane to contain the DFT coefficients {[0]-Real,[1]-Img}
-  merge(planes, 2, complexI);  //creates a two-channel complexI array from the planes
-  // Applying DFT (in place)
-  // dft(complexI, complexI);
-  
-  /* If want to view the fourier transform "image", add here things from 
-     http://docs.opencv.org/2.4/doc/tutorials/core/discrete_fourier_transform/discrete_fourier_transform.html
-     These seem to be unnecessary for the basic case
-  */
-  
+int main(int argc, char *argv[]) {
+ 
+  if(argc!=2) {
+    cout << "Incorrect number of arguments - one argument required for cpu/gpu choice." << endl;
+    cout << "Usage: ./fft_lpf cpu   OR   ./fft_lpf gpu" << endl;
+    return 1;
+  }
+  std:: string argv1 = argv[1];
+  if(argv1!="cpu" && argv1!="gpu") {
+    cout << "Incorrect command line argument (has to be 'cpu' or 'gpu')!" << endl;    
+    cout << "Usage: ./fft_lpf cpu   OR   ./fft_lpf gpu" << endl;
+    return 1;
+  }
 
-    //-------------- GPU version ------------------------------
+
+  //-------------- Preparation ------------------------------ 
+  // Read image from file, making sure that the image is in grayscale
+  Mat img = imread("lenna.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+
+  // Make space for complex components
+  Mat planes[] = {Mat_<float>(img), Mat::zeros(img.size(), CV_32F)}; //or CV_32FC1
+  Mat complexI;    //Complex plane to contain the DFT coefficients
+  merge(planes, 2, complexI);  //creates a two-channel complexI array from the planes
+
+
+  // ---- CPU version ----
+  if(argv1=="cpu") {
+    // Applying forward DFT (in place)
+    dft(complexI, complexI);
+    
+
+    // LPF GOES HERE
+    
+    
+    // Inverse DFT
+    Mat out, outimg; //make matrices
+    dft(complexI,out, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT); //getting inverse using dft function
+    out.convertTo(outimg, CV_8U);
+    imshow("Output", outimg);
+    imwrite( "out.jpg", outimg );
+  }
+
+
+  //-------------- GPU version ------------------------------
+  //////////////////////////////////////
+  // WORK IN PROGRESS - SOME BUG REMAINS
+  //////////////////////////////////////
+  if(argv1=="gpu") {
+    // --- Preparation ---
     cuda::GpuMat complexIgpu;
     cuda::GpuMat gpuimg;
     gpuimg.upload(img);  //converting image mat to gpu mat
     complexIgpu.upload(complexI);  //converting image mat to gpu mat
+
+    // Applying forward DFT
     //cuda::dft(gpuimg, complexIgpu, complexIgpu.size());  // Applying DFT, using complex
     cuda::dft(complexIgpu, complexIgpu, complexIgpu.size());  // Applying DFT, using complex
     //cuda::dft(complexIgpu, gpudst, complexIgpu.size());  // Applying DFT, using real images
 
 
-    //OWN VERSION
-  /*
-       //CPU
-       Mat out, outimg; //make matrices
-       dft(complexI,out, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT); //getting inverse using dft function
-       out.convertTo(outimg, CV_8U);
-       imshow("Output", outimg);
-       //imwrite( "out.jpg", outimg );
-       */
+    // LPF GOES HERE
 
-       //GPU
+
+    // Inverse DFT
     cuda::GpuMat gpuout;//, gpuoutimg;
     cuda::dft(complexIgpu,gpuout, complexIgpu.size(), DFT_INVERSE | DFT_REAL_OUTPUT | DFT_SCALE);
     //cuda::dft(complexIgpu,gpuout, complexIgpu.size(), DFT_INVERSE);
-
 
     Mat out(gpuout);
     Mat outimg;
@@ -99,22 +101,27 @@ int main() {
     imwrite( "outgpu.jpg", outimg );
 
 
-    /* ODD RESULT - probalbly due to the complex-complex - complex-real thing...
-       debug using:
+    /* ODD RESULT - probalbly due to the complex-complex - complex-real setting of the DFT functions...
+       to be debugged, with the help of:
        http://answers.opencv.org/question/11485/opencv-gpudft-distorted-image-after-inverse-transform/
        http://docs.opencv.org/2.4/modules/gpu/doc/image_processing.html#gpu-dft
     */
     
-    //show the image
-    imshow("Original Image", img);
+  }
+
+
+  // Show the image
+  imshow("Original Image", img);
   
-    // Wait until user press some key
-    waitKey(0);
-    return 0;
+  // Wait until user presses a key before exiting
+  waitKey(0); // use while images shown, take out if only image saving is required
+  return 0;
 }
 
 
-//fft2
+// Helpful websites:
+//http://opencvexamples.blogspot.com/2014/06/discrete-fourier-transform.html
+//http://docs.opencv.org/2.4/doc/tutorials/core/discrete_fourier_transform/discrete_fourier_transform.html
 
-
-//ifft2
+//GPU based:
+//http://answers.opencv.org/question/11485/opencv-gpudft-distorted-image-after-inverse-transform/
