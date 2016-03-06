@@ -1,0 +1,40 @@
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+100.14      0.01     0.01  1188293     0.00     0.00  cv::Mat::release()
+  0.00      0.01     0.00   192092     0.00     0.00  cv::MatStep::operator[](int)
+  0.00      0.01     0.00   192092     0.00     0.00  cv::MatStep::operator[](int) const
+  0.00      0.01     0.00   162042     0.00     0.00  cv::Mat::~Mat()
+  0.00      0.01     0.00        9     0.00     0.00  cv::_InputArray::init(int, void const*)
+  0.00      0.01     0.00        7     0.00     0.00  cv::_InputArray::~_InputArray()
+  0.00      0.01     0.00        6     0.00     0.00  cv::Size_<int>::Size_()
+  0.00      0.01     0.00        4     0.00     0.00  cv::_InputArray::_InputArray(cv::Mat const&)
+  0.00      0.01     0.00        4     0.00     0.00  cv::MatSize::MatSize(int*)
+  0.00      0.01     0.00        4     0.00     0.00  cv::MatStep::MatStep()
+  0.00      0.01     0.00        3     0.00     0.00  cv::_OutputArray::~_OutputArray()
+  0.00      0.01     0.00        3     0.00     0.00  cv::Mat::Mat()
+  0.00      0.01     0.00        2     0.00     0.00  cv::_InputArray::_InputArray()
+  0.00      0.01     0.00        2     0.00     0.40  cv::Mat::operator=(cv::Mat const&)
+  0.00      0.01     0.00        2     0.00     0.00  cv::String::String(char const*)
+  0.00      0.01     0.00        2     0.00     0.00  cv::String::~String()
+  0.00      0.01     0.00        1     0.00     0.00  _GLOBAL__sub_I_main
+  0.00      0.01     0.00        1     0.00     0.00  __static_initialization_and_destruction_0(int, int)
+  0.00      0.01     0.00        1     0.00     0.00  saveWarp(std::string, cv::Mat const&, int)
+  0.00      0.01     0.00        1     0.00     0.00  cv::TermCriteria::TermCriteria(int, int, double)
+  0.00      0.01     0.00        1     0.00     0.00  cv::_OutputArray::_OutputArray()
+  0.00      0.01     0.00        1     0.00     0.00  cv::_OutputArray::_OutputArray(cv::Mat&)
+  0.00      0.01     0.00        1     0.00     0.00  cv::_InputOutputArray::_InputOutputArray(cv::Mat&)
+  0.00      0.01     0.00        1     0.00     0.00  cv::_InputOutputArray::~_InputOutputArray()
+  0.00      0.01     0.00        1     0.00     0.00  cv::Mat::create(int, int, int)
+  0.00      0.01     0.00        1     0.00     0.00  cv::Mat::Mat(int, int, int)
+  0.00      0.01     0.00        1     0.00     0.00  cv::Vec<double, 4>::Vec()
+  0.00      0.01     0.00        1     0.00     0.00  cv::Matx<double, 4, 1>::Matx()
+  0.00      0.01     0.00        1     0.00     0.00  cv::Size_<int>::Size_(int, int)
+  0.00      0.01     0.00        1     0.00     9.20  cv::MatExpr::~MatExpr()
+  0.00      0.01     0.00        1     0.00     0.00  cv::Scalar_<double>::Scalar_()
+  0.00      0.01     0.00        1     0.00     0.00  float const* cv::Mat::ptr<float>(int) const
+  0.00      0.01     0.00        1     0.00     0.00  cv::Mat::type() const
+  0.00      0.01     0.00        1     0.00     0.00  cv::MatExpr::operator cv::Mat() const
+  0.00      0.01     0.00        1     0.00     0.00  cv::MatSize::operator()() const
+  0.00      0.01     0.00        1     0.00     0.00  std::operator|(std::_Ios_Openmode, std::_Ios_Openmode)
+

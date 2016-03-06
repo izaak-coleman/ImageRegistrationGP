@@ -1,6 +1,6 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/included/unit_test.hpp>
-#include "hello.hpp"
+#include "hello.h"
 #include <sstream>
 
 BOOST_AUTO_TEST_CASE(hello_world_inserts_text)

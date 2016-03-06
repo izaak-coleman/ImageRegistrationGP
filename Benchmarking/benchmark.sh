@@ -5,7 +5,7 @@ alg_time_t=0.0
 TIMEFORMAT=%R  # Time format of unix time used: %R "real time" (not CPU time)
 
 # Variables to be changed as needed
-process=./sorting   # the process to be timed
+process=./sorting  # the process to be timed
 N=100               # number of runs the time is averaged over
 
 # Executing process "./sorting" in a loop, to calculate average execution time
