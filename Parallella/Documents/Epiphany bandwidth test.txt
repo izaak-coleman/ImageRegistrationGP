@@ -1,0 +1,14 @@
+Results from running the bandwidth test on Epiphany, run on 24/2/2016
+--------------------------------------------------------------------------
+ARM Host	--> eCore(0,0) write speed 	=	13.78 MB/s
+ARM Host	--> eCore(0,0) read speed 	=	6.62 MB/s
+ARM Host	--> ERAM write speed 		=	75.76 MB/s
+ARM Host	<-- ERAM read speed 		=	103.02 MB/s
+ARM Host	<-> DRAM: Copy speed 		=	195.55 MB/s
+eCore(0,0)	--> eCore(1,0) write speed(DMA)	=	1280.04 MB/s
+eCore(0,0)	<-- eCore(1,0) read speed(DMA)	=	390.01 MB/s
+eCore(0,0)	--> ERAM write speed (DMA)	=	241.54 MB/s
+eCore(0,0)	<-- ERAM read speed (DMA)	=	87.60 MB/s
+
+(These are from the "e-bandwidth-test.log" file created by the bandwidth
+test program on Parallella at "~/Work/epiphany-examples/apps/e-bandwidth-test")
