@@ -300,16 +300,11 @@ static void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const
     CV_Assert (map_matrix.type() == CV_32FC1);
     CV_Assert (update.type() == CV_32FC1);
 
-    CV_Assert (motionType == MOTION_TRANSLATION || motionType == MOTION_EUCLIDEAN ||
-        motionType == MOTION_AFFINE || motionType == MOTION_HOMOGRAPHY);
+    CV_Assert (motionType == MOTION_TRANSLATION || motionType == MOTION_AFFINE);
 
-    if (motionType == MOTION_HOMOGRAPHY)
-        CV_Assert (map_matrix.rows == 3 && update.rows == 8);
-    else if (motionType == MOTION_AFFINE)
+    if (motionType == MOTION_AFFINE)
         CV_Assert(map_matrix.rows == 2 && update.rows == 6);
-    else if (motionType == MOTION_EUCLIDEAN)
-        CV_Assert (map_matrix.rows == 2 && update.rows == 3);
-    else
+    else // motionType == MOTION_TRANSLATION
         CV_Assert (map_matrix.rows == 2 && update.rows == 2);
 
     CV_Assert (update.cols == 1);
@@ -326,7 +321,7 @@ static void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const
         mapPtr[2] += updatePtr[0];
         mapPtr[5] += updatePtr[1];
     }
-    if (motionType == MOTION_AFFINE) {
+    else if (motionType == MOTION_AFFINE) {
         mapPtr[0] += updatePtr[0];
         mapPtr[3] += updatePtr[1];
         mapPtr[1] += updatePtr[2];
@@ -334,26 +329,6 @@ static void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const
         mapPtr[2] += updatePtr[4];
         mapPtr[5] += updatePtr[5];
     }
-    if (motionType == MOTION_HOMOGRAPHY) {
-        mapPtr[0] += updatePtr[0];
-        mapPtr[3] += updatePtr[1];
-        mapPtr[6] += updatePtr[2];
-        mapPtr[1] += updatePtr[3];
-        mapPtr[4] += updatePtr[4];
-        mapPtr[7] += updatePtr[5];
-        mapPtr[2] += updatePtr[6];
-        mapPtr[5] += updatePtr[7];
-    }
-    if (motionType == MOTION_EUCLIDEAN) {
-        double new_theta = updatePtr[0];
-        new_theta += asin(mapPtr[3]);
-
-        mapPtr[2] += updatePtr[1];
-        mapPtr[5] += updatePtr[2];
-        mapPtr[0] = mapPtr[4] = (float) cos(new_theta);
-        mapPtr[3] = (float) sin(new_theta);
-        mapPtr[1] = -mapPtr[3];
-		}
 }
 
 
@@ -388,23 +363,16 @@ double modified_findTransformECC(InputArray templateImage,
     CV_Assert (map.rows == 2 || map.rows ==3);
 
 
-    CV_Assert (motionType == MOTION_AFFINE || motionType == MOTION_HOMOGRAPHY ||
-        motionType == MOTION_EUCLIDEAN || motionType == MOTION_TRANSLATION);
+    CV_Assert (motionType == MOTION_AFFINE || motionType == MOTION_TRANSLATION);
 
     CV_Assert (criteria.type & TermCriteria::COUNT || criteria.type & TermCriteria::EPS);
     const int    numberOfIterations = (criteria.type & TermCriteria::COUNT) ? criteria.maxCount : 200;
     const double termination_eps    = (criteria.type & TermCriteria::EPS)   ? criteria.epsilon  :  -1;
 
     int paramTemp = 6;//default: affine
-    switch (motionType){
-      case MOTION_TRANSLATION:
-          paramTemp = 2;
-          break;
-      case MOTION_EUCLIDEAN:
-          paramTemp = 3;
-          break;
-    }
-
+		if (motionType == MOTION_TRANSLATION) {
+			paramTemp = 2;
+		}
     const int numberOfParameters = paramTemp;
 
     const int ws = src.cols;
@@ -572,9 +540,6 @@ double modified_findTransformECC(InputArray templateImage,
                 break;
             case MOTION_TRANSLATION:
                 image_jacobian_translation_ECC(gradientXWarped, gradientYWarped, jacobian);
-                break;
-            case MOTION_EUCLIDEAN:
-                image_jacobian_euclidean_ECC(gradientXWarped, gradientYWarped, Xgrid, Ygrid, map, jacobian);
                 break;
 				}
 
