@@ -8,6 +8,7 @@
 
 #include <fstream>
 #include "opencv2/opencv.hpp"
+#include <ctime> // speed testing with ctime
 
 //cuda include files
 #include "opencv2/cudacodec.hpp"
@@ -25,14 +26,16 @@ using namespace cv;
 
 static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType);
 
-static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
-                                      const Mat& src3, const Mat& src4,
-                                      Mat& gpu_dst);
+static void image_jacobian_affine_ECC(const cuda::GpuMat& gpu_src1, 
+																			const cuda::GpuMat& gpu_src2,
+                                      const cuda::GpuMat& gpu_src3, 
+																			const cuda::GpuMat& gpu_src4,
+                                      Mat& dst);
 
 
 static void image_jacobian_euclidean_ECC(const Mat& src1, const Mat& src2,
                                          const Mat& src3, const Mat& src4,
-					       const Mat& src5, Mat& dst);
+					       												 const Mat& src5, Mat& dst);
 
 
 static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat& dst);
@@ -52,15 +55,16 @@ double modified_findTransformECC(InputArray templateImage,
 				 );
 
 
-//--------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
-int main( int argc, char** argv )
+int main(int argc, char** argv)
 {
   // Check correct number of command line arguments
-  if( argc != 4)
+  if (argc != 4)
     {
-      std::cout << " Usage: findTransform <TemplateImage> <InputImage> <OutputWarp.cpp>" << std::endl;
+      std::cout << " Usage: findTransform <TemplateImage>" << 
+			" <InputImage> <OutputWarp.cpp>" << std::endl;
       return -1;
     }
   
@@ -76,7 +80,7 @@ int main( int argc, char** argv )
   input_image = cv::imread( inputImageName , 0 );
   
   // Define motion model
-  const int warp_mode = cv::MOTION_EUCLIDEAN;
+  const int warp_mode = cv::MOTION_AFFINE;
  
   // Set space for warp matrix.
   cv::Mat warp_matrix = cv::Mat::eye(2, 3, CV_32F);
@@ -90,6 +94,8 @@ int main( int argc, char** argv )
   Mat inputMask;
  
   // Run find_transformECC to find the warp matrix
+	std::clock_t function;
+	function = std::clock();
   double cc = modified_findTransformECC (
 					 template_image,
 					 input_image,
@@ -97,18 +103,23 @@ int main( int argc, char** argv )
 					 warp_mode,
 					 criteria,
 					 inputMask);
+
+	std::cout << std::endl << "Time taken ecc " << (std::clock() - function)/(double) CLOCKS_PER_SEC << std::endl;
  
   // Reserve a matrix to store the warped image
   cv::Mat warped_image = cv::Mat(template_image.rows, template_image.cols, CV_32FC1);
 
   // Apply the warp matrix to the input image to produce a warped image 
   // (i.e. aligned to the template image)
-  cv::warpAffine(input_image, warped_image, warp_matrix, warped_image.size(), cv::INTER_LINEAR + cv::WARP_INVERSE_MAP);
+  cv::warpAffine(input_image, warped_image, warp_matrix, 
+			warped_image.size(), cv::INTER_LINEAR + cv::WARP_INVERSE_MAP);
  
   // Save values in the warp matrix to the filename provided on command-line
   saveWarp(outputWarpMatrix, warp_matrix, warp_mode);
 
-  std::cout << "Enhanced correlation coefficient between the template image and the final warped input image = " << cc << std::endl; 
+  std::cout << "Enhanced correlation coefficient" << 
+			" between the template image and the final" << 
+			" warped input image = " << cc << std::endl; 
 
   // Show final output
   cv::namedWindow( "Warped Image", CV_WINDOW_AUTOSIZE );
@@ -148,8 +159,8 @@ static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType)
 }
 
 
-//--------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 static void image_jacobian_euclidean_ECC(const Mat& src1, const Mat& src2,
                                          const Mat& src3, const Mat& src4,
@@ -205,29 +216,27 @@ static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat
 
 
 
-static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
-                                      const Mat& src3, const Mat& src4,
+static void image_jacobian_affine_ECC(const cuda::GpuMat& gpu_src1, 
+																			const cuda::GpuMat& gpu_src2,
+                                      const cuda::GpuMat& gpu_src3, 
+																			const cuda::GpuMat& gpu_src4,
 																			Mat& dst)
 {
 
-    CV_Assert(src1.size() == src2.size());
-    CV_Assert(src1.size() == src3.size());
-    CV_Assert(src1.size() == src4.size());
+    CV_Assert(gpu_src1.size() == gpu_src2.size());
+    CV_Assert(gpu_src1.size() == gpu_src3.size());
+    CV_Assert(gpu_src1.size() == gpu_src4.size());
 
-    CV_Assert(src1.rows == dst.rows);
-    CV_Assert(dst.cols == (6*src1.cols));
+    CV_Assert(gpu_src1.rows == dst.rows);
+    CV_Assert(dst.cols == (6*gpu_src1.cols));
 
     CV_Assert(dst.type() == CV_32FC1);
 
-		cuda::GpuMat gpu_src1, gpu_src2, gpu_src3, gpu_src4, gpu_dst;
+		cuda::GpuMat gpu_dst;
 
-		gpu_src1.upload(src1);
-		gpu_src2.upload(src2);
-		gpu_src3.upload(src3);
-		gpu_src4.upload(src4);
 		gpu_dst.upload(dst);
 
-    const int w = src1.cols;
+    const int w = gpu_src1.cols;
 
     //compute Jacobian blocks (6 blocks)
 		
@@ -239,10 +248,6 @@ static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
 		gpu_src1.copyTo(gpu_dst.colRange(4*w,5*w));
 		gpu_src2.copyTo(gpu_dst.colRange(5*w,6*w));
 
-		gpu_src1.download(src1);
-		gpu_src2.download(src2);
-		gpu_src3.download(src3);
-		gpu_src4.download(src4);
 		gpu_dst.download(dst);
 }
 
@@ -280,7 +285,7 @@ static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst
         w = src2.cols/dst.cols;
         Mat mat;
         for (int i=0; i<dst.rows; i++){
-            mat = Mat(src1.colRange(i*w, (i+1)*w));
+            mat = Mat(src1.colRange(i*w, (i+1)*w));  // gpu has colrange
             gpu_mat.upload(mat);
 						norm = cuda::norm(gpu_mat, NORM_L2);
 						dstPtr[i*(dst.rows+1)] = (float) pow(norm,2); //diagonal elements
@@ -393,8 +398,12 @@ double modified_findTransformECC(InputArray templateImage,
     for (j=0; j<hs; j++)
         YcoPtr[j] = (float) j;
 
+		// move X/Ygrid to the gpu for the entire registration
     repeat(Xcoord, hs, 1, Xgrid);
     repeat(Ycoord, 1, ws, Ygrid);
+		cuda::GpuMat gpu_Xgrid, gpu_Ygrid;
+		gpu_Xgrid.upload(Xgrid);
+		gpu_Ygrid.upload(Ygrid);
 
     Xcoord.release();
     Ycoord.release();
@@ -520,8 +529,6 @@ double modified_findTransformECC(InputArray templateImage,
 		
 			gpu_gradientX.download(gradientX);
 			gpu_gradientY.download(gradientY);
-			gpu_gradientXWarped.download(gradientXWarped);
-			gpu_gradientYWarped.download(gradientYWarped);
 			gpu_imageFloat.download(imageFloat);
 			gpu_imageMask.download(imageMask);
 			gpu_imageWarped.download(imageWarped);
@@ -536,9 +543,18 @@ double modified_findTransformECC(InputArray templateImage,
 				// delete or upgrade others 
         switch (motionType){
             case MOTION_AFFINE:
-                image_jacobian_affine_ECC(gradientXWarped, gradientYWarped, Xgrid, Ygrid, jacobian);
+								// need to compute on gpu then download to cpu
+                image_jacobian_affine_ECC(gpu_gradientXWarped, 
+									gpu_gradientYWarped, gpu_Xgrid, gpu_Ygrid, jacobian);
+								gpu_gradientXWarped.download(gradientXWarped);
+								gpu_gradientYWarped.download(gradientYWarped);
                 break;
+
             case MOTION_TRANSLATION:
+								// cpu based function, so need to download BEFORE, 
+								// to ensure cpu Mats are up to date
+								gpu_gradientXWarped.download(gradientXWarped);
+								gpu_gradientYWarped.download(gradientYWarped);
                 image_jacobian_translation_ECC(gradientXWarped, gradientYWarped, jacobian);
                 break;
 				}
