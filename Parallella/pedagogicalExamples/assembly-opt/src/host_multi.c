@@ -75,25 +75,31 @@ int main(int argc, char *argv[])
 
     row = 0;
     col = 0;
-    coreid = (row + platform.row) * 64 + col + platform.col;
+    //    coreid = (row + platform.row) * 64 + col + platform.col;
+    coreid = (row + platform.row) * 16 + col + platform.col;
     fprintf(stderr,"\n\nMultiplying A[%d][%d] x B[%d][%d] = C[%d][%d]\n",_Smtx,_Smtx,_Smtx,_Smtx,_Smtx,_Smtx);
     fprintf(stderr, "\nGroup rows: %d Group_cols: %d. Starting row: %d col : %d\n",group_rows_num,group_cols_num,row,col);
 
     // Open the single-core workgroup and reset the core, in
     // case a previous process is running. Note that we used
     // core coordinates relative to the workgroup.
+    /*
     e_open(&dev, row, col, group_rows_num, group_cols_num);
     for ( i=0 ; i < group_rows_num; i++ ) {     
         for ( j=0 ; j < group_cols_num ; j++ ) {
-            e_reset_core(&dev, i, j);       
+	  e_reset_core(&dev, i, j);       
         }                                   
     }                                       
+    */
+    //e_reset_core was REPLACED BY THE FOLLOWING IN NEW SDK
+    e_reset_group(&dev);       
 
 
     // Load the device program onto the selected eCore
     // and launch after loading.
-
+    fprintf(stderr,"Printtaa nyt perkele!\n");
     int load_err=e_load_group("matmul_multi.srec", &dev, 0, 0, group_rows_num, group_cols_num, E_FALSE);
+    fprintf(stderr,"Printtaa taas perkele!\n");
     char load_result[5];
     if (load_err == E_OK) strcpy(load_result,"E_OK");
     if (load_err == E_ERR) strcpy(load_result,"E_ERR");
@@ -165,13 +171,13 @@ int main(int argc, char *argv[])
     tdiff = (timer[1].tv_sec - timer[0].tv_sec) * 1000 + ((double) (timer[1].tv_usec - timer[0].tv_usec) / 1000.0);
 
 
-    //printf("Optimized MATMUL time: %d cycles\tTime: %9.9f msec\n", mailbox.output.clocks,clock_to_time(mailbox.output.clocks)); 
+    printf("Optimized MATMUL time: %d cycles\tTime: %9.9f msec\n", mailbox.output.clocks,clock_to_time(mailbox.output.clocks)); 
 
-    //printf("Optimized MATMUL Exec time: %d cycles\tTime: %9.9f msec\n", mailbox.output.dummy1,clock_to_time(mailbox.output.dummy1)); 
+    printf("Optimized MATMUL Exec time: %d cycles\tTime: %9.9f msec\n", mailbox.output.dummy1,clock_to_time(mailbox.output.dummy1)); 
 
-    //printf("Optimized MATMUL Shared memory Comms time: %d cycles\tTime: %9.9f msec\n", (mailbox.output.clocks-mailbox.output.dummy1),clock_to_time(mailbox.output.clocks-mailbox.output.dummy1)); 
+    printf("Optimized MATMUL Shared memory Comms time: %d cycles\tTime: %9.9f msec\n", (mailbox.output.clocks-mailbox.output.dummy1),clock_to_time(mailbox.output.clocks-mailbox.output.dummy1)); 
     //
-    //printf("\nTime from host: %9.6f msec\n",tdiff);
+    printf("\nTime from host: %9.6f msec\n",tdiff);
     float gflops = ((2.0 * _Smtx * _Smtx * _Smtx)/(clock_to_time(mailbox.output.clocks)/1000))/1000/1000/1000;
 
     float gflops2 = ((2.0 * _Smtx * _Smtx * _Smtx)/(clock_to_time(mailbox.output.dummy1)/1000))/1000/1000/1000;
