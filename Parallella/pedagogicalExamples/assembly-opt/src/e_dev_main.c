@@ -39,10 +39,16 @@ int main(void) {
 	//// Who am I? Query the CoreID from hardware.
 	//coreid = e_get_coreid();
 
+	e_coreid_t coreid;
+
+	//// Who am I? Query the CoreID from hardware.
+	coreid = e_get_coreid();
+
     mailbox.result = matmul_main(&mailbox);
     
     mailbox.flag = 1;
     mailbox.coreid = 0x808;
     //mailbox.coreid = coreid;
+    mailbox.coreid = coreid;
 	return EXIT_SUCCESS;
 }

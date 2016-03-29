@@ -9,9 +9,11 @@
 
 
 #define _Nchips 1                  // # of chips in operand matrix side
-#define _Nside  8                  // # of cores in chip side
+//#define _Nside  8                  // # of cores in chip side
+#define _Nside  4                  // # of cores in chip side
 #define _Ncores (_Nside * _Nside)  // Num of cores = 64
-#define _Score  32                 // side size of per-core sub-submatrix (max 32)
+//#define _Score  32                 // side size of per-core sub-submatrix (max 32)
+#define _Score  4                 // side size of per-core sub-submatrix (max 32)
 #define _Schip  (_Score * _Nside)  // side size of per-chip submatrix
 #define _Smtx   (_Schip * _Nchips) // side size of operand matrix
 
