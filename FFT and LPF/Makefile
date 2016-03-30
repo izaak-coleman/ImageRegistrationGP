@@ -1,5 +1,7 @@
-OBJ=fft_lpf.o
-EXE=fft_lpf
+#OBJ=fft_lpf.o
+#EXE=fft_lpf
+OBJ=lpf_only.o
+EXE=lpf_only
 CXX=g++
 COMPFLAGS=-Wall -ggdb -MMD -I/vol/bitbucket/ic711/usr/local/include -L/vol/bitbucket/ic711/usr/local/lib
 LIBS=`pkg-config --libs opencv --cflags opencv`

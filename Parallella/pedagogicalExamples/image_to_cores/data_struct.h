@@ -33,12 +33,125 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include <opencv2/highgui/highgui.hpp>
 #include <stdint.h>
 
-#define CORES 16
+//#define CORES 16    //replaced by _Ncores below
 #define ALIGN8 8
 // SCALE: 1, 2, or 4
 #define SCALE 2
 #define X_PIX 150  //columns -- CHECK if that's enough for Mat, of if need to multiply by channels!
 #define Y_PIX 150  //rows
+
+
+// ============= NEW PARTS (30 March) ================ //
+
+
+
+#ifndef __FFT2D_H__
+#define __FFT2D_H__
+
+#include <stdint.h>
+#include "fft2dlib.h"
+#ifndef __HOST__
+#include <e_coreid.h>
+#endif // __HOST__
+
+#define _Nchips 1                  // # of chips in operand matrix side
+#define _Nside  4                  // # of cores in chip side
+#define _Ncores (_Nside * _Nside)  // Num of cores = 16
+
+/*
+#ifndef _lgSfft
+#define _lgSfft 7                  // Log2 of size of 1D-FFT
+#endif
+#define _Sfft   (1<<_lgSfft)       // Size of 1D-FFT
+#define _Score  (_Sfft / _Ncores)  // Num of 1D vectors per-core
+#define _Schip  (_Score * _Ncores) // Num of 1D vectors per-chip
+#define _Smtx   (_Schip * _Sfft)   // Num of elements in 2D array
+*/
+
+
+#define _Nbanks 2                  // Num of SRAM banks on core
+
+#define _BankA  0
+#define _BankW  1
+#define _BankB  2
+#define _BankP  3
+#define _PING   0
+#define _PONG   1
+
+
+//UNLIKELY TO BE CRUCIAL
+#ifdef __Debug__
+#define dstate(x) { me.mystate = (x); }
+#else
+#define dstate(x)
+#endif
+
+#define TIMERS 10
+
+
+//UNLIKELY TO BE USEFUL - FFT related
+#if 0
+#if _lgSfft == 5
+#	warning "LgFFt = 5"
+#elif _lgSfft == 6
+#	warning "LgFFt = 6"
+#elif _lgSfft == 7
+#	warning "LgFFt = 7"
+#endif
+#endif
+
+
+
+
+
+
+//  CORE
+typedef struct {
+	int        corenum;
+	int        row;
+	int        col;
+
+	int        mystate;
+
+	int volatile     go_sync;           // The "go" signal from prev core
+        int volatile     sync[_Ncores];     // Sync with peer cores      //DO WE NEED THIS?
+	int volatile    *tgt_go_sync;       // ptr to go_sync of next core  //DO WE NEED THIS?
+	int volatile    *tgt_sync[_Ncores]; // ptr to sync of target neighbor //DO WE NEED THIS?
+
+	cfloat volatile *bank[_Nbanks][2];            // Ping Pong Bank local space pointer  //DO WE NEED THIS?
+	cfloat volatile *tgt_bk[_Ncores][_Nbanks][2]; // Target Bank for matrix rotate in global space //DO WE NEED THIS?
+
+        //uint32_t time_p[TIMERS]; // Timers    //LIKELY NOT NECESSARY
+} core_t;
+
+
+// "ready" and "go" flags for each core
+typedef struct {
+	volatile int64_t  go;     // Signal to start functions (image processing) in the core
+	volatile int      ready;  // Core is ready after reset
+} mbox_t;
+
+
+typedef struct {
+	volatile cfloat A[_Smtx]; // Global A matrix
+	volatile cfloat B[_Smtx]; // Global B matrix
+	volatile mbox_t core;
+} shared_buf_t;
+
+
+typedef struct {
+	void            *pBase; // ptr to base of shared buffers
+	volatile cfloat *pA;    // ptr to global A matrix
+	volatile cfloat *pB;    // ptr to global B matrix
+	mbox_t          *pCore; // ptr to cores mailbox
+} shared_buf_ptr_t;
+
+
+
+
+
+
+// =============== OLD PARTS ========================== //
 
 typedef struct __attribute__((aligned(ALIGN8)))
 {

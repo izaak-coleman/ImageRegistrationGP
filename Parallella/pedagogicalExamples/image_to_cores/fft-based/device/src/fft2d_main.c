@@ -1,6 +1,7 @@
 /*
   fft2d_unit.c
 
+  Copyright (C) 2016 Jukka Soikkeli and Chris Smallwood
   Copyright (C) 2012 Adapteva, Inc.
   Contributed by Yainv Sapir <yaniv@adapteva.com>
 
@@ -49,8 +50,8 @@ int main(int argc, char *argv[])
 
 	status = 0;
 
-	// Initialize data structures - mainly target pointers
-	dstate(1);
+	// Initialize data structures - mainly target pointers 
+	dstate(1);  //CHECK
 	init();
 	dstate(2);
 
@@ -62,7 +63,7 @@ int main(int argc, char *argv[])
 			// edge is detected in the mailbox, the loop
 			// is terminated and a call to the actual
 			// FFT() function is initiated.
-			while (Mailbox.pCore->go == 0) {};
+		        while (Mailbox.pCore->go == 0) {};  //busy waiting loop for host to signal "go"
 
 			e_ctimer_set(E_CTIMER_0, E_CTIMER_MAX);
 			me.time_p[0] = e_ctimer_start(E_CTIMER_0, E_CTIMER_CLK);
@@ -93,6 +94,12 @@ int main(int argc, char *argv[])
 #	endif // _USE_DMA_E_
 #endif // _USE_DRAM_
 
+		// ======= OUR CALCULATIONS ========== //
+		me.calc();  // function for calculations
+
+
+		/*
+		//OLD "CALCULATE" parts
 		dstate(5);
 		
 		// Calculate. During this time, the host polls the
@@ -109,6 +116,7 @@ int main(int argc, char *argv[])
 
 		me.time_p[8] = e_ctimer_get(E_CTIMER_0);
 		dstate(6);
+		*/
 
 		// Save _Score rows to DRAM.
 #ifdef _USE_DRAM_
@@ -154,6 +162,110 @@ int main(int argc, char *argv[])
 	return status;
 }
 
+
+
+
+void calc() {
+  	int i0, i1, j, l, l1, l2, N, Wc;
+	cfloat t;
+	cfloat *X;
+	cfloat *W;
+
+	volatile cfloat * restrict _X = (me.bank[_BankA][_PING] + row * _Sfft);
+	volatile cfloat * restrict _W = me.bank[_BankW][_PING]+Wn_offset;
+
+	X = __builtin_assume_aligned((void *) _X, 8);
+	W = __builtin_assume_aligned((void *) _W, 8);
+
+	// Calculate the number of points
+	N = 1 << lgN;
+
+
+
+	// Compute the FFT - stage #1
+	// W[Wc] of first stage is always 1+0i -> avoid multiply
+	for (i0=0; i0<N; i0+=2)
+	{
+		i1 = i0 + 1;
+
+		t = X[i1];
+		X[i1] = X[i0] - t;
+		X[i0] = X[i0] + t;
+	}
+
+	/*
+	// Compute the FFT - stage #2 to #(lgN-1)
+	// N = 32 -> lgN = 5 -> l = 1,2,3 -> l2@i0 = 4,8,16 -> l1@j =  2,4,8
+	wstride = wstride >> 1;
+	l2 = 2;
+	for (l=1; l<(lgN-1); l++)
+	{
+		// per stage, do
+		l1 = l2;
+		l2 <<= 1;
+
+		wstride = wstride >> 1;
+
+		// First W[Wc] in a group is always 1+0i -> avoid multiply
+		for (i0=0; i0<N; i0+=l2)
+		{
+			i1 = i0 + l1;
+
+			t = X[i1];
+			X[i1] = X[i0] - t;
+			X[i0] = X[i0] + t;
+		}
+
+		Wc = wstride;
+
+		for (j=1; j<l1; j++)
+		{
+			for (i0=j; i0<N; i0+=l2)
+			{
+				i1 = i0 + l1;
+
+				t = W[Wc] * X[i1]; //HERE
+				X[i1] = X[i0] - t;
+				X[i0] = X[i0] + t;
+			}
+
+			Wc += wstride;
+		}
+	}
+
+	// last stage, #lgN
+	// l = lgN-1 = 4 -> l2@i0 = 32 -> l1@j = 16
+	l1 = l2;
+	l2 <<= 1;
+
+	wstride = wstride >> 1;
+
+	i0 = 0;
+	t = X[l1];
+	X[l1] = X[i0] - t;
+	X[i0] = X[i0] + t;
+
+	Wc = wstride;
+
+	for (j=1; j<l1; j++) // j = 1,2...14,15
+	{
+		i0 = j; // i0 = 1,2...14,15
+		i1 = i0 + l1;
+
+		t = W[Wc] * X[i1];
+		X[i1] = X[i0] - t;
+		X[i0] = X[i0] + t;
+
+		Wc += wstride;
+	}
+
+	*/
+
+	return;
+
+
+
+}
 
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
@@ -326,6 +438,7 @@ void init()
 	// Use the e_neighbor_id() API to generate the pointer addresses of the arrays
 	// in the horizontal and vertical target cores, where the submatrices data will
 	// be swapped.
+	// CHECK - but likely needed anyway...
 	cnum = 0;
 	for (row=0; row<e_group_config.group_rows; row++)
 		for (col=0; col<e_group_config.group_cols; col++)
@@ -339,8 +452,7 @@ void init()
 	me.tgt_go_sync = e_get_global_address(row, col, (void *) (&me.go_sync));
 
 	// Generate Wn
-//	generateWn(me.bank[_BankW][_PING], _Sfft, _1overSfft);
-	generateWn(me.bank[_BankW][_PING], _lgSfft);
+	generateWn(me.bank[_BankW][_PING], _lgSfft);  //CHECK - what do we do with _lgSfft, or its equivalent?
 
 	// Clear the inter-core sync signals
 	me.go_sync = 0;
@@ -352,7 +464,7 @@ void init()
 	Mailbox.pCore->ready = 1;
 
 #if 0
-	// Initialize input image - TODO: to be removed
+	// Initialize input image
 	for (row=0; row<_Score; row++)
 	{
 		for (col=0; col<_Sfft; col++)
