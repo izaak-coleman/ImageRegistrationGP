@@ -1,2 +1,2 @@
-clcc -k -c matvecmult_kern2.cl
-gcc -o matvecmult2.x matvecmult_host2.c matvecmult_kern2.o -I$COPRTHR_PATH/include -L$COPRTHR_PATH/lib -lstdcl -locl
+clcc -k -c matvecmult_kern.cl
+gcc -o matvecmult.x matvecmult_host.c matvecmult_kern.o -I$COPRTHR_PATH/include -L$COPRTHR_PATH/lib -lstdcl -locl
