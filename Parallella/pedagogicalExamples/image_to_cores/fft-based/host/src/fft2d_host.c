@@ -294,12 +294,14 @@ int main(int argc, char *argv[])
 //	for (int i=0; i<TIMERS; i++)
 //		printf("time_p[%d] = %u\n", i, time_p[i]);
 
+
 	time_d[2] = time_p[7] - time_p[2]; // FFT setup
 	time_d[3] = time_p[2] - time_p[3]; // bitrev (x8)
 	time_d[4] = time_p[3] - time_p[4]; // FFT-1D (x8)
 	time_d[5] = time_p[4] - time_p[5]; // corner-turn
 	time_d[6] = time_p[7] - time_p[8]; // FFT-2D
-	time_d[7] = time_p[6] - time_p[7]; // LPF
+	//time_d[7] = time_p[6] - time_p[7]; // LPF
+	time_d[7] = time_p[1] - time_p[2]; // calc()
 	time_d[9] = time_p[0] - time_p[9]; // Total cycles
 
 	 printf(       "Finished calculation in %u cycles (%5.3f msec @ %3.0f MHz)\n\n", time_d[9], (time_d[9] * 1000.0 / eMHz), (eMHz / 1e6));
@@ -310,7 +312,8 @@ int main(int argc, char *argv[])
 	 printf(       "  BITREV      - %7u cycles (%5.3f msec)\n", time_d[3], (time_d[3] * 1000.0 / eMHz));
 	 printf(       "  FFT1D       - %7u cycles (%5.3f msec x2)\n", time_d[4], (time_d[4] * 1000.0 / eMHz));
 	 printf(       "  Corner Turn - %7u cycles (%5.3f msec)\n", time_d[5], (time_d[5] * 1000.0 / eMHz));
-	 printf(       "LPF           - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
+	 //printf(       "LPF           - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
+	 printf(       "calc()           - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
 	 printf(       "\n");
 
 	 printf(       "Reading processed image back to host\n");

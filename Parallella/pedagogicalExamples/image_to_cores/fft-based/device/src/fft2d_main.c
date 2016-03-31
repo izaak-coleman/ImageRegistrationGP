@@ -96,8 +96,9 @@ int main(int argc, char *argv[])
 #endif // _USE_DRAM_
 
 		// ======= OUR CALCULATIONS ========== //
+		me.time_p[1] = e_ctimer_get(E_CTIMER_0); //CHECK!!
 		calc();  // function for calculations
-
+		me.time_p[2] = e_ctimer_get(E_CTIMER_0); //CHECK!!
 
 		/*
 		//OLD "CALCULATE" parts
@@ -209,7 +210,8 @@ void calc() {
 	  volatile cfloat * restrict xX = (me.bank[_BankA][_PING] + row *_Sfft);
 
 	  for(int col=0;col<_Sfft;col++) { //change the name _Sfft to something else
-	    xX[col] *= 1.358;
+	    //xX[col] *= 1.358;
+	    xX[col] *= 0.5;
 	  }
 	}	
 
