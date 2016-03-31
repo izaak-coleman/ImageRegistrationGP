@@ -40,6 +40,7 @@ void FFT2D(fft_dir_t dir);
 void corner_turn(int pingpong);
 void LPF(int lgNN);
 void init();
+void calc();
 
 
 ///////////////////////////////////////////////////////
@@ -95,7 +96,7 @@ int main(int argc, char *argv[])
 #endif // _USE_DRAM_
 
 		// ======= OUR CALCULATIONS ========== //
-		me.calc();  // function for calculations
+		calc();  // function for calculations
 
 
 		/*
@@ -171,6 +172,10 @@ void calc() {
 	cfloat *X;
 	cfloat *W;
 
+	int row=0;
+	int Wn_offset = 0;
+	
+
 	volatile cfloat * restrict _X = (me.bank[_BankA][_PING] + row * _Sfft);
 	volatile cfloat * restrict _W = me.bank[_BankW][_PING]+Wn_offset;
 
@@ -178,7 +183,7 @@ void calc() {
 	W = __builtin_assume_aligned((void *) _W, 8);
 
 	// Calculate the number of points
-	N = 1 << lgN;
+	N = 1 << 2;//1 << lgN;
 
 
 

@@ -68,6 +68,8 @@ typedef unsigned int e_coreid_t;
 #define FALSE 0
 #define TRUE  1
 
+//#define _USE_DRAM_
+
 typedef struct {
 	int  run_target;
 	e_loader_diag_t verbose;
@@ -239,15 +241,16 @@ int main(int argc, char *argv[])
 	// Copy operand matrices to Epiphany system
 	addr = DRAM_BASE + offsetof(shared_buf_t, A[0]);
 	sz = sizeof(Mailbox.A);
+	 printf(       "HELLO DRAM\n");
 	 printf(       "Writing A[%ldB] to address %08x...\n", sz, addr);
 	fprintf(fo, "%% Writing A[%ldB] to address %08x...\n", sz, addr);
-	e_write(addr, (void *) Mailbox.A, sz);
+	e_write(pDRAM,0,0,addr, (void *) Mailbox.A, sz); //added "pDRAM,0,0"
 
 	addr = DRAM_BASE + offsetof(shared_buf_t, B[0]);
 	sz = sizeof(Mailbox.B);
 	 printf(       "Writing B[%ldB] to address %08x...\n", sz, addr);
 	fprintf(fo, "%% Writing B[%ldB] to address %08x...\n", sz, addr);
-	e_write(addr, (void *) Mailbox.B, sz);
+	e_write(pDRAM,0,0,addr, (void *) Mailbox.B, sz); //added "pDRAM,0,0"
 #else
 	// Copy operand matrices to Epiphany cores' memory
 	 printf(       "Writing image to Epiphany\n");
@@ -324,17 +327,18 @@ int main(int argc, char *argv[])
 	sz = sizeof(Mailbox.B);
 	 printf(       "Reading B[%ldB] from address %08x...\n", sz, addr);
 	fprintf(fo, "%% Reading B[%ldB] from address %08x...\n", sz, addr);
-	blknum = sz / RdBlkSz;
-	remndr = sz % RdBlkSz;
-	for (i=0; i<blknum; i++)
+	int blknum = sz / RdBlkSz; //added "int" type, maybe size_t would work as well
+	int remndr = sz % RdBlkSz; //added "int" type, maybe size_t would work as well
+	int j; //added "int" type j here, as later e_read did not have it declared
+	for (j=0; j<blknum; j++)
 	{
 		printf(".");
-		fflush(stdout);
-		e_read(addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), RdBlkSz);
+		fflush(stdout); //CHANGE i TO j HERE?
+		e_read(pDRAM,0,0,addr+j*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+j*RdBlkSz), RdBlkSz); // added "pDRAM,0,0,"
 	}
 	printf(".");
 	fflush(stdout);
-	e_read(addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), remndr);
+	e_read(pDRAM,0,0,addr+j*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+j*RdBlkSz), remndr); // added "pDRAM,0,0,"
 #else
 	// Read result matrix from Epiphany cores' memory
 	sz = sizeof(Mailbox.A) / _Ncores;
