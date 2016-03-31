@@ -33,9 +33,9 @@
 #define _Nside  4                  // # of cores in chip side
 #define _Ncores (_Nside * _Nside)  // Num of cores = 16
 #ifndef _lgSfft
-#define _lgSfft 7                  // Log2 of size of 1D-FFT
+#define _lgSfft 7                  // Log2 of size of 1D-FFT //WAS 7!, use 6 for 64x64 image, 8 for 256x256
 #endif
-#define _Sfft   (1<<_lgSfft)       // Size of 1D-FFT
+#define _Sfft   (1<<_lgSfft)       // Size of 1D-FFT //i.e. 2^_lsSfft
 #define _Score  (_Sfft / _Ncores)  // Num of 1D vectors per-core
 #define _Schip  (_Score * _Ncores) // Num of 1D vectors per-chip
 #define _Smtx   (_Schip * _Sfft)   // Num of elements in 2D array

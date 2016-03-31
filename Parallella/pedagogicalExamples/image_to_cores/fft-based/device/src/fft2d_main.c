@@ -175,95 +175,151 @@ void calc() {
 	int row=0;
 	int Wn_offset = 0;
 	
+	/*
+	for(row=0;row<_Score;row++) { 
+	  volatile cfloat * restrict _X = (me.bank[_BankA][_PING] + row *_Sfft);
+	  volatile cfloat * restrict _W = me.bank[_BankW][_PING]+Wn_offset;
+	  
+	  X = __builtin_assume_aligned((void *) _X, 8);
+	  W = __builtin_assume_aligned((void *) _W, 8);
+	  
+	  // Calculate the number of points
+	  N = 1 << 2;//1 << lgN;
+	  
+	  //Loop for changing values
+	  for (i0=0; i0<N; i0++)
+	      {
+		X[i0] = X[i0] * 2;
+	      }
+	  
+	  //bitrev(me.bank[_BankA][_PONG], _lgSfft, _Score);
+	  //corner_turn(_PING);
 
-	volatile cfloat * restrict _X = (me.bank[_BankA][_PING] + row * _Sfft);
-	volatile cfloat * restrict _W = me.bank[_BankW][_PING]+Wn_offset;
-
-	X = __builtin_assume_aligned((void *) _X, 8);
-	W = __builtin_assume_aligned((void *) _W, 8);
-
-	// Calculate the number of points
-	N = 1 << 2;//1 << lgN;
-
-
-
-	// Compute the FFT - stage #1
-	// W[Wc] of first stage is always 1+0i -> avoid multiply
-	for (i0=0; i0<N; i0+=2)
-	{
-		i1 = i0 + 1;
-
-		t = X[i1];
-		X[i1] = X[i0] - t;
-		X[i0] = X[i0] + t;
+	  for (i0=0; i0<N; i0++)
+	    {
+	      X[i0] = X[i0] * 0;
+	    }
+	  
 	}
+	*/
+
+
+    
+	for(row=0;row<_Score;row++) { 
+	  volatile cfloat * restrict xX = (me.bank[_BankA][_PING] + row *_Sfft);
+
+	  for(int col=0;col<_Sfft;col++) { //change the name _Sfft to something else
+	    xX[col] *= 1.358;
+	  }
+	}	
 
 	/*
-	// Compute the FFT - stage #2 to #(lgN-1)
-	// N = 32 -> lgN = 5 -> l = 1,2,3 -> l2@i0 = 4,8,16 -> l1@j =  2,4,8
-	wstride = wstride >> 1;
-	l2 = 2;
-	for (l=1; l<(lgN-1); l++)
-	{
-		// per stage, do
-		l1 = l2;
-		l2 <<= 1;
-
-		wstride = wstride >> 1;
-
-		// First W[Wc] in a group is always 1+0i -> avoid multiply
-		for (i0=0; i0<N; i0+=l2)
-		{
-			i1 = i0 + l1;
-
-			t = X[i1];
-			X[i1] = X[i0] - t;
-			X[i0] = X[i0] + t;
-		}
-
-		Wc = wstride;
-
-		for (j=1; j<l1; j++)
-		{
-			for (i0=j; i0<N; i0+=l2)
-			{
-				i1 = i0 + l1;
-
-				t = W[Wc] * X[i1]; //HERE
-				X[i1] = X[i0] - t;
-				X[i0] = X[i0] + t;
-			}
-
-			Wc += wstride;
-		}
+	//LOOP THAT DOES A WHOLE ROW for a core
+	for(int col=0;col<128;col++) {  //make the width the IMAGE WIDTH, not hardcoded
+	    me.bank[_BankA][_PING][col] *= 1.358;
 	}
+	*/
+	//}
 
-	// last stage, #lgN
-	// l = lgN-1 = 4 -> l2@i0 = 32 -> l1@j = 16
-	l1 = l2;
-	l2 <<= 1;
 
-	wstride = wstride >> 1;
-
-	i0 = 0;
-	t = X[l1];
-	X[l1] = X[i0] - t;
-	X[i0] = X[i0] + t;
-
-	Wc = wstride;
-
-	for (j=1; j<l1; j++) // j = 1,2...14,15
-	{
-		i0 = j; // i0 = 1,2...14,15
-		i1 = i0 + l1;
-
-		t = W[Wc] * X[i1];
-		X[i1] = X[i0] - t;
-		X[i0] = X[i0] + t;
-
-		Wc += wstride;
+	/*
+	  for (i0=0; i0<N; i0+=2)
+	    {
+	      i1 = i0 + 1;
+	      
+	      t = X[i1];
+	      X[i1] = X[i0] - t;
+	      X[i0] = X[i0] + t;
+	      }*/
+	
+	/*
+	for(row=0;row<_Score;row++) { 
+	  volatile cfloat * restrict _X = (me.bank[_BankA][_PING] + row * _Sfft);
+	  volatile cfloat * restrict _W = me.bank[_BankW][_PING]+Wn_offset;
+	  
+	  
+	  X = __builtin_assume_aligned((void *) _X, 8);
+	  W = __builtin_assume_aligned((void *) _W, 8);
+	  
+	  // Calculate the number of points
+	  N = 1 << lgN;
+	  
+	  // Compute the FFT - stage #1
+	  // W[Wc] of first stage is always 1+0i -> avoid multiply
+	  for (i0=0; i0<N; i0+=2)
+	    {
+	      i1 = i0 + 1;
+	      
+	      t = X[i1];
+	      X[i1] = X[i0] - t;
+	      X[i0] = X[i0] + t;
+	    }
+	  
+	  // Compute the FFT - stage #2 to #(lgN-1)
+	  // N = 32 -> lgN = 5 -> l = 1,2,3 -> l2@i0 = 4,8,16 -> l1@j =  2,4,8
+	  wstride = wstride >> 1;
+	  l2 = 2;
+	  for (l=1; l<(lgN-1); l++)
+	    {
+	      // per stage, do
+	      l1 = l2;
+	      l2 <<= 1;
+	      
+	      wstride = wstride >> 1;
+	      
+	      // First W[Wc] in a group is always 1+0i -> avoid multiply
+	      for (i0=0; i0<N; i0+=l2)
+		{
+		  i1 = i0 + l1;
+		  
+		  t = X[i1];
+		  X[i1] = X[i0] - t;
+		  X[i0] = X[i0] + t;
+		}
+	      
+	      Wc = wstride;
+	      
+	      for (j=1; j<l1; j++)
+		{
+		  for (i0=j; i0<N; i0+=l2)
+		    {
+		      i1 = i0 + l1;
+		      
+		      t = W[Wc] * X[i1]; //HERE
+		      X[i1] = X[i0] - t;
+		      X[i0] = X[i0] + t;
+		    }
+		  
+		  Wc += wstride;
+		}
+	    }
+	  
+	  // last stage, #lgN
+	  // l = lgN-1 = 4 -> l2@i0 = 32 -> l1@j = 16
+	  l1 = l2;
+	  l2 <<= 1;
+	  
+	  wstride = wstride >> 1;
+	  
+	  i0 = 0;
+	  t = X[l1];
+	  X[l1] = X[i0] - t;
+	  X[i0] = X[i0] + t;
+	  
+	  Wc = wstride;
+	  
+	  for (j=1; j<l1; j++) // j = 1,2...14,15
+	    {
+	      i0 = j; // i0 = 1,2...14,15
+	      i1 = i0 + l1;
+	      
+	      t = W[Wc] * X[i1];
+	      X[i1] = X[i0] - t;
+	      X[i0] = X[i0] + t;
+	      
+	      Wc += wstride;
+	    }
 	}
-
 	*/
 
 	return;
@@ -457,7 +513,13 @@ void init()
 	me.tgt_go_sync = e_get_global_address(row, col, (void *) (&me.go_sync));
 
 	// Generate Wn
+	if(_lgSfft == 6) {
+	generateWn(me.bank[_BankW][_PING], 7);  //TEMP HARDCODED - for testing _lgSfft=6 issues...
+	}
+	else {
 	generateWn(me.bank[_BankW][_PING], _lgSfft);  //CHECK - what do we do with _lgSfft, or its equivalent?
+	}
+
 
 	// Clear the inter-core sync signals
 	me.go_sync = 0;

@@ -408,6 +408,7 @@ int fft2d_go(e_mem_t *pDRAM)
 	unsigned int addr;
 	size_t sz;
 
+	printf("Waiting for Epiphany to be ready.\n");
 	// Wait until Epiphany is ready
 	addr = offsetof(shared_buf_t, core.ready);
 	Mailbox.core.ready = 0;
@@ -415,6 +416,7 @@ int fft2d_go(e_mem_t *pDRAM)
 		e_read(pDRAM, 0, 0, addr, (void *) &(Mailbox.core.ready), sizeof(Mailbox.core.ready));
 	//READS THE READY MESSAGE UNTIL READY? - busy waiting, but OK as the cores are only doing one thing
 
+	printf("Waiting until cores finished calc.\n");
 	// Wait until cores finished previous calculation
 	addr = offsetof(shared_buf_t, core.go);
 	sz = sizeof(int64_t);
@@ -422,7 +424,7 @@ int fft2d_go(e_mem_t *pDRAM)
 	while (Mailbox.core.go != 0)
 		e_read(pDRAM, 0, 0, addr, (void *) (&Mailbox.core.go), sz);
 
-	
+	printf("Signal cores to start again.\n");	
 	// Signal cores to start crunching   //same as above, but does a WRITE instead or read
 	Mailbox.core.go = 1;   //REPETITION?
 	addr = offsetof(shared_buf_t, core.go);    //REPETITION?

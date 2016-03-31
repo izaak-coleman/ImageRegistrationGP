@@ -20,7 +20,7 @@
 % Done!
 
 % Reading time count...
-% Finished calculation in 1036 cycles (0.002 msec @ 600 MHz)
+% Finished calculation in 1479127 cycles (2.465 msec @ 600 MHz)
 
 % Reading processed image back to host
 % Reading A[8192B] from address 00002000...
