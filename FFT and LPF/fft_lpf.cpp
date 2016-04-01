@@ -133,19 +133,19 @@ void LPF(Mat &dft, const float R)
 	Mat temp = Mat(dft.rows, dft.cols, CV_32F);
 	Point centre = Point(dft.rows / 2, dft.cols / 2);
 
-  float radius;
+        float sqDistance;
 	for(int i = 0; i < dft.rows; i++)
 	{
 		for(int j = 0; j < dft.cols; j++)
 		{
-      sqDistance = (float) pow((i - centre.x), 2.0) + pow((double) (j - centre.y), 2.0);
-      if (sqDistance < pow(R, 2.0)){
-        temp.at<float>(i,j) = dft.at<float>(i,j);
-      } else {
-        temp.at<float>(i,j) = 0;
-      }
+		     sqDistance = (float) pow((i - centre.x), 2.0) + pow((double) (j - centre.y), 2.0);
+		     if (sqDistance < pow(R, 2.0)){
+      		        temp.at<float>(i,j) = dft.at<float>(i,j);
+		     } else {
+                        temp.at<float>(i,j) = 0;
+                     }
 		}
 	}
-  Mat planes[] = {temp, temp};
+        Mat planes[] = {temp, temp};
 	merge(planes, 2, dft);
 }
