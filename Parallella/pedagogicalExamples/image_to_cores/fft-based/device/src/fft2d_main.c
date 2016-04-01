@@ -36,9 +36,12 @@
 #include "dram_buffers.h"
 #include "static_buffers.h"
 
-void FFT2D(fft_dir_t dir);
-void corner_turn(int pingpong);
-void LPF(int lgNN);
+/*
+void FFT2D(fft_dir_t dir); //TO BE REMOVED
+void corner_turn(int pingpong); //TO BE REMOVED
+void LPF(int lgNN); //TO BE REMOVED
+*/
+
 void init();
 void calc();
 
@@ -52,7 +55,7 @@ int main(int argc, char *argv[])
 	status = 0;
 
 	// Initialize data structures - mainly target pointers 
-	dstate(1);  //CHECK
+	dstate(1);  //CHECK - debugging info - REMOVE? [remove all dstate parts, not needed for us]
 	init();
 	dstate(2);
 
@@ -203,136 +206,38 @@ void calc() {
 	  
 	}
 	*/
-
-
     
 	for(row=0;row<_Score;row++) { 
 	  volatile cfloat * restrict xX = (me.bank[_BankA][_PING] + row *_Sfft);
 
 	  for(int col=0;col<_Sfft;col++) { //change the name _Sfft to something else
-	    //xX[col] *= 1.358;
-	    xX[col] *= 0.5;
+	    //xX[col] *= 0.5;
+
+	    //float mult = 0.5;
+	    //Mailbox.pCore->mult = 0.5;
+	    float mult = Mailbox.pCore->mult;
+	    //float mult;
+	    //if(Mailbox.pCore->mult != 0)
+	    //  mult = Mailbox.pCore->mult;
+	    //else
+	    //  mult = 1.5;
+	    int limit  = 255; //limit for image value (255, as 8-bit image elements)
+	    int newval = (int) (xX[col]*mult); //value after multiplication
+	    if(newval <= limit) //if newval is less than limit, apply
+	      xX[col] *= mult;
+	    else                //if newval is beyond limit, assign limit value (not enough bits for more)
+	      xX[col] = limit;
 	  }
 	}	
 
-	/*
-	//LOOP THAT DOES A WHOLE ROW for a core
-	for(int col=0;col<128;col++) {  //make the width the IMAGE WIDTH, not hardcoded
-	    me.bank[_BankA][_PING][col] *= 1.358;
-	}
-	*/
-	//}
-
-
-	/*
-	  for (i0=0; i0<N; i0+=2)
-	    {
-	      i1 = i0 + 1;
-	      
-	      t = X[i1];
-	      X[i1] = X[i0] - t;
-	      X[i0] = X[i0] + t;
-	      }*/
-	
-	/*
-	for(row=0;row<_Score;row++) { 
-	  volatile cfloat * restrict _X = (me.bank[_BankA][_PING] + row * _Sfft);
-	  volatile cfloat * restrict _W = me.bank[_BankW][_PING]+Wn_offset;
-	  
-	  
-	  X = __builtin_assume_aligned((void *) _X, 8);
-	  W = __builtin_assume_aligned((void *) _W, 8);
-	  
-	  // Calculate the number of points
-	  N = 1 << lgN;
-	  
-	  // Compute the FFT - stage #1
-	  // W[Wc] of first stage is always 1+0i -> avoid multiply
-	  for (i0=0; i0<N; i0+=2)
-	    {
-	      i1 = i0 + 1;
-	      
-	      t = X[i1];
-	      X[i1] = X[i0] - t;
-	      X[i0] = X[i0] + t;
-	    }
-	  
-	  // Compute the FFT - stage #2 to #(lgN-1)
-	  // N = 32 -> lgN = 5 -> l = 1,2,3 -> l2@i0 = 4,8,16 -> l1@j =  2,4,8
-	  wstride = wstride >> 1;
-	  l2 = 2;
-	  for (l=1; l<(lgN-1); l++)
-	    {
-	      // per stage, do
-	      l1 = l2;
-	      l2 <<= 1;
-	      
-	      wstride = wstride >> 1;
-	      
-	      // First W[Wc] in a group is always 1+0i -> avoid multiply
-	      for (i0=0; i0<N; i0+=l2)
-		{
-		  i1 = i0 + l1;
-		  
-		  t = X[i1];
-		  X[i1] = X[i0] - t;
-		  X[i0] = X[i0] + t;
-		}
-	      
-	      Wc = wstride;
-	      
-	      for (j=1; j<l1; j++)
-		{
-		  for (i0=j; i0<N; i0+=l2)
-		    {
-		      i1 = i0 + l1;
-		      
-		      t = W[Wc] * X[i1]; //HERE
-		      X[i1] = X[i0] - t;
-		      X[i0] = X[i0] + t;
-		    }
-		  
-		  Wc += wstride;
-		}
-	    }
-	  
-	  // last stage, #lgN
-	  // l = lgN-1 = 4 -> l2@i0 = 32 -> l1@j = 16
-	  l1 = l2;
-	  l2 <<= 1;
-	  
-	  wstride = wstride >> 1;
-	  
-	  i0 = 0;
-	  t = X[l1];
-	  X[l1] = X[i0] - t;
-	  X[i0] = X[i0] + t;
-	  
-	  Wc = wstride;
-	  
-	  for (j=1; j<l1; j++) // j = 1,2...14,15
-	    {
-	      i0 = j; // i0 = 1,2...14,15
-	      i1 = i0 + l1;
-	      
-	      t = W[Wc] * X[i1];
-	      X[i1] = X[i0] - t;
-	      X[i0] = X[i0] + t;
-	      
-	      Wc += wstride;
-	    }
-	}
-	*/
-
 	return;
-
-
 
 }
 
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
-void FFT2D(fft_dir_t dir)
+/*
+void FFT2D(fft_dir_t dir)  //TO BE REMOVED
 {
 	int row, cnum, Wn_offset;
 
@@ -393,11 +298,12 @@ void FFT2D(fft_dir_t dir)
 	dstate(106);
 	return;
 }
-
+*/
 
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
-void corner_turn(int pingpong)
+/*
+void corner_turn(int pingpong)   //TO BE REMOVED
 {
 #ifdef _USE_DMA_I_
 	unsigned cnum;
@@ -431,11 +337,12 @@ void corner_turn(int pingpong)
 
 	return;
 }
-
+*/
 
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
-void LPF(int lgNN)
+/*
+void LPF(int lgNN)   //TO BE REMOVED
 {
 	int row, col, k;
 	#define Fco 2
@@ -472,7 +379,7 @@ void LPF(int lgNN)
 
 	return;
 }
-
+*/
 
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
@@ -531,6 +438,7 @@ void init()
 	// Init the host-accelerator sync signals
 	Mailbox.pCore->go = 0;
 	Mailbox.pCore->ready = 1;
+	//Mailbox.pCore->mult = 1;
 
 #if 0
 	// Initialize input image

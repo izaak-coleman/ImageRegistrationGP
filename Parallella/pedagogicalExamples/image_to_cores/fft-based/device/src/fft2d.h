@@ -1,6 +1,8 @@
 /*
   fft2d.h
 
+  Copyright (C) 2016 Jukka Soikkeli <jes15@ic.ac.uk>
+
   Copyright (C) 2012 Adapteva, Inc.
   Contributed by Yainv Sapir <yaniv@adapteva.com>
 
@@ -94,6 +96,9 @@ typedef struct {
 typedef struct {
 	volatile int64_t  go;     // Call for FFT2D function
 	volatile int      ready;  // Core is ready after reset
+  ///////////////////////////////
+	volatile float    mult;  // Multiplier //CHECK!!
+  //////////////////////////////
 } mbox_t;
 
 

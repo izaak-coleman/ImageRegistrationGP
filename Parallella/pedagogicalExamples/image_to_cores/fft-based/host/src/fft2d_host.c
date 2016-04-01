@@ -98,6 +98,10 @@ unsigned int coreID[_Ncores];      //core ID array
 typedef struct timeval timeval_t;
 e_platform_t platform;
 
+//////////////////////////
+	float mult = 1.5; //multiplier
+//////////////////////////
+
 int main(int argc, char *argv[])
 {
 	e_epiphany_t Epiphany, *pEpiphany;
@@ -116,14 +120,16 @@ int main(int argc, char *argv[])
 
 	unsigned int addr;
 	size_t sz;
-	timeval_t timer[4];
+	//timeval_t timer[4];
+	timeval_t timer[8];
 	uint32_t time_p[TIMERS];
 	uint32_t time_d[TIMERS];
 	FILE *fo;
 //	FILE *fi;
 	int  result;
-	
-
+	//////////////////////////////////////////
+	gettimeofday(&timer[0], NULL);  //CHECK
+	//////////////////////////////////////////
 	pEpiphany = &Epiphany;
 	pDRAM     = &DRAM;
 	msize     = 0x00400000;
@@ -165,6 +171,16 @@ int main(int argc, char *argv[])
 	Mailbox.core.ready = 0;
 	e_write(pDRAM, 0, 0, addr, (void *) &(Mailbox.core.ready), sizeof(Mailbox.core.ready));
 
+	////////////////////////////////////////
+	// Pass the multiplier into the program
+	printf("Multiplier is %1.1f \n",mult);
+	addr = offsetof(shared_buf_t, core.mult);
+	Mailbox.core.mult = mult;
+	e_write(pDRAM, 0, 0, addr, (void *) &(Mailbox.core.mult), sizeof(Mailbox.core.mult));
+	////////////////////////////////////////
+
+
+	// Load program
 	printf("Loading program on Epiphany chip...\n");
 	strcpy(ar.srecFile, "../../device/Release/e_fft2d.srec");
 	result = e_load_group(ar.srecFile, pEpiphany, 0, 0, platform.rows, platform.cols, (e_bool_t) (ar.run_target));
@@ -238,6 +254,7 @@ int main(int argc, char *argv[])
 #ifdef _USE_DRAM_
 	// Copy operand matrices to Epiphany system
 	addr = DRAM_BASE + offsetof(shared_buf_t, A[0]);
+	gettimeofday(&timer[1], NULL);  //CHECK
 	sz = sizeof(Mailbox.A);
 	 printf(       "Writing A[%ldB] to address %08x...\n", sz, addr);
 	fprintf(fo, "%% Writing A[%ldB] to address %08x...\n", sz, addr);
@@ -248,11 +265,13 @@ int main(int argc, char *argv[])
 	 printf(       "Writing B[%ldB] to address %08x...\n", sz, addr);
 	fprintf(fo, "%% Writing B[%ldB] to address %08x...\n", sz, addr);
 	e_write(addr, (void *) Mailbox.B, sz);
+	gettimeofday(&timer[2], NULL); //CHECK
 #else
 	// Copy operand matrices to Epiphany cores' memory
 	 printf(       "Writing image to Epiphany\n");
 	fprintf(fo, "%% Writing image to Epiphany\n");
-
+        
+	gettimeofday(&timer[1], NULL);  //CHECK
 	sz = sizeof(Mailbox.A) / _Ncores;
 	for (row=0; row<(int) platform.rows; row++)
 		for (col=0; col<(int) platform.cols; col++)
@@ -265,6 +284,7 @@ int main(int argc, char *argv[])
 			fprintf(fo, "%% Writing A[%uB] to address %08x...\n", sz, (coreID[cnum] << 20) | addr); fflush(fo);
 			e_write(pEpiphany, row, col, addr, (void *) &Mailbox.A[cnum * _Score * _Sfft], sz);
 		}
+	gettimeofday(&timer[2], NULL); //CHECK
 	printf("\n");
 #endif
 
@@ -274,16 +294,16 @@ int main(int argc, char *argv[])
 	fprintf(fo, "%% GO!\n");
 	fflush(stdout);
 	fflush(fo);
-	gettimeofday(&timer[0], NULL);
+	gettimeofday(&timer[3], NULL);
 	fft2d_go(pDRAM);  //checks the DRAM for ready and go, runs the core programs, and waits for all cores to finish
-	gettimeofday(&timer[1], NULL);
+	gettimeofday(&timer[4], NULL); //timing the whole thing using sys/time?
 	 printf(       "Done!\n\n");
 	fprintf(fo, "%% Done!\n\n");
 	fflush(stdout);
 	fflush(fo);
 
-	//HERE
 
+	//TIMERS on Epiphany
 	// Read time counters
 //	 printf(       "Reading time count...\n");
 	fprintf(fo, "%% Reading time count...\n");
@@ -295,25 +315,35 @@ int main(int argc, char *argv[])
 //		printf("time_p[%d] = %u\n", i, time_p[i]);
 
 
-	time_d[2] = time_p[7] - time_p[2]; // FFT setup
-	time_d[3] = time_p[2] - time_p[3]; // bitrev (x8)
-	time_d[4] = time_p[3] - time_p[4]; // FFT-1D (x8)
-	time_d[5] = time_p[4] - time_p[5]; // corner-turn
-	time_d[6] = time_p[7] - time_p[8]; // FFT-2D
+	//time_d[2] = time_p[7] - time_p[2]; // FFT setup
+	//time_d[3] = time_p[2] - time_p[3]; // bitrev (x8)
+	//time_d[4] = time_p[3] - time_p[4]; // FFT-1D (x8)
+	//time_d[5] = time_p[4] - time_p[5]; // corner-turn
+	//time_d[6] = time_p[7] - time_p[8]; // FFT-2D
 	//time_d[7] = time_p[6] - time_p[7]; // LPF
 	time_d[7] = time_p[1] - time_p[2]; // calc()
 	time_d[9] = time_p[0] - time_p[9]; // Total cycles
+	//timeval timeE = timer[1].tv_usec - timer[0].tv_usec; //Timing whole epiphany running of the process
 
 	 printf(       "Finished calculation in %u cycles (%5.3f msec @ %3.0f MHz)\n\n", time_d[9], (time_d[9] * 1000.0 / eMHz), (eMHz / 1e6));
 	fprintf(fo, "%% Finished calculation in %u cycles (%5.3f msec @ %3.0f MHz)\n\n", time_d[9], (time_d[9] * 1000.0 / eMHz), (eMHz / 1e6));
 
-	 printf(       "FFT2D         - %7u cycles (%5.3f msec)\n", time_d[6], (time_d[6] * 1000.0 / eMHz));
-	 printf(       "  FFT Setup   - %7u cycles (%5.3f msec)\n", time_d[2], (time_d[2] * 1000.0 / eMHz));
-	 printf(       "  BITREV      - %7u cycles (%5.3f msec)\n", time_d[3], (time_d[3] * 1000.0 / eMHz));
-	 printf(       "  FFT1D       - %7u cycles (%5.3f msec x2)\n", time_d[4], (time_d[4] * 1000.0 / eMHz));
-	 printf(       "  Corner Turn - %7u cycles (%5.3f msec)\n", time_d[5], (time_d[5] * 1000.0 / eMHz));
+	//printf(       "FFT2D         - %7u cycles (%5.3f msec)\n", time_d[6], (time_d[6] * 1000.0 / eMHz));
+	//printf(       "  FFT Setup   - %7u cycles (%5.3f msec)\n", time_d[2], (time_d[2] * 1000.0 / eMHz));
+	//printf(       "  BITREV      - %7u cycles (%5.3f msec)\n", time_d[3], (time_d[3] * 1000.0 / eMHz));
+	//printf(       "  FFT1D       - %7u cycles (%5.3f msec x2)\n", time_d[4], (time_d[4] * 1000.0 / eMHz));
+	//printf(       "  Corner Turn - %7u cycles (%5.3f msec)\n", time_d[5], (time_d[5] * 1000.0 / eMHz));
 	 //printf(       "LPF           - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
-	 printf(       "calc()           - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
+	//THE ABOVE TO BE REMOVED, keep the below:
+	 printf(       "Calculations     - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
+	 //printf(       "calc()           - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
+	 // TO BE ADDED:
+	 //printf(       "Overhead         - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
+	 //printf(       "Memory overhead  - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
+	 //printf(       "Memory overhead  - (%7u microsec)\n", timer[3].tv_usec - timer[2].tv_usec); //CHECK
+	 //printf(       "Alt time of full process on Epiphany     - (%5.3u microsec)\n", timer[1].tv_usec - timer[0].tv_usec); //Brings up a warning, but is OK
+	 printf(       "Memory overhead (in)  - (%5.3f msec)\n", (timer[2].tv_usec - timer[1].tv_usec)/1000.0); //CHECK
+	 printf(       "Alt time of full process on Epiphany     - (%5.3f msec)\n", (timer[4].tv_usec - timer[3].tv_usec)/1000.0); //Brings up a warning, but is OK
 	 printf(       "\n");
 
 	 printf(       "Reading processed image back to host\n");
@@ -324,6 +354,7 @@ int main(int argc, char *argv[])
 	// Read result matrix
 #ifdef _USE_DRAM_
 	addr = DRAM_BASE + offsetof(shared_buf_t, B[0]);
+	gettimeofday(&timer[5], NULL); //CHECK
 	sz = sizeof(Mailbox.B);
 	 printf(       "Reading B[%ldB] from address %08x...\n", sz, addr);
 	fprintf(fo, "%% Reading B[%ldB] from address %08x...\n", sz, addr);
@@ -338,8 +369,10 @@ int main(int argc, char *argv[])
 	printf(".");
 	fflush(stdout);
 	e_read(addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), remndr);
+	gettimeofday(&timer[6], NULL); //CHECK
 #else
 	// Read result matrix from Epiphany cores' memory
+	gettimeofday(&timer[5], NULL); //CHECK
 	sz = sizeof(Mailbox.A) / _Ncores;
 	for (row=0; row<(int) platform.rows; row++)
 		for (col=0; col<(int) platform.cols; col++)
@@ -352,9 +385,10 @@ int main(int argc, char *argv[])
 			fprintf(fo, "%% Reading A[%uB] from address %08x...\n", sz, (coreID[cnum] << 20) | addr); fflush(fo);
 			e_read(pEpiphany, row, col, addr, (void *) &Mailbox.B[cnum * _Score * _Sfft], sz);
 		}
+	gettimeofday(&timer[6], NULL); //CHECK
 #endif
 	printf("\n");
-
+	 printf(       "Memory overhead (out)  - (%5.3f msec)\n", (timer[6].tv_usec - timer[5].tv_usec)/1000.0); //CHECK
 
 
 	// Convert processed image matrix B into the image file date.
@@ -395,6 +429,11 @@ int main(int argc, char *argv[])
 	fflush(fo);
 	fclose(fo);
 
+	///////////////////////////////////////
+	gettimeofday(&timer[7], NULL);  //CHECK	
+	///////////////////////////////////////
+	printf(       "Full program time     - (%5.3f msec)\n", (timer[7].tv_usec - timer[0].tv_usec)/1000.0 );
+	
 	//Returnin success if test runs expected number of clock cycles
 	//Need to add comparison with golden reference image!
 	if(time_d[9]>50000){
@@ -501,7 +540,14 @@ void get_args(int argc, char *argv[])
 	char buf[255];
 	char *dotp;
 
-	for (n=1; n<argc; n++)
+	////////////////////////
+	//If more than two args, then multiplier is one of them
+	if(argc>2)
+	  mult = atof(argv[1]);
+	////////////////////////
+
+	//for (n=1; n<argc; n++)
+	for (n=2; n<argc; n++) //CHANGED FROM THE ABOVE
 	{
 		if (!strcmp(argv[n], "-no-run"))
 			ar.run_target = FALSE;
