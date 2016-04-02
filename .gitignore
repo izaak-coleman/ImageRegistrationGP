@@ -10,3 +10,6 @@ Makefile
 *.elf
 *.srec
 Parallella/hello/main
+
+*.o
+*.d
