@@ -62,6 +62,11 @@
 #include <IL/ilut.h>
 #endif
 
+/////////////////////////////
+// FOR USING DRAM instead of local mem
+//#define _USE_DRAM_
+/////////////////////////////
+
 typedef unsigned int e_coreid_t;
 #include <e-hal.h>
 #include "calclib.h"
@@ -256,18 +261,23 @@ int main(int argc, char *argv[])
 
 #ifdef _USE_DRAM_
 	// Copy operand matrices to Epiphany system
-	addr = DRAM_BASE + offsetof(shared_buf_t, A[0]);
+	//addr = DRAM_BASE + offsetof(shared_buf_t, A[0]);
+	addr = offsetof(shared_buf_t, A[0]);
 	gettimeofday(&timer[1], NULL);
 	sz = sizeof(Mailbox.A);
+	printf(        "HELLO DRAM\n"); //REMOVE
 	 printf(       "Writing A[%ldB] to address %08x...\n", sz, addr);
 	fprintf(fo, "%% Writing A[%ldB] to address %08x...\n", sz, addr);
-	e_write(addr, (void *) Mailbox.A, sz);
+	//e_write(addr, (void *) Mailbox.A, sz);
+	e_write(pDRAM,0,0,addr, (void *) Mailbox.A, sz); //added "pDRAM,0,0"
 
-	addr = DRAM_BASE + offsetof(shared_buf_t, B[0]);
+	//addr = DRAM_BASE + offsetof(shared_buf_t, B[0]);
+	addr = offsetof(shared_buf_t, B[0]);
 	sz = sizeof(Mailbox.B);
 	 printf(       "Writing B[%ldB] to address %08x...\n", sz, addr);
 	fprintf(fo, "%% Writing B[%ldB] to address %08x...\n", sz, addr);
-	e_write(addr, (void *) Mailbox.B, sz);
+	//e_write(addr, (void *) Mailbox.B, sz);
+	e_write(pDRAM,0,0,addr, (void *) Mailbox.B, sz); //added "pDRAM,0,0"
 	gettimeofday(&timer[2], NULL);
 #else
 	// Copy operand matrices to Epiphany cores' memory
@@ -340,22 +350,28 @@ int main(int argc, char *argv[])
 
 	// Read result matrix
 #ifdef _USE_DRAM_
-	addr = DRAM_BASE + offsetof(shared_buf_t, B[0]);
+	//addr = DRAM_BASE + offsetof(shared_buf_t, B[0]);
+	addr = offsetof(shared_buf_t, B[0]);
 	gettimeofday(&timer[5], NULL);
 	sz = sizeof(Mailbox.B);
 	 printf(       "Reading B[%ldB] from address %08x...\n", sz, addr);
 	fprintf(fo, "%% Reading B[%ldB] from address %08x...\n", sz, addr);
-	blknum = sz / RdBlkSz;
-	remndr = sz % RdBlkSz;
+	//blknum = sz / RdBlkSz;
+	//remndr = sz % RdBlkSz;
+	int blknum = sz / RdBlkSz; //added "int" type, maybe size_t would work as well
+	int remndr = sz % RdBlkSz; //added "int" type, maybe size_t would work as well
+	int i; //added "int" type i here, as later e_read did not have it declared
 	for (i=0; i<blknum; i++)
 	{
 		printf(".");
 		fflush(stdout);
-		e_read(addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), RdBlkSz);
+		//e_read(addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), RdBlkSz);
+		e_read(pDRAM,0,0,addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), RdBlkSz); // added "pDRAM,0,0,"
 	}
 	printf(".");
 	fflush(stdout);
-	e_read(addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), remndr);
+	//e_read(addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), remndr);
+	e_read(pDRAM,0,0,addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), remndr); // added "pDRAM,0,0,"
 	gettimeofday(&timer[6], NULL);
 #else
 	// Read result matrix from Epiphany cores' memory
