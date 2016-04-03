@@ -104,9 +104,20 @@ int main(int argc, char *argv[])
 #endif // _USE_DRAM_
 
 		// ======= OUR CALCULATIONS ========== //
+
 		me.time_p[1] = e_ctimer_get(E_CTIMER_0); //CHECK!!
 		calc();  // function for calculations
 		me.time_p[2] = e_ctimer_get(E_CTIMER_0); //CHECK!!
+
+
+		/*
+		//LOOP, to test DRAM vs eCore memory speed
+		me.time_p[1] = e_ctimer_get(E_CTIMER_0); //CHECK!!
+		for(int count=0; count<10; count++) {
+		  calc();  // function for calculations
+		}
+		me.time_p[2] = e_ctimer_get(E_CTIMER_0); //CHECK!!
+		*/
 
 		/*
 		//OLD "CALCULATE" parts

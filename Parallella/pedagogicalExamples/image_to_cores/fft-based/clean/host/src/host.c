@@ -262,8 +262,8 @@ int main(int argc, char *argv[])
 #ifdef _USE_DRAM_
 	// Copy operand matrices to Epiphany system
 	//addr = DRAM_BASE + offsetof(shared_buf_t, A[0]);
-	addr = offsetof(shared_buf_t, A[0]);
 	gettimeofday(&timer[1], NULL);
+	addr = offsetof(shared_buf_t, A[0]);
 	sz = sizeof(Mailbox.A);
 	printf(        "HELLO DRAM\n"); //REMOVE
 	 printf(       "Writing A[%ldB] to address %08x...\n", sz, addr);
@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
 	fflush(fo);
 	gettimeofday(&timer[3], NULL);
         calc_go(pDRAM);  //checks the DRAM for ready and go, runs the core programs, and waits for all cores to finish
-	gettimeofday(&timer[4], NULL); //timing the whole thing using sys/time?
+	gettimeofday(&timer[4], NULL); //timing the whole Epiphany calculation using sys/time
 	 printf(       "Done!\n\n");
 	fprintf(fo, "%% Done!\n\n");
 	fflush(stdout);
@@ -351,8 +351,8 @@ int main(int argc, char *argv[])
 	// Read result matrix
 #ifdef _USE_DRAM_
 	//addr = DRAM_BASE + offsetof(shared_buf_t, B[0]);
-	addr = offsetof(shared_buf_t, B[0]);
 	gettimeofday(&timer[5], NULL);
+	addr = offsetof(shared_buf_t, B[0]);
 	sz = sizeof(Mailbox.B);
 	 printf(       "Reading B[%ldB] from address %08x...\n", sz, addr);
 	fprintf(fo, "%% Reading B[%ldB] from address %08x...\n", sz, addr);
