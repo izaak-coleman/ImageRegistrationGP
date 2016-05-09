@@ -8,6 +8,7 @@
 
 #include <fstream>
 #include "opencv2/opencv.hpp"
+#include <ctime>
 
 //cuda include files
 #include "opencv2/cudacodec.hpp"
@@ -42,6 +43,7 @@ static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
 static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst);
 
 static void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const int motionType);
+
 
 double modified_findTransformECC(InputArray templateImage,
 				 InputArray inputImage,
@@ -88,6 +90,8 @@ int main( int argc, char** argv )
 			number_of_iterations, termination_eps);
 
   Mat inputMask;
+	std::clock_t function;
+	function = std::clock();
  
   // Run find_transformECC to find the warp matrix
   double cc = modified_findTransformECC (
@@ -97,6 +101,7 @@ int main( int argc, char** argv )
 					 warp_mode,
 					 criteria,
 					 inputMask);
+		std::cout << std::endl << "Time taken ecc 2.2 " << (std::clock() - function)/(double) CLOCKS_PER_SEC << std::endl;
  
   // Reserve a matrix to store the warped image
   cv::Mat warped_image = cv::Mat(template_image.rows, template_image.cols, CV_32FC1);

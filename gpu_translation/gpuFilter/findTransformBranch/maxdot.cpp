@@ -14,7 +14,6 @@
 #include "opencv2/cudastereo.hpp" 
 #include "opencv2/cudawarping.hpp"
 
-#include <cublas_v2.h>
 using namespace cv;
 using namespace std;
 
@@ -221,23 +220,4 @@ void gpuDotProduct(cuda::GpuMat src1, cuda::GpuMat src2, cuda::GpuMat fold){
  cout << "gpuDotProduct dest: " << dest_download << endl;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

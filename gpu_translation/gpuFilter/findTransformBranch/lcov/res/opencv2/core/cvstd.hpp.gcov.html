@@ -1,0 +1,1154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - ex_test.info - opencv2/core/cvstd.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">opencv2/core</a> - cvstd.hpp<span style="font-size: 80%;"> (source / <a href="cvstd.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">ex_test.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-03-07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : /*M///////////////////////////////////////////////////////////////////////////////////////</a>
+<span class="lineNum">       2 </span>                :            : //
+<span class="lineNum">       3 </span>                :            : //  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING.
+<span class="lineNum">       4 </span>                :            : //
+<span class="lineNum">       5 </span>                :            : //  By downloading, copying, installing or using the software you agree to this license.
+<span class="lineNum">       6 </span>                :            : //  If you do not agree to this license, do not download, install,
+<span class="lineNum">       7 </span>                :            : //  copy or use the software.
+<span class="lineNum">       8 </span>                :            : //
+<span class="lineNum">       9 </span>                :            : //
+<span class="lineNum">      10 </span>                :            : //                          License Agreement
+<span class="lineNum">      11 </span>                :            : //                For Open Source Computer Vision Library
+<span class="lineNum">      12 </span>                :            : //
+<span class="lineNum">      13 </span>                :            : // Copyright (C) 2000-2008, Intel Corporation, all rights reserved.
+<span class="lineNum">      14 </span>                :            : // Copyright (C) 2009, Willow Garage Inc., all rights reserved.
+<span class="lineNum">      15 </span>                :            : // Copyright (C) 2013, OpenCV Foundation, all rights reserved.
+<span class="lineNum">      16 </span>                :            : // Third party copyrights are property of their respective owners.
+<span class="lineNum">      17 </span>                :            : //
+<span class="lineNum">      18 </span>                :            : // Redistribution and use in source and binary forms, with or without modification,
+<span class="lineNum">      19 </span>                :            : // are permitted provided that the following conditions are met:
+<span class="lineNum">      20 </span>                :            : //
+<span class="lineNum">      21 </span>                :            : //   * Redistribution's of source code must retain the above copyright notice,
+<span class="lineNum">      22 </span>                :            : //     this list of conditions and the following disclaimer.
+<span class="lineNum">      23 </span>                :            : //
+<span class="lineNum">      24 </span>                :            : //   * Redistribution's in binary form must reproduce the above copyright notice,
+<span class="lineNum">      25 </span>                :            : //     this list of conditions and the following disclaimer in the documentation
+<span class="lineNum">      26 </span>                :            : //     and/or other materials provided with the distribution.
+<span class="lineNum">      27 </span>                :            : //
+<span class="lineNum">      28 </span>                :            : //   * The name of the copyright holders may not be used to endorse or promote products
+<span class="lineNum">      29 </span>                :            : //     derived from this software without specific prior written permission.
+<span class="lineNum">      30 </span>                :            : //
+<span class="lineNum">      31 </span>                :            : // This software is provided by the copyright holders and contributors &quot;as is&quot; and
+<span class="lineNum">      32 </span>                :            : // any express or implied warranties, including, but not limited to, the implied
+<span class="lineNum">      33 </span>                :            : // warranties of merchantability and fitness for a particular purpose are disclaimed.
+<span class="lineNum">      34 </span>                :            : // In no event shall the Intel Corporation or contributors be liable for any direct,
+<span class="lineNum">      35 </span>                :            : // indirect, incidental, special, exemplary, or consequential damages
+<span class="lineNum">      36 </span>                :            : // (including, but not limited to, procurement of substitute goods or services;
+<span class="lineNum">      37 </span>                :            : // loss of use, data, or profits; or business interruption) however caused
+<span class="lineNum">      38 </span>                :            : // and on any theory of liability, whether in contract, strict liability,
+<span class="lineNum">      39 </span>                :            : // or tort (including negligence or otherwise) arising in any way out of
+<span class="lineNum">      40 </span>                :            : // the use of this software, even if advised of the possibility of such damage.
+<span class="lineNum">      41 </span>                :            : //
+<span class="lineNum">      42 </span>                :            : //M*/
+<span class="lineNum">      43 </span>                :            : 
+<span class="lineNum">      44 </span>                :            : #ifndef __OPENCV_CORE_CVSTD_HPP__
+<span class="lineNum">      45 </span>                :            : #define __OPENCV_CORE_CVSTD_HPP__
+<span class="lineNum">      46 </span>                :            : 
+<span class="lineNum">      47 </span>                :            : #ifndef __cplusplus
+<span class="lineNum">      48 </span>                :            : #  error cvstd.hpp header must be compiled as C++
+<span class="lineNum">      49 </span>                :            : #endif
+<span class="lineNum">      50 </span>                :            : 
+<span class="lineNum">      51 </span>                :            : #include &quot;opencv2/core/cvdef.h&quot;
+<span class="lineNum">      52 </span>                :            : 
+<span class="lineNum">      53 </span>                :            : #include &lt;cstddef&gt;
+<span class="lineNum">      54 </span>                :            : #include &lt;cstring&gt;
+<span class="lineNum">      55 </span>                :            : #include &lt;cctype&gt;
+<span class="lineNum">      56 </span>                :            : 
+<span class="lineNum">      57 </span>                :            : #ifndef OPENCV_NOSTL
+<span class="lineNum">      58 </span>                :            : #  include &lt;string&gt;
+<span class="lineNum">      59 </span>                :            : #endif
+<span class="lineNum">      60 </span>                :            : 
+<span class="lineNum">      61 </span>                :            : // import useful primitives from stl
+<span class="lineNum">      62 </span>                :            : #ifndef OPENCV_NOSTL_TRANSITIONAL
+<span class="lineNum">      63 </span>                :            : #  include &lt;algorithm&gt;
+<span class="lineNum">      64 </span>                :            : #  include &lt;utility&gt;
+<span class="lineNum">      65 </span>                :            : #  include &lt;cstdlib&gt; //for abs(int)
+<span class="lineNum">      66 </span>                :            : #  include &lt;cmath&gt;
+<span class="lineNum">      67 </span>                :            : 
+<span class="lineNum">      68 </span>                :            : namespace cv
+<span class="lineNum">      69 </span>                :            : {
+<span class="lineNum">      70 </span>                :            :     using std::min;
+<span class="lineNum">      71 </span>                :            :     using std::max;
+<span class="lineNum">      72 </span>                :            :     using std::abs;
+<span class="lineNum">      73 </span>                :            :     using std::swap;
+<span class="lineNum">      74 </span>                :            :     using std::sqrt;
+<span class="lineNum">      75 </span>                :            :     using std::exp;
+<span class="lineNum">      76 </span>                :            :     using std::pow;
+<span class="lineNum">      77 </span>                :            :     using std::log;
+<span class="lineNum">      78 </span>                :            : }
+<span class="lineNum">      79 </span>                :            : 
+<span class="lineNum">      80 </span>                :            : namespace std
+<span class="lineNum">      81 </span>                :            : {
+<span class="lineNum">      82 </span>                :            :     static inline uchar abs(uchar a) { return a; }
+<span class="lineNum">      83 </span>                :            :     static inline ushort abs(ushort a) { return a; }
+<span class="lineNum">      84 </span>                :            :     static inline unsigned abs(unsigned a) { return a; }
+<span class="lineNum">      85 </span>                :            :     static inline uint64 abs(uint64 a) { return a; }
+<span class="lineNum">      86 </span>                :            : }
+<span class="lineNum">      87 </span>                :            : 
+<span class="lineNum">      88 </span>                :            : #else
+<span class="lineNum">      89 </span>                :            : namespace cv
+<span class="lineNum">      90 </span>                :            : {
+<span class="lineNum">      91 </span>                :            :     template&lt;typename T&gt; static inline T min(T a, T b) { return a &lt; b ? a : b; }
+<span class="lineNum">      92 </span>                :            :     template&lt;typename T&gt; static inline T max(T a, T b) { return a &gt; b ? a : b; }
+<span class="lineNum">      93 </span>                :            :     template&lt;typename T&gt; static inline T abs(T a) { return a &lt; 0 ? -a : a; }
+<span class="lineNum">      94 </span>                :            :     template&lt;typename T&gt; static inline void swap(T&amp; a, T&amp; b) { T tmp = a; a = b; b = tmp; }
+<span class="lineNum">      95 </span>                :            : 
+<span class="lineNum">      96 </span>                :            :     template&lt;&gt; inline uchar abs(uchar a) { return a; }
+<span class="lineNum">      97 </span>                :            :     template&lt;&gt; inline ushort abs(ushort a) { return a; }
+<span class="lineNum">      98 </span>                :            :     template&lt;&gt; inline unsigned abs(unsigned a) { return a; }
+<span class="lineNum">      99 </span>                :            :     template&lt;&gt; inline uint64 abs(uint64 a) { return a; }
+<span class="lineNum">     100 </span>                :            : }
+<span class="lineNum">     101 </span>                :            : #endif
+<span class="lineNum">     102 </span>                :            : 
+<span class="lineNum">     103 </span>                :            : namespace cv {
+<span class="lineNum">     104 </span>                :            : 
+<span class="lineNum">     105 </span>                :            : //! @addtogroup core_utils
+<span class="lineNum">     106 </span>                :            : //! @{
+<span class="lineNum">     107 </span>                :            : 
+<span class="lineNum">     108 </span>                :            : //////////////////////////// memory management functions ////////////////////////////
+<span class="lineNum">     109 </span>                :            : 
+<span class="lineNum">     110 </span>                :            : /** @brief Allocates an aligned memory buffer.
+<span class="lineNum">     111 </span>                :            : 
+<span class="lineNum">     112 </span>                :            : The function allocates the buffer of the specified size and returns it. When the buffer size is 16
+<span class="lineNum">     113 </span>                :            : bytes or more, the returned buffer is aligned to 16 bytes.
+<span class="lineNum">     114 </span>                :            : @param bufSize Allocated buffer size.
+<span class="lineNum">     115 </span>                :            :  */
+<span class="lineNum">     116 </span>                :            : CV_EXPORTS void* fastMalloc(size_t bufSize);
+<span class="lineNum">     117 </span>                :            : 
+<span class="lineNum">     118 </span>                :            : /** @brief Deallocates a memory buffer.
+<span class="lineNum">     119 </span>                :            : 
+<span class="lineNum">     120 </span>                :            : The function deallocates the buffer allocated with fastMalloc . If NULL pointer is passed, the
+<span class="lineNum">     121 </span>                :            : function does nothing. C version of the function clears the pointer *pptr* to avoid problems with
+<span class="lineNum">     122 </span>                :            : double memory deallocation.
+<span class="lineNum">     123 </span>                :            : @param ptr Pointer to the allocated buffer.
+<span class="lineNum">     124 </span>                :            :  */
+<span class="lineNum">     125 </span>                :            : CV_EXPORTS void fastFree(void* ptr);
+<span class="lineNum">     126 </span>                :            : 
+<span class="lineNum">     127 </span>                :            : /*!
+<span class="lineNum">     128 </span>                :            :   The STL-compilant memory Allocator based on cv::fastMalloc() and cv::fastFree()
+<span class="lineNum">     129 </span>                :            : */
+<span class="lineNum">     130 </span>                :            : template&lt;typename _Tp&gt; class Allocator
+<span class="lineNum">     131 </span>                :            : {
+<span class="lineNum">     132 </span>                :            : public:
+<span class="lineNum">     133 </span>                :            :     typedef _Tp value_type;
+<span class="lineNum">     134 </span>                :            :     typedef value_type* pointer;
+<span class="lineNum">     135 </span>                :            :     typedef const value_type* const_pointer;
+<span class="lineNum">     136 </span>                :            :     typedef value_type&amp; reference;
+<span class="lineNum">     137 </span>                :            :     typedef const value_type&amp; const_reference;
+<span class="lineNum">     138 </span>                :            :     typedef size_t size_type;
+<span class="lineNum">     139 </span>                :            :     typedef ptrdiff_t difference_type;
+<span class="lineNum">     140 </span>                :            :     template&lt;typename U&gt; class rebind { typedef Allocator&lt;U&gt; other; };
+<span class="lineNum">     141 </span>                :            : 
+<span class="lineNum">     142 </span>                :            :     explicit Allocator() {}
+<span class="lineNum">     143 </span>                :            :     ~Allocator() {}
+<span class="lineNum">     144 </span>                :            :     explicit Allocator(Allocator const&amp;) {}
+<span class="lineNum">     145 </span>                :            :     template&lt;typename U&gt;
+<span class="lineNum">     146 </span>                :            :     explicit Allocator(Allocator&lt;U&gt; const&amp;) {}
+<span class="lineNum">     147 </span>                :            : 
+<span class="lineNum">     148 </span>                :            :     // address
+<span class="lineNum">     149 </span>                :            :     pointer address(reference r) { return &amp;r; }
+<span class="lineNum">     150 </span>                :            :     const_pointer address(const_reference r) { return &amp;r; }
+<span class="lineNum">     151 </span>                :            : 
+<span class="lineNum">     152 </span>                :            :     pointer allocate(size_type count, const void* =0) { return reinterpret_cast&lt;pointer&gt;(fastMalloc(count * sizeof (_Tp))); }
+<span class="lineNum">     153 </span>                :            :     void deallocate(pointer p, size_type) { fastFree(p); }
+<span class="lineNum">     154 </span>                :            : 
+<span class="lineNum">     155 </span>                :            :     void construct(pointer p, const _Tp&amp; v) { new(static_cast&lt;void*&gt;(p)) _Tp(v); }
+<span class="lineNum">     156 </span>                :            :     void destroy(pointer p) { p-&gt;~_Tp(); }
+<span class="lineNum">     157 </span>                :            : 
+<span class="lineNum">     158 </span>                :            :     size_type max_size() const { return cv::max(static_cast&lt;_Tp&gt;(-1)/sizeof(_Tp), 1); }
+<span class="lineNum">     159 </span>                :            : };
+<span class="lineNum">     160 </span>                :            : 
+<span class="lineNum">     161 </span>                :            : //! @} core_utils
+<span class="lineNum">     162 </span>                :            : 
+<span class="lineNum">     163 </span>                :            : //! @cond IGNORED
+<span class="lineNum">     164 </span>                :            : 
+<span class="lineNum">     165 </span>                :            : namespace detail
+<span class="lineNum">     166 </span>                :            : {
+<span class="lineNum">     167 </span>                :            : 
+<span class="lineNum">     168 </span>                :            : // Metafunction to avoid taking a reference to void.
+<span class="lineNum">     169 </span>                :            : template&lt;typename T&gt;
+<span class="lineNum">     170 </span>                :            : struct RefOrVoid { typedef T&amp; type; };
+<span class="lineNum">     171 </span>                :            : 
+<span class="lineNum">     172 </span>                :            : template&lt;&gt;
+<span class="lineNum">     173 </span>                :            : struct RefOrVoid&lt;void&gt;{ typedef void type; };
+<span class="lineNum">     174 </span>                :            : 
+<span class="lineNum">     175 </span>                :            : template&lt;&gt;
+<span class="lineNum">     176 </span>                :            : struct RefOrVoid&lt;const void&gt;{ typedef const void type; };
+<span class="lineNum">     177 </span>                :            : 
+<span class="lineNum">     178 </span>                :            : template&lt;&gt;
+<span class="lineNum">     179 </span>                :            : struct RefOrVoid&lt;volatile void&gt;{ typedef volatile void type; };
+<span class="lineNum">     180 </span>                :            : 
+<span class="lineNum">     181 </span>                :            : template&lt;&gt;
+<span class="lineNum">     182 </span>                :            : struct RefOrVoid&lt;const volatile void&gt;{ typedef const volatile void type; };
+<span class="lineNum">     183 </span>                :            : 
+<span class="lineNum">     184 </span>                :            : // This class would be private to Ptr, if it didn't have to be a non-template.
+<span class="lineNum">     185 </span>                :            : struct PtrOwner;
+<span class="lineNum">     186 </span>                :            : 
+<span class="lineNum">     187 </span>                :            : }
+<span class="lineNum">     188 </span>                :            : 
+<span class="lineNum">     189 </span>                :            : template&lt;typename Y&gt;
+<span class="lineNum">     190 </span>                :            : struct DefaultDeleter
+<span class="lineNum">     191 </span>                :            : {
+<span class="lineNum">     192 </span>                :            :     void operator () (Y* p) const;
+<span class="lineNum">     193 </span>                :            : };
+<span class="lineNum">     194 </span>                :            : 
+<span class="lineNum">     195 </span>                :            : //! @endcond
+<span class="lineNum">     196 </span>                :            : 
+<span class="lineNum">     197 </span>                :            : //! @addtogroup core_basic
+<span class="lineNum">     198 </span>                :            : //! @{
+<span class="lineNum">     199 </span>                :            : 
+<span class="lineNum">     200 </span>                :            : /** @brief Template class for smart pointers with shared ownership
+<span class="lineNum">     201 </span>                :            : 
+<span class="lineNum">     202 </span>                :            : A Ptr\&lt;T\&gt; pretends to be a pointer to an object of type T. Unlike an ordinary pointer, however, the
+<span class="lineNum">     203 </span>                :            : object will be automatically cleaned up once all Ptr instances pointing to it are destroyed.
+<span class="lineNum">     204 </span>                :            : 
+<span class="lineNum">     205 </span>                :            : Ptr is similar to boost::shared_ptr that is part of the Boost library
+<span class="lineNum">     206 </span>                :            : (&lt;http://www.boost.org/doc/libs/release/libs/smart_ptr/shared_ptr.htm&gt;) and std::shared_ptr from
+<span class="lineNum">     207 </span>                :            : the [C++11](http://en.wikipedia.org/wiki/C++11) standard.
+<span class="lineNum">     208 </span>                :            : 
+<span class="lineNum">     209 </span>                :            : This class provides the following advantages:
+<span class="lineNum">     210 </span>                :            : -   Default constructor, copy constructor, and assignment operator for an arbitrary C++ class or C
+<span class="lineNum">     211 </span>                :            :     structure. For some objects, like files, windows, mutexes, sockets, and others, a copy
+<span class="lineNum">     212 </span>                :            :     constructor or an assignment operator are difficult to define. For some other objects, like
+<span class="lineNum">     213 </span>                :            :     complex classifiers in OpenCV, copy constructors are absent and not easy to implement. Finally,
+<span class="lineNum">     214 </span>                :            :     some of complex OpenCV and your own data structures may be written in C. However, copy
+<span class="lineNum">     215 </span>                :            :     constructors and default constructors can simplify programming a lot. Besides, they are often
+<span class="lineNum">     216 </span>                :            :     required (for example, by STL containers). By using a Ptr to such an object instead of the
+<span class="lineNum">     217 </span>                :            :     object itself, you automatically get all of the necessary constructors and the assignment
+<span class="lineNum">     218 </span>                :            :     operator.
+<span class="lineNum">     219 </span>                :            : -   *O(1)* complexity of the above-mentioned operations. While some structures, like std::vector,
+<span class="lineNum">     220 </span>                :            :     provide a copy constructor and an assignment operator, the operations may take a considerable
+<span class="lineNum">     221 </span>                :            :     amount of time if the data structures are large. But if the structures are put into a Ptr, the
+<span class="lineNum">     222 </span>                :            :     overhead is small and independent of the data size.
+<span class="lineNum">     223 </span>                :            : -   Automatic and customizable cleanup, even for C structures. See the example below with FILE\*.
+<span class="lineNum">     224 </span>                :            : -   Heterogeneous collections of objects. The standard STL and most other C++ and OpenCV containers
+<span class="lineNum">     225 </span>                :            :     can store only objects of the same type and the same size. The classical solution to store
+<span class="lineNum">     226 </span>                :            :     objects of different types in the same container is to store pointers to the base class (Base\*)
+<span class="lineNum">     227 </span>                :            :     instead but then you lose the automatic memory management. Again, by using Ptr\&lt;Base\&gt; instead
+<span class="lineNum">     228 </span>                :            :     of raw pointers, you can solve the problem.
+<span class="lineNum">     229 </span>                :            : 
+<span class="lineNum">     230 </span>                :            : A Ptr is said to *own* a pointer - that is, for each Ptr there is a pointer that will be deleted
+<span class="lineNum">     231 </span>                :            : once all Ptr instances that own it are destroyed. The owned pointer may be null, in which case
+<span class="lineNum">     232 </span>                :            : nothing is deleted. Each Ptr also *stores* a pointer. The stored pointer is the pointer the Ptr
+<span class="lineNum">     233 </span>                :            : pretends to be; that is, the one you get when you use Ptr::get or the conversion to T\*. It's
+<span class="lineNum">     234 </span>                :            : usually the same as the owned pointer, but if you use casts or the general shared-ownership
+<span class="lineNum">     235 </span>                :            : constructor, the two may diverge: the Ptr will still own the original pointer, but will itself point
+<span class="lineNum">     236 </span>                :            : to something else.
+<span class="lineNum">     237 </span>                :            : 
+<span class="lineNum">     238 </span>                :            : The owned pointer is treated as a black box. The only thing Ptr needs to know about it is how to
+<span class="lineNum">     239 </span>                :            : delete it. This knowledge is encapsulated in the *deleter* - an auxiliary object that is associated
+<span class="lineNum">     240 </span>                :            : with the owned pointer and shared between all Ptr instances that own it. The default deleter is an
+<span class="lineNum">     241 </span>                :            : instance of DefaultDeleter, which uses the standard C++ delete operator; as such it will work with
+<span class="lineNum">     242 </span>                :            : any pointer allocated with the standard new operator.
+<span class="lineNum">     243 </span>                :            : 
+<span class="lineNum">     244 </span>                :            : However, if the pointer must be deleted in a different way, you must specify a custom deleter upon
+<span class="lineNum">     245 </span>                :            : Ptr construction. A deleter is simply a callable object that accepts the pointer as its sole
+<span class="lineNum">     246 </span>                :            : argument. For example, if you want to wrap FILE, you may do so as follows:
+<span class="lineNum">     247 </span>                :            : @code
+<span class="lineNum">     248 </span>                :            :     Ptr&lt;FILE&gt; f(fopen(&quot;myfile.txt&quot;, &quot;w&quot;), fclose);
+<span class="lineNum">     249 </span>                :            :     if(!f) throw ...;
+<span class="lineNum">     250 </span>                :            :     fprintf(f, ....);
+<span class="lineNum">     251 </span>                :            :     ...
+<span class="lineNum">     252 </span>                :            :     // the file will be closed automatically by f's destructor.
+<span class="lineNum">     253 </span>                :            : @endcode
+<span class="lineNum">     254 </span>                :            : Alternatively, if you want all pointers of a particular type to be deleted the same way, you can
+<span class="lineNum">     255 </span>                :            : specialize DefaultDeleter&lt;T&gt;::operator() for that type, like this:
+<span class="lineNum">     256 </span>                :            : @code
+<span class="lineNum">     257 </span>                :            :     namespace cv {
+<span class="lineNum">     258 </span>                :            :     template&lt;&gt; void DefaultDeleter&lt;FILE&gt;::operator ()(FILE * obj) const
+<span class="lineNum">     259 </span>                :            :     {
+<span class="lineNum">     260 </span>                :            :         fclose(obj);
+<span class="lineNum">     261 </span>                :            :     }
+<span class="lineNum">     262 </span>                :            :     }
+<span class="lineNum">     263 </span>                :            : @endcode
+<span class="lineNum">     264 </span>                :            : For convenience, the following types from the OpenCV C API already have such a specialization that
+<span class="lineNum">     265 </span>                :            : calls the appropriate release function:
+<span class="lineNum">     266 </span>                :            : -   CvCapture
+<span class="lineNum">     267 </span>                :            : -   CvFileStorage
+<span class="lineNum">     268 </span>                :            : -   CvHaarClassifierCascade
+<span class="lineNum">     269 </span>                :            : -   CvMat
+<span class="lineNum">     270 </span>                :            : -   CvMatND
+<span class="lineNum">     271 </span>                :            : -   CvMemStorage
+<span class="lineNum">     272 </span>                :            : -   CvSparseMat
+<span class="lineNum">     273 </span>                :            : -   CvVideoWriter
+<span class="lineNum">     274 </span>                :            : -   IplImage
+<span class="lineNum">     275 </span>                :            : @note The shared ownership mechanism is implemented with reference counting. As such, cyclic
+<span class="lineNum">     276 </span>                :            : ownership (e.g. when object a contains a Ptr to object b, which contains a Ptr to object a) will
+<span class="lineNum">     277 </span>                :            : lead to all involved objects never being cleaned up. Avoid such situations.
+<span class="lineNum">     278 </span>                :            : @note It is safe to concurrently read (but not write) a Ptr instance from multiple threads and
+<span class="lineNum">     279 </span>                :            : therefore it is normally safe to use it in multi-threaded applications. The same is true for Mat and
+<span class="lineNum">     280 </span>                :            : other C++ OpenCV classes that use internal reference counts.
+<span class="lineNum">     281 </span>                :            : */
+<span class="lineNum">     282 </span>                :            : template&lt;typename T&gt;
+<span class="lineNum">     283 </span>                :            : struct Ptr
+<span class="lineNum">     284 </span>                :            : {
+<span class="lineNum">     285 </span>                :            :     /** Generic programming support. */
+<span class="lineNum">     286 </span>                :            :     typedef T element_type;
+<span class="lineNum">     287 </span>                :            : 
+<span class="lineNum">     288 </span>                :            :     /** The default constructor creates a null Ptr - one that owns and stores a null pointer.
+<span class="lineNum">     289 </span>                :            :     */
+<span class="lineNum">     290 </span>                :            :     Ptr();
+<span class="lineNum">     291 </span>                :            : 
+<span class="lineNum">     292 </span>                :            :     /**
+<span class="lineNum">     293 </span>                :            :     If p is null, these are equivalent to the default constructor.
+<span class="lineNum">     294 </span>                :            :     Otherwise, these constructors assume ownership of p - that is, the created Ptr owns and stores p
+<span class="lineNum">     295 </span>                :            :     and assumes it is the sole owner of it. Don't use them if p is already owned by another Ptr, or
+<span class="lineNum">     296 </span>                :            :     else p will get deleted twice.
+<span class="lineNum">     297 </span>                :            :     With the first constructor, DefaultDeleter\&lt;Y\&gt;() becomes the associated deleter (so p will
+<span class="lineNum">     298 </span>                :            :     eventually be deleted with the standard delete operator). Y must be a complete type at the point
+<span class="lineNum">     299 </span>                :            :     of invocation.
+<span class="lineNum">     300 </span>                :            :     With the second constructor, d becomes the associated deleter.
+<span class="lineNum">     301 </span>                :            :     Y\* must be convertible to T\*.
+<span class="lineNum">     302 </span>                :            :     @param p Pointer to own.
+<span class="lineNum">     303 </span>                :            :     @note It is often easier to use makePtr instead.
+<span class="lineNum">     304 </span>                :            :      */
+<span class="lineNum">     305 </span>                :            :     template&lt;typename Y&gt;
+<span class="lineNum">     306 </span>                :            : #ifdef DISABLE_OPENCV_24_COMPATIBILITY
+<span class="lineNum">     307 </span>                :            :     explicit
+<span class="lineNum">     308 </span>                :            : #endif
+<span class="lineNum">     309 </span>                :            :     Ptr(Y* p);
+<span class="lineNum">     310 </span>                :            : 
+<span class="lineNum">     311 </span>                :            :     /** @overload
+<span class="lineNum">     312 </span>                :            :     @param d Deleter to use for the owned pointer.
+<span class="lineNum">     313 </span>                :            :     @param p Pointer to own.
+<span class="lineNum">     314 </span>                :            :     */
+<span class="lineNum">     315 </span>                :            :     template&lt;typename Y, typename D&gt;
+<span class="lineNum">     316 </span>                :            :     Ptr(Y* p, D d);
+<span class="lineNum">     317 </span>                :            : 
+<span class="lineNum">     318 </span>                :            :     /**
+<span class="lineNum">     319 </span>                :            :     These constructors create a Ptr that shares ownership with another Ptr - that is, own the same
+<span class="lineNum">     320 </span>                :            :     pointer as o.
+<span class="lineNum">     321 </span>                :            :     With the first two, the same pointer is stored, as well; for the second, Y\* must be convertible
+<span class="lineNum">     322 </span>                :            :     to T\*.
+<span class="lineNum">     323 </span>                :            :     With the third, p is stored, and Y may be any type. This constructor allows to have completely
+<span class="lineNum">     324 </span>                :            :     unrelated owned and stored pointers, and should be used with care to avoid confusion. A relatively
+<span class="lineNum">     325 </span>                :            :     benign use is to create a non-owning Ptr, like this:
+<span class="lineNum">     326 </span>                :            :     @code
+<span class="lineNum">     327 </span>                :            :         ptr = Ptr&lt;T&gt;(Ptr&lt;T&gt;(), dont_delete_me); // owns nothing; will not delete the pointer.
+<span class="lineNum">     328 </span>                :            :     @endcode
+<span class="lineNum">     329 </span>                :            :     @param o Ptr to share ownership with.
+<span class="lineNum">     330 </span>                :            :     */
+<span class="lineNum">     331 </span>                :            :     Ptr(const Ptr&amp; o);
+<span class="lineNum">     332 </span>                :            : 
+<span class="lineNum">     333 </span>                :            :     /** @overload
+<span class="lineNum">     334 </span>                :            :     @param o Ptr to share ownership with.
+<span class="lineNum">     335 </span>                :            :     */
+<span class="lineNum">     336 </span>                :            :     template&lt;typename Y&gt;
+<span class="lineNum">     337 </span>                :            :     Ptr(const Ptr&lt;Y&gt;&amp; o);
+<span class="lineNum">     338 </span>                :            : 
+<span class="lineNum">     339 </span>                :            :     /** @overload
+<span class="lineNum">     340 </span>                :            :     @param o Ptr to share ownership with.
+<span class="lineNum">     341 </span>                :            :     @param p Pointer to store.
+<span class="lineNum">     342 </span>                :            :     */
+<span class="lineNum">     343 </span>                :            :     template&lt;typename Y&gt;
+<span class="lineNum">     344 </span>                :            :     Ptr(const Ptr&lt;Y&gt;&amp; o, T* p);
+<span class="lineNum">     345 </span>                :            : 
+<span class="lineNum">     346 </span>                :            :     /** The destructor is equivalent to calling Ptr::release. */
+<span class="lineNum">     347 </span>                :            :     ~Ptr();
+<span class="lineNum">     348 </span>                :            : 
+<span class="lineNum">     349 </span>                :            :     /**
+<span class="lineNum">     350 </span>                :            :     Assignment replaces the current Ptr instance with one that owns and stores same pointers as o and
+<span class="lineNum">     351 </span>                :            :     then destroys the old instance.
+<span class="lineNum">     352 </span>                :            :     @param o Ptr to share ownership with.
+<span class="lineNum">     353 </span>                :            :      */
+<span class="lineNum">     354 </span>                :            :     Ptr&amp; operator = (const Ptr&amp; o);
+<span class="lineNum">     355 </span>                :            : 
+<span class="lineNum">     356 </span>                :            :     /** @overload */
+<span class="lineNum">     357 </span>                :            :     template&lt;typename Y&gt;
+<span class="lineNum">     358 </span>                :            :     Ptr&amp; operator = (const Ptr&lt;Y&gt;&amp; o);
+<span class="lineNum">     359 </span>                :            : 
+<span class="lineNum">     360 </span>                :            :     /** If no other Ptr instance owns the owned pointer, deletes it with the associated deleter. Then sets
+<span class="lineNum">     361 </span>                :            :     both the owned and the stored pointers to NULL.
+<span class="lineNum">     362 </span>                :            :     */
+<span class="lineNum">     363 </span>                :            :     void release();
+<span class="lineNum">     364 </span>                :            : 
+<span class="lineNum">     365 </span>                :            :     /**
+<span class="lineNum">     366 </span>                :            :     `ptr.reset(...)` is equivalent to `ptr = Ptr&lt;T&gt;(...)`.
+<span class="lineNum">     367 </span>                :            :     @param p Pointer to own.
+<span class="lineNum">     368 </span>                :            :     */
+<span class="lineNum">     369 </span>                :            :     template&lt;typename Y&gt;
+<span class="lineNum">     370 </span>                :            :     void reset(Y* p);
+<span class="lineNum">     371 </span>                :            : 
+<span class="lineNum">     372 </span>                :            :     /** @overload
+<span class="lineNum">     373 </span>                :            :     @param d Deleter to use for the owned pointer.
+<span class="lineNum">     374 </span>                :            :     @param p Pointer to own.
+<span class="lineNum">     375 </span>                :            :     */
+<span class="lineNum">     376 </span>                :            :     template&lt;typename Y, typename D&gt;
+<span class="lineNum">     377 </span>                :            :     void reset(Y* p, D d);
+<span class="lineNum">     378 </span>                :            : 
+<span class="lineNum">     379 </span>                :            :     /**
+<span class="lineNum">     380 </span>                :            :     Swaps the owned and stored pointers (and deleters, if any) of this and o.
+<span class="lineNum">     381 </span>                :            :     @param o Ptr to swap with.
+<span class="lineNum">     382 </span>                :            :     */
+<span class="lineNum">     383 </span>                :            :     void swap(Ptr&amp; o);
+<span class="lineNum">     384 </span>                :            : 
+<span class="lineNum">     385 </span>                :            :     /** Returns the stored pointer. */
+<span class="lineNum">     386 </span>                :            :     T* get() const;
+<span class="lineNum">     387 </span>                :            : 
+<span class="lineNum">     388 </span>                :            :     /** Ordinary pointer emulation. */
+<span class="lineNum">     389 </span>                :            :     typename detail::RefOrVoid&lt;T&gt;::type operator * () const;
+<span class="lineNum">     390 </span>                :            : 
+<span class="lineNum">     391 </span>                :            :     /** Ordinary pointer emulation. */
+<span class="lineNum">     392 </span>                :            :     T* operator -&gt; () const;
+<span class="lineNum">     393 </span>                :            : 
+<span class="lineNum">     394 </span>                :            :     /** Equivalent to get(). */
+<span class="lineNum">     395 </span>                :            :     operator T* () const;
+<span class="lineNum">     396 </span>                :            : 
+<span class="lineNum">     397 </span>                :            :     /** ptr.empty() is equivalent to `!ptr.get()`. */
+<span class="lineNum">     398 </span>                :            :     bool empty() const;
+<span class="lineNum">     399 </span>                :            : 
+<span class="lineNum">     400 </span>                :            :     /** Returns a Ptr that owns the same pointer as this, and stores the same
+<span class="lineNum">     401 </span>                :            :        pointer as this, except converted via static_cast to Y*.
+<span class="lineNum">     402 </span>                :            :     */
+<span class="lineNum">     403 </span>                :            :     template&lt;typename Y&gt;
+<span class="lineNum">     404 </span>                :            :     Ptr&lt;Y&gt; staticCast() const;
+<span class="lineNum">     405 </span>                :            : 
+<span class="lineNum">     406 </span>                :            :     /** Ditto for const_cast. */
+<span class="lineNum">     407 </span>                :            :     template&lt;typename Y&gt;
+<span class="lineNum">     408 </span>                :            :     Ptr&lt;Y&gt; constCast() const;
+<span class="lineNum">     409 </span>                :            : 
+<span class="lineNum">     410 </span>                :            :     /** Ditto for dynamic_cast. */
+<span class="lineNum">     411 </span>                :            :     template&lt;typename Y&gt;
+<span class="lineNum">     412 </span>                :            :     Ptr&lt;Y&gt; dynamicCast() const;
+<span class="lineNum">     413 </span>                :            : 
+<span class="lineNum">     414 </span>                :            : #ifdef CV_CXX_MOVE_SEMANTICS
+<span class="lineNum">     415 </span>                :            :     Ptr(Ptr&amp;&amp; o);
+<span class="lineNum">     416 </span>                :            :     Ptr&amp; operator = (Ptr&amp;&amp; o);
+<span class="lineNum">     417 </span>                :            : #endif
+<span class="lineNum">     418 </span>                :            : 
+<span class="lineNum">     419 </span>                :            : private:
+<span class="lineNum">     420 </span>                :            :     detail::PtrOwner* owner;
+<span class="lineNum">     421 </span>                :            :     T* stored;
+<span class="lineNum">     422 </span>                :            : 
+<span class="lineNum">     423 </span>                :            :     template&lt;typename Y&gt;
+<span class="lineNum">     424 </span>                :            :     friend struct Ptr; // have to do this for the cross-type copy constructor
+<span class="lineNum">     425 </span>                :            : };
+<span class="lineNum">     426 </span>                :            : 
+<span class="lineNum">     427 </span>                :            : /** Equivalent to ptr1.swap(ptr2). Provided to help write generic algorithms. */
+<span class="lineNum">     428 </span>                :            : template&lt;typename T&gt;
+<span class="lineNum">     429 </span>                :            : void swap(Ptr&lt;T&gt;&amp; ptr1, Ptr&lt;T&gt;&amp; ptr2);
+<span class="lineNum">     430 </span>                :            : 
+<span class="lineNum">     431 </span>                :            : /** Return whether ptr1.get() and ptr2.get() are equal and not equal, respectively. */
+<span class="lineNum">     432 </span>                :            : template&lt;typename T&gt;
+<span class="lineNum">     433 </span>                :            : bool operator == (const Ptr&lt;T&gt;&amp; ptr1, const Ptr&lt;T&gt;&amp; ptr2);
+<span class="lineNum">     434 </span>                :            : template&lt;typename T&gt;
+<span class="lineNum">     435 </span>                :            : bool operator != (const Ptr&lt;T&gt;&amp; ptr1, const Ptr&lt;T&gt;&amp; ptr2);
+<span class="lineNum">     436 </span>                :            : 
+<span class="lineNum">     437 </span>                :            : /** `makePtr&lt;T&gt;(...)` is equivalent to `Ptr&lt;T&gt;(new T(...))`. It is shorter than the latter, and it's
+<span class="lineNum">     438 </span>                :            : marginally safer than using a constructor or Ptr::reset, since it ensures that the owned pointer
+<span class="lineNum">     439 </span>                :            : is new and thus not owned by any other Ptr instance.
+<span class="lineNum">     440 </span>                :            : Unfortunately, perfect forwarding is impossible to implement in C++03, and so makePtr is limited
+<span class="lineNum">     441 </span>                :            : to constructors of T that have up to 10 arguments, none of which are non-const references.
+<span class="lineNum">     442 </span>                :            :  */
+<span class="lineNum">     443 </span>                :            : template&lt;typename T&gt;
+<span class="lineNum">     444 </span>                :            : Ptr&lt;T&gt; makePtr();
+<span class="lineNum">     445 </span>                :            : /** @overload */
+<span class="lineNum">     446 </span>                :            : template&lt;typename T, typename A1&gt;
+<span class="lineNum">     447 </span>                :            : Ptr&lt;T&gt; makePtr(const A1&amp; a1);
+<span class="lineNum">     448 </span>                :            : /** @overload */
+<span class="lineNum">     449 </span>                :            : template&lt;typename T, typename A1, typename A2&gt;
+<span class="lineNum">     450 </span>                :            : Ptr&lt;T&gt; makePtr(const A1&amp; a1, const A2&amp; a2);
+<span class="lineNum">     451 </span>                :            : /** @overload */
+<span class="lineNum">     452 </span>                :            : template&lt;typename T, typename A1, typename A2, typename A3&gt;
+<span class="lineNum">     453 </span>                :            : Ptr&lt;T&gt; makePtr(const A1&amp; a1, const A2&amp; a2, const A3&amp; a3);
+<span class="lineNum">     454 </span>                :            : /** @overload */
+<span class="lineNum">     455 </span>                :            : template&lt;typename T, typename A1, typename A2, typename A3, typename A4&gt;
+<span class="lineNum">     456 </span>                :            : Ptr&lt;T&gt; makePtr(const A1&amp; a1, const A2&amp; a2, const A3&amp; a3, const A4&amp; a4);
+<span class="lineNum">     457 </span>                :            : /** @overload */
+<span class="lineNum">     458 </span>                :            : template&lt;typename T, typename A1, typename A2, typename A3, typename A4, typename A5&gt;
+<span class="lineNum">     459 </span>                :            : Ptr&lt;T&gt; makePtr(const A1&amp; a1, const A2&amp; a2, const A3&amp; a3, const A4&amp; a4, const A5&amp; a5);
+<span class="lineNum">     460 </span>                :            : /** @overload */
+<span class="lineNum">     461 </span>                :            : template&lt;typename T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6&gt;
+<span class="lineNum">     462 </span>                :            : Ptr&lt;T&gt; makePtr(const A1&amp; a1, const A2&amp; a2, const A3&amp; a3, const A4&amp; a4, const A5&amp; a5, const A6&amp; a6);
+<span class="lineNum">     463 </span>                :            : /** @overload */
+<span class="lineNum">     464 </span>                :            : template&lt;typename T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7&gt;
+<span class="lineNum">     465 </span>                :            : Ptr&lt;T&gt; makePtr(const A1&amp; a1, const A2&amp; a2, const A3&amp; a3, const A4&amp; a4, const A5&amp; a5, const A6&amp; a6, const A7&amp; a7);
+<span class="lineNum">     466 </span>                :            : /** @overload */
+<span class="lineNum">     467 </span>                :            : template&lt;typename T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8&gt;
+<span class="lineNum">     468 </span>                :            : Ptr&lt;T&gt; makePtr(const A1&amp; a1, const A2&amp; a2, const A3&amp; a3, const A4&amp; a4, const A5&amp; a5, const A6&amp; a6, const A7&amp; a7, const A8&amp; a8);
+<span class="lineNum">     469 </span>                :            : /** @overload */
+<span class="lineNum">     470 </span>                :            : template&lt;typename T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9&gt;
+<span class="lineNum">     471 </span>                :            : Ptr&lt;T&gt; makePtr(const A1&amp; a1, const A2&amp; a2, const A3&amp; a3, const A4&amp; a4, const A5&amp; a5, const A6&amp; a6, const A7&amp; a7, const A8&amp; a8, const A9&amp; a9);
+<span class="lineNum">     472 </span>                :            : /** @overload */
+<span class="lineNum">     473 </span>                :            : template&lt;typename T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6, typename A7, typename A8, typename A9, typename A10&gt;
+<span class="lineNum">     474 </span>                :            : Ptr&lt;T&gt; makePtr(const A1&amp; a1, const A2&amp; a2, const A3&amp; a3, const A4&amp; a4, const A5&amp; a5, const A6&amp; a6, const A7&amp; a7, const A8&amp; a8, const A9&amp; a9, const A10&amp; a10);
+<span class="lineNum">     475 </span>                :            : 
+<span class="lineNum">     476 </span>                :            : //////////////////////////////// string class ////////////////////////////////
+<span class="lineNum">     477 </span>                :            : 
+<span class="lineNum">     478 </span>                :            : class CV_EXPORTS FileNode; //for string constructor from FileNode
+<span class="lineNum">     479 </span>                :            : 
+<span class="lineNum">     480 </span>                :            : class CV_EXPORTS String
+<span class="lineNum">     481 </span>                :            : {
+<span class="lineNum">     482 </span>                :            : public:
+<span class="lineNum">     483 </span>                :            :     typedef char value_type;
+<span class="lineNum">     484 </span>                :            :     typedef char&amp; reference;
+<span class="lineNum">     485 </span>                :            :     typedef const char&amp; const_reference;
+<span class="lineNum">     486 </span>                :            :     typedef char* pointer;
+<span class="lineNum">     487 </span>                :            :     typedef const char* const_pointer;
+<span class="lineNum">     488 </span>                :            :     typedef ptrdiff_t difference_type;
+<span class="lineNum">     489 </span>                :            :     typedef size_t size_type;
+<span class="lineNum">     490 </span>                :            :     typedef char* iterator;
+<span class="lineNum">     491 </span>                :            :     typedef const char* const_iterator;
+<span class="lineNum">     492 </span>                :            : 
+<span class="lineNum">     493 </span>                :            :     static const size_t npos = size_t(-1);
+<span class="lineNum">     494 </span>                :            : 
+<span class="lineNum">     495 </span>                :            :     explicit String();
+<span class="lineNum">     496 </span>                :            :     String(const String&amp; str);
+<span class="lineNum">     497 </span>                :            :     String(const String&amp; str, size_t pos, size_t len = npos);
+<span class="lineNum">     498 </span>                :            :     String(const char* s);
+<span class="lineNum">     499 </span>                :            :     String(const char* s, size_t n);
+<span class="lineNum">     500 </span>                :            :     String(size_t n, char c);
+<span class="lineNum">     501 </span>                :            :     String(const char* first, const char* last);
+<span class="lineNum">     502 </span>                :            :     template&lt;typename Iterator&gt; String(Iterator first, Iterator last);
+<span class="lineNum">     503 </span>                :            :     explicit String(const FileNode&amp; fn);
+<span class="lineNum">     504 </span>                :            :     ~String();
+<span class="lineNum">     505 </span>                :            : 
+<span class="lineNum">     506 </span>                :            :     String&amp; operator=(const String&amp; str);
+<span class="lineNum">     507 </span>                :            :     String&amp; operator=(const char* s);
+<span class="lineNum">     508 </span>                :            :     String&amp; operator=(char c);
+<span class="lineNum">     509 </span>                :            : 
+<span class="lineNum">     510 </span>                :            :     String&amp; operator+=(const String&amp; str);
+<span class="lineNum">     511 </span>                :            :     String&amp; operator+=(const char* s);
+<span class="lineNum">     512 </span>                :            :     String&amp; operator+=(char c);
+<span class="lineNum">     513 </span>                :            : 
+<span class="lineNum">     514 </span>                :            :     size_t size() const;
+<span class="lineNum">     515 </span>                :            :     size_t length() const;
+<span class="lineNum">     516 </span>                :            : 
+<span class="lineNum">     517 </span>                :            :     char operator[](size_t idx) const;
+<span class="lineNum">     518 </span>                :            :     char operator[](int idx) const;
+<span class="lineNum">     519 </span>                :            : 
+<span class="lineNum">     520 </span>                :            :     const char* begin() const;
+<span class="lineNum">     521 </span>                :            :     const char* end() const;
+<span class="lineNum">     522 </span>                :            : 
+<span class="lineNum">     523 </span>                :            :     const char* c_str() const;
+<span class="lineNum">     524 </span>                :            : 
+<span class="lineNum">     525 </span>                :            :     bool empty() const;
+<span class="lineNum">     526 </span>                :            :     void clear();
+<span class="lineNum">     527 </span>                :            : 
+<span class="lineNum">     528 </span>                :            :     int compare(const char* s) const;
+<span class="lineNum">     529 </span>                :            :     int compare(const String&amp; str) const;
+<span class="lineNum">     530 </span>                :            : 
+<span class="lineNum">     531 </span>                :            :     void swap(String&amp; str);
+<span class="lineNum">     532 </span>                :            :     String substr(size_t pos = 0, size_t len = npos) const;
+<span class="lineNum">     533 </span>                :            : 
+<span class="lineNum">     534 </span>                :            :     size_t find(const char* s, size_t pos, size_t n) const;
+<span class="lineNum">     535 </span>                :            :     size_t find(char c, size_t pos = 0) const;
+<span class="lineNum">     536 </span>                :            :     size_t find(const String&amp; str, size_t pos = 0) const;
+<span class="lineNum">     537 </span>                :            :     size_t find(const char* s, size_t pos = 0) const;
+<span class="lineNum">     538 </span>                :            : 
+<span class="lineNum">     539 </span>                :            :     size_t rfind(const char* s, size_t pos, size_t n) const;
+<span class="lineNum">     540 </span>                :            :     size_t rfind(char c, size_t pos = npos) const;
+<span class="lineNum">     541 </span>                :            :     size_t rfind(const String&amp; str, size_t pos = npos) const;
+<span class="lineNum">     542 </span>                :            :     size_t rfind(const char* s, size_t pos = npos) const;
+<span class="lineNum">     543 </span>                :            : 
+<span class="lineNum">     544 </span>                :            :     size_t find_first_of(const char* s, size_t pos, size_t n) const;
+<span class="lineNum">     545 </span>                :            :     size_t find_first_of(char c, size_t pos = 0) const;
+<span class="lineNum">     546 </span>                :            :     size_t find_first_of(const String&amp; str, size_t pos = 0) const;
+<span class="lineNum">     547 </span>                :            :     size_t find_first_of(const char* s, size_t pos = 0) const;
+<span class="lineNum">     548 </span>                :            : 
+<span class="lineNum">     549 </span>                :            :     size_t find_last_of(const char* s, size_t pos, size_t n) const;
+<span class="lineNum">     550 </span>                :            :     size_t find_last_of(char c, size_t pos = npos) const;
+<span class="lineNum">     551 </span>                :            :     size_t find_last_of(const String&amp; str, size_t pos = npos) const;
+<span class="lineNum">     552 </span>                :            :     size_t find_last_of(const char* s, size_t pos = npos) const;
+<span class="lineNum">     553 </span>                :            : 
+<span class="lineNum">     554 </span>                :            :     friend String operator+ (const String&amp; lhs, const String&amp; rhs);
+<span class="lineNum">     555 </span>                :            :     friend String operator+ (const String&amp; lhs, const char*   rhs);
+<span class="lineNum">     556 </span>                :            :     friend String operator+ (const char*   lhs, const String&amp; rhs);
+<span class="lineNum">     557 </span>                :            :     friend String operator+ (const String&amp; lhs, char          rhs);
+<span class="lineNum">     558 </span>                :            :     friend String operator+ (char          lhs, const String&amp; rhs);
+<span class="lineNum">     559 </span>                :            : 
+<span class="lineNum">     560 </span>                :            :     String toLowerCase() const;
+<span class="lineNum">     561 </span>                :            : 
+<span class="lineNum">     562 </span>                :            : #ifndef OPENCV_NOSTL
+<span class="lineNum">     563 </span>                :            :     String(const std::string&amp; str);
+<span class="lineNum">     564 </span>                :            :     String(const std::string&amp; str, size_t pos, size_t len = npos);
+<span class="lineNum">     565 </span>                :            :     String&amp; operator=(const std::string&amp; str);
+<span class="lineNum">     566 </span>                :            :     String&amp; operator+=(const std::string&amp; str);
+<span class="lineNum">     567 </span>                :            :     operator std::string() const;
+<span class="lineNum">     568 </span>                :            : 
+<span class="lineNum">     569 </span>                :            :     friend String operator+ (const String&amp; lhs, const std::string&amp; rhs);
+<span class="lineNum">     570 </span>                :            :     friend String operator+ (const std::string&amp; lhs, const String&amp; rhs);
+<span class="lineNum">     571 </span>                :            : #endif
+<span class="lineNum">     572 </span>                :            : 
+<span class="lineNum">     573 </span>                :            : private:
+<span class="lineNum">     574 </span>                :            :     char*  cstr_;
+<span class="lineNum">     575 </span>                :            :     size_t len_;
+<span class="lineNum">     576 </span>                :            : 
+<span class="lineNum">     577 </span>                :            :     char* allocate(size_t len); // len without trailing 0
+<span class="lineNum">     578 </span>                :            :     void deallocate();
+<span class="lineNum">     579 </span>                :            : 
+<span class="lineNum">     580 </span>                :            :     String(int); // disabled and invalid. Catch invalid usages like, commandLineParser.has(0) problem
+<span class="lineNum">     581 </span>                :            : };
+<span class="lineNum">     582 </span>                :            : 
+<span class="lineNum">     583 </span>                :            : //! @} core_basic
+<span class="lineNum">     584 </span>                :            : 
+<span class="lineNum">     585 </span>                :            : ////////////////////////// cv::String implementation /////////////////////////
+<span class="lineNum">     586 </span>                :            : 
+<span class="lineNum">     587 </span>                :            : //! @cond IGNORED
+<span class="lineNum">     588 </span>                :            : 
+<span class="lineNum">     589 </span>                :            : inline
+<span class="lineNum">     590 </span>                :            : String::String()
+<span class="lineNum">     591 </span>                :            :     : cstr_(0), len_(0)
+<span class="lineNum">     592 </span>                :            : {}
+<span class="lineNum">     593 </span>                :            : 
+<span class="lineNum">     594 </span>                :            : inline
+<span class="lineNum">     595 </span>                :            : String::String(const String&amp; str)
+<span class="lineNum">     596 </span>                :            :     : cstr_(str.cstr_), len_(str.len_)
+<span class="lineNum">     597 </span>                :            : {
+<span class="lineNum">     598 </span>                :            :     if (cstr_)
+<span class="lineNum">     599 </span>                :            :         CV_XADD(((int*)cstr_)-1, 1);
+<span class="lineNum">     600 </span>                :            : }
+<span class="lineNum">     601 </span>                :            : 
+<span class="lineNum">     602 </span>                :            : inline
+<span class="lineNum">     603 </span>                :            : String::String(const String&amp; str, size_t pos, size_t len)
+<span class="lineNum">     604 </span>                :            :     : cstr_(0), len_(0)
+<span class="lineNum">     605 </span>                :            : {
+<span class="lineNum">     606 </span>                :            :     pos = min(pos, str.len_);
+<span class="lineNum">     607 </span>                :            :     len = min(str.len_ - pos, len);
+<span class="lineNum">     608 </span>                :            :     if (!len) return;
+<span class="lineNum">     609 </span>                :            :     if (len == str.len_)
+<span class="lineNum">     610 </span>                :            :     {
+<span class="lineNum">     611 </span>                :            :         CV_XADD(((int*)str.cstr_)-1, 1);
+<span class="lineNum">     612 </span>                :            :         cstr_ = str.cstr_;
+<span class="lineNum">     613 </span>                :            :         len_ = str.len_;
+<span class="lineNum">     614 </span>                :            :         return;
+<span class="lineNum">     615 </span>                :            :     }
+<span class="lineNum">     616 </span>                :            :     memcpy(allocate(len), str.cstr_ + pos, len);
+<span class="lineNum">     617 </span>                :            : }
+<a name="618"><span class="lineNum">     618 </span>                :            : </a>
+<span class="lineNum">     619 </span>                :            : inline
+<span class="lineNum">     620 </span>                :<span class="lineCov">          8 : String::String(const char* s)</span>
+<span class="lineNum">     621 </span>                :<span class="lineCov">          8 :     : cstr_(0), len_(0)</span>
+<span class="lineNum">     622 </span>                :            : {
+<span class="lineNum">     623 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 8 times"> + </span>]:<span class="lineCov">          8 :     if (!s) return;</span>
+<span class="lineNum">     624 </span>                :<span class="lineCov">          8 :     size_t len = strlen(s);</span>
+<span class="lineNum">     625 </span>                :<span class="lineCov">          8 :     memcpy(allocate(len), s, len);</span>
+<span class="lineNum">     626 </span>                :            : }
+<span class="lineNum">     627 </span>                :            : 
+<span class="lineNum">     628 </span>                :            : inline
+<span class="lineNum">     629 </span>                :            : String::String(const char* s, size_t n)
+<span class="lineNum">     630 </span>                :            :     : cstr_(0), len_(0)
+<span class="lineNum">     631 </span>                :            : {
+<span class="lineNum">     632 </span>                :            :     if (!n) return;
+<span class="lineNum">     633 </span>                :            :     memcpy(allocate(n), s, n);
+<span class="lineNum">     634 </span>                :            : }
+<span class="lineNum">     635 </span>                :            : 
+<span class="lineNum">     636 </span>                :            : inline
+<span class="lineNum">     637 </span>                :            : String::String(size_t n, char c)
+<span class="lineNum">     638 </span>                :            :     : cstr_(0), len_(0)
+<span class="lineNum">     639 </span>                :            : {
+<span class="lineNum">     640 </span>                :            :     memset(allocate(n), c, n);
+<span class="lineNum">     641 </span>                :            : }
+<span class="lineNum">     642 </span>                :            : 
+<span class="lineNum">     643 </span>                :            : inline
+<span class="lineNum">     644 </span>                :            : String::String(const char* first, const char* last)
+<span class="lineNum">     645 </span>                :            :     : cstr_(0), len_(0)
+<span class="lineNum">     646 </span>                :            : {
+<span class="lineNum">     647 </span>                :            :     size_t len = (size_t)(last - first);
+<span class="lineNum">     648 </span>                :            :     memcpy(allocate(len), first, len);
+<span class="lineNum">     649 </span>                :            : }
+<span class="lineNum">     650 </span>                :            : 
+<span class="lineNum">     651 </span>                :            : template&lt;typename Iterator&gt; inline
+<span class="lineNum">     652 </span>                :            : String::String(Iterator first, Iterator last)
+<span class="lineNum">     653 </span>                :            :     : cstr_(0), len_(0)
+<span class="lineNum">     654 </span>                :            : {
+<span class="lineNum">     655 </span>                :            :     size_t len = (size_t)(last - first);
+<span class="lineNum">     656 </span>                :            :     char* str = allocate(len);
+<span class="lineNum">     657 </span>                :            :     while (first != last)
+<span class="lineNum">     658 </span>                :            :     {
+<span class="lineNum">     659 </span>                :            :         *str++ = *first;
+<span class="lineNum">     660 </span>                :            :         ++first;
+<span class="lineNum">     661 </span>                :            :     }
+<span class="lineNum">     662 </span>                :            : }
+<a name="663"><span class="lineNum">     663 </span>                :            : </a>
+<span class="lineNum">     664 </span>                :            : inline
+<span class="lineNum">     665 </span>                :<span class="lineCov">          8 : String::~String()</span>
+<span class="lineNum">     666 </span>                :            : {
+<span class="lineNum">     667 </span>                :<span class="lineCov">          8 :     deallocate();</span>
+<span class="lineNum">     668 </span>                :<span class="lineCov">          8 : }</span>
+<span class="lineNum">     669 </span>                :            : 
+<span class="lineNum">     670 </span>                :            : inline
+<span class="lineNum">     671 </span>                :            : String&amp; String::operator=(const String&amp; str)
+<span class="lineNum">     672 </span>                :            : {
+<span class="lineNum">     673 </span>                :            :     if (&amp;str == this) return *this;
+<span class="lineNum">     674 </span>                :            : 
+<span class="lineNum">     675 </span>                :            :     deallocate();
+<span class="lineNum">     676 </span>                :            :     if (str.cstr_) CV_XADD(((int*)str.cstr_)-1, 1);
+<span class="lineNum">     677 </span>                :            :     cstr_ = str.cstr_;
+<span class="lineNum">     678 </span>                :            :     len_ = str.len_;
+<span class="lineNum">     679 </span>                :            :     return *this;
+<span class="lineNum">     680 </span>                :            : }
+<span class="lineNum">     681 </span>                :            : 
+<span class="lineNum">     682 </span>                :            : inline
+<span class="lineNum">     683 </span>                :            : String&amp; String::operator=(const char* s)
+<span class="lineNum">     684 </span>                :            : {
+<span class="lineNum">     685 </span>                :            :     deallocate();
+<span class="lineNum">     686 </span>                :            :     if (!s) return *this;
+<span class="lineNum">     687 </span>                :            :     size_t len = strlen(s);
+<span class="lineNum">     688 </span>                :            :     memcpy(allocate(len), s, len);
+<span class="lineNum">     689 </span>                :            :     return *this;
+<span class="lineNum">     690 </span>                :            : }
+<span class="lineNum">     691 </span>                :            : 
+<span class="lineNum">     692 </span>                :            : inline
+<span class="lineNum">     693 </span>                :            : String&amp; String::operator=(char c)
+<span class="lineNum">     694 </span>                :            : {
+<span class="lineNum">     695 </span>                :            :     deallocate();
+<span class="lineNum">     696 </span>                :            :     allocate(1)[0] = c;
+<span class="lineNum">     697 </span>                :            :     return *this;
+<span class="lineNum">     698 </span>                :            : }
+<span class="lineNum">     699 </span>                :            : 
+<span class="lineNum">     700 </span>                :            : inline
+<span class="lineNum">     701 </span>                :            : String&amp; String::operator+=(const String&amp; str)
+<span class="lineNum">     702 </span>                :            : {
+<span class="lineNum">     703 </span>                :            :     *this = *this + str;
+<span class="lineNum">     704 </span>                :            :     return *this;
+<span class="lineNum">     705 </span>                :            : }
+<span class="lineNum">     706 </span>                :            : 
+<span class="lineNum">     707 </span>                :            : inline
+<span class="lineNum">     708 </span>                :            : String&amp; String::operator+=(const char* s)
+<span class="lineNum">     709 </span>                :            : {
+<span class="lineNum">     710 </span>                :            :     *this = *this + s;
+<span class="lineNum">     711 </span>                :            :     return *this;
+<span class="lineNum">     712 </span>                :            : }
+<span class="lineNum">     713 </span>                :            : 
+<span class="lineNum">     714 </span>                :            : inline
+<span class="lineNum">     715 </span>                :            : String&amp; String::operator+=(char c)
+<span class="lineNum">     716 </span>                :            : {
+<span class="lineNum">     717 </span>                :            :     *this = *this + c;
+<span class="lineNum">     718 </span>                :            :     return *this;
+<span class="lineNum">     719 </span>                :            : }
+<span class="lineNum">     720 </span>                :            : 
+<span class="lineNum">     721 </span>                :            : inline
+<span class="lineNum">     722 </span>                :            : size_t String::size() const
+<span class="lineNum">     723 </span>                :            : {
+<span class="lineNum">     724 </span>                :            :     return len_;
+<span class="lineNum">     725 </span>                :            : }
+<span class="lineNum">     726 </span>                :            : 
+<span class="lineNum">     727 </span>                :            : inline
+<span class="lineNum">     728 </span>                :            : size_t String::length() const
+<span class="lineNum">     729 </span>                :            : {
+<span class="lineNum">     730 </span>                :            :     return len_;
+<span class="lineNum">     731 </span>                :            : }
+<span class="lineNum">     732 </span>                :            : 
+<span class="lineNum">     733 </span>                :            : inline
+<span class="lineNum">     734 </span>                :            : char String::operator[](size_t idx) const
+<span class="lineNum">     735 </span>                :            : {
+<span class="lineNum">     736 </span>                :            :     return cstr_[idx];
+<span class="lineNum">     737 </span>                :            : }
+<span class="lineNum">     738 </span>                :            : 
+<span class="lineNum">     739 </span>                :            : inline
+<span class="lineNum">     740 </span>                :            : char String::operator[](int idx) const
+<span class="lineNum">     741 </span>                :            : {
+<span class="lineNum">     742 </span>                :            :     return cstr_[idx];
+<span class="lineNum">     743 </span>                :            : }
+<span class="lineNum">     744 </span>                :            : 
+<span class="lineNum">     745 </span>                :            : inline
+<span class="lineNum">     746 </span>                :            : const char* String::begin() const
+<span class="lineNum">     747 </span>                :            : {
+<span class="lineNum">     748 </span>                :            :     return cstr_;
+<span class="lineNum">     749 </span>                :            : }
+<span class="lineNum">     750 </span>                :            : 
+<span class="lineNum">     751 </span>                :            : inline
+<span class="lineNum">     752 </span>                :            : const char* String::end() const
+<span class="lineNum">     753 </span>                :            : {
+<span class="lineNum">     754 </span>                :            :     return len_ ? cstr_ + 1 : 0;
+<span class="lineNum">     755 </span>                :            : }
+<span class="lineNum">     756 </span>                :            : 
+<span class="lineNum">     757 </span>                :            : inline
+<span class="lineNum">     758 </span>                :            : bool String::empty() const
+<span class="lineNum">     759 </span>                :            : {
+<span class="lineNum">     760 </span>                :            :     return len_ == 0;
+<span class="lineNum">     761 </span>                :            : }
+<span class="lineNum">     762 </span>                :            : 
+<span class="lineNum">     763 </span>                :            : inline
+<span class="lineNum">     764 </span>                :            : const char* String::c_str() const
+<span class="lineNum">     765 </span>                :            : {
+<span class="lineNum">     766 </span>                :            :     return cstr_ ? cstr_ : &quot;&quot;;
+<span class="lineNum">     767 </span>                :            : }
+<span class="lineNum">     768 </span>                :            : 
+<span class="lineNum">     769 </span>                :            : inline
+<span class="lineNum">     770 </span>                :            : void String::swap(String&amp; str)
+<span class="lineNum">     771 </span>                :            : {
+<span class="lineNum">     772 </span>                :            :     cv::swap(cstr_, str.cstr_);
+<span class="lineNum">     773 </span>                :            :     cv::swap(len_, str.len_);
+<span class="lineNum">     774 </span>                :            : }
+<span class="lineNum">     775 </span>                :            : 
+<span class="lineNum">     776 </span>                :            : inline
+<span class="lineNum">     777 </span>                :            : void String::clear()
+<span class="lineNum">     778 </span>                :            : {
+<span class="lineNum">     779 </span>                :            :     deallocate();
+<span class="lineNum">     780 </span>                :            : }
+<span class="lineNum">     781 </span>                :            : 
+<span class="lineNum">     782 </span>                :            : inline
+<span class="lineNum">     783 </span>                :            : int String::compare(const char* s) const
+<span class="lineNum">     784 </span>                :            : {
+<span class="lineNum">     785 </span>                :            :     if (cstr_ == s) return 0;
+<span class="lineNum">     786 </span>                :            :     return strcmp(c_str(), s);
+<span class="lineNum">     787 </span>                :            : }
+<span class="lineNum">     788 </span>                :            : 
+<span class="lineNum">     789 </span>                :            : inline
+<span class="lineNum">     790 </span>                :            : int String::compare(const String&amp; str) const
+<span class="lineNum">     791 </span>                :            : {
+<span class="lineNum">     792 </span>                :            :     if (cstr_ == str.cstr_) return 0;
+<span class="lineNum">     793 </span>                :            :     return strcmp(c_str(), str.c_str());
+<span class="lineNum">     794 </span>                :            : }
+<span class="lineNum">     795 </span>                :            : 
+<span class="lineNum">     796 </span>                :            : inline
+<span class="lineNum">     797 </span>                :            : String String::substr(size_t pos, size_t len) const
+<span class="lineNum">     798 </span>                :            : {
+<span class="lineNum">     799 </span>                :            :     return String(*this, pos, len);
+<span class="lineNum">     800 </span>                :            : }
+<span class="lineNum">     801 </span>                :            : 
+<span class="lineNum">     802 </span>                :            : inline
+<span class="lineNum">     803 </span>                :            : size_t String::find(const char* s, size_t pos, size_t n) const
+<span class="lineNum">     804 </span>                :            : {
+<span class="lineNum">     805 </span>                :            :     if (n == 0 || pos + n &gt; len_) return npos;
+<span class="lineNum">     806 </span>                :            :     const char* lmax = cstr_ + len_ - n;
+<span class="lineNum">     807 </span>                :            :     for (const char* i = cstr_ + pos; i &lt;= lmax; ++i)
+<span class="lineNum">     808 </span>                :            :     {
+<span class="lineNum">     809 </span>                :            :         size_t j = 0;
+<span class="lineNum">     810 </span>                :            :         while (j &lt; n &amp;&amp; s[j] == i[j]) ++j;
+<span class="lineNum">     811 </span>                :            :         if (j == n) return (size_t)(i - cstr_);
+<span class="lineNum">     812 </span>                :            :     }
+<span class="lineNum">     813 </span>                :            :     return npos;
+<span class="lineNum">     814 </span>                :            : }
+<span class="lineNum">     815 </span>                :            : 
+<span class="lineNum">     816 </span>                :            : inline
+<span class="lineNum">     817 </span>                :            : size_t String::find(char c, size_t pos) const
+<span class="lineNum">     818 </span>                :            : {
+<span class="lineNum">     819 </span>                :            :     return find(&amp;c, pos, 1);
+<span class="lineNum">     820 </span>                :            : }
+<span class="lineNum">     821 </span>                :            : 
+<span class="lineNum">     822 </span>                :            : inline
+<span class="lineNum">     823 </span>                :            : size_t String::find(const String&amp; str, size_t pos) const
+<span class="lineNum">     824 </span>                :            : {
+<span class="lineNum">     825 </span>                :            :     return find(str.c_str(), pos, str.len_);
+<span class="lineNum">     826 </span>                :            : }
+<span class="lineNum">     827 </span>                :            : 
+<span class="lineNum">     828 </span>                :            : inline
+<span class="lineNum">     829 </span>                :            : size_t String::find(const char* s, size_t pos) const
+<span class="lineNum">     830 </span>                :            : {
+<span class="lineNum">     831 </span>                :            :     if (pos &gt;= len_ || !s[0]) return npos;
+<span class="lineNum">     832 </span>                :            :     const char* lmax = cstr_ + len_;
+<span class="lineNum">     833 </span>                :            :     for (const char* i = cstr_ + pos; i &lt; lmax; ++i)
+<span class="lineNum">     834 </span>                :            :     {
+<span class="lineNum">     835 </span>                :            :         size_t j = 0;
+<span class="lineNum">     836 </span>                :            :         while (s[j] &amp;&amp; s[j] == i[j])
+<span class="lineNum">     837 </span>                :            :         {   if(i + j &gt;= lmax) return npos;
+<span class="lineNum">     838 </span>                :            :             ++j;
+<span class="lineNum">     839 </span>                :            :         }
+<span class="lineNum">     840 </span>                :            :         if (!s[j]) return (size_t)(i - cstr_);
+<span class="lineNum">     841 </span>                :            :     }
+<span class="lineNum">     842 </span>                :            :     return npos;
+<span class="lineNum">     843 </span>                :            : }
+<span class="lineNum">     844 </span>                :            : 
+<span class="lineNum">     845 </span>                :            : inline
+<span class="lineNum">     846 </span>                :            : size_t String::rfind(const char* s, size_t pos, size_t n) const
+<span class="lineNum">     847 </span>                :            : {
+<span class="lineNum">     848 </span>                :            :     if (n &gt; len_) return npos;
+<span class="lineNum">     849 </span>                :            :     if (pos &gt; len_ - n) pos = len_ - n;
+<span class="lineNum">     850 </span>                :            :     for (const char* i = cstr_ + pos; i &gt;= cstr_; --i)
+<span class="lineNum">     851 </span>                :            :     {
+<span class="lineNum">     852 </span>                :            :         size_t j = 0;
+<span class="lineNum">     853 </span>                :            :         while (j &lt; n &amp;&amp; s[j] == i[j]) ++j;
+<span class="lineNum">     854 </span>                :            :         if (j == n) return (size_t)(i - cstr_);
+<span class="lineNum">     855 </span>                :            :     }
+<span class="lineNum">     856 </span>                :            :     return npos;
+<span class="lineNum">     857 </span>                :            : }
+<span class="lineNum">     858 </span>                :            : 
+<span class="lineNum">     859 </span>                :            : inline
+<span class="lineNum">     860 </span>                :            : size_t String::rfind(char c, size_t pos) const
+<span class="lineNum">     861 </span>                :            : {
+<span class="lineNum">     862 </span>                :            :     return rfind(&amp;c, pos, 1);
+<span class="lineNum">     863 </span>                :            : }
+<span class="lineNum">     864 </span>                :            : 
+<span class="lineNum">     865 </span>                :            : inline
+<span class="lineNum">     866 </span>                :            : size_t String::rfind(const String&amp; str, size_t pos) const
+<span class="lineNum">     867 </span>                :            : {
+<span class="lineNum">     868 </span>                :            :     return rfind(str.c_str(), pos, str.len_);
+<span class="lineNum">     869 </span>                :            : }
+<span class="lineNum">     870 </span>                :            : 
+<span class="lineNum">     871 </span>                :            : inline
+<span class="lineNum">     872 </span>                :            : size_t String::rfind(const char* s, size_t pos) const
+<span class="lineNum">     873 </span>                :            : {
+<span class="lineNum">     874 </span>                :            :     return rfind(s, pos, strlen(s));
+<span class="lineNum">     875 </span>                :            : }
+<span class="lineNum">     876 </span>                :            : 
+<span class="lineNum">     877 </span>                :            : inline
+<span class="lineNum">     878 </span>                :            : size_t String::find_first_of(const char* s, size_t pos, size_t n) const
+<span class="lineNum">     879 </span>                :            : {
+<span class="lineNum">     880 </span>                :            :     if (n == 0 || pos + n &gt; len_) return npos;
+<span class="lineNum">     881 </span>                :            :     const char* lmax = cstr_ + len_;
+<span class="lineNum">     882 </span>                :            :     for (const char* i = cstr_ + pos; i &lt; lmax; ++i)
+<span class="lineNum">     883 </span>                :            :     {
+<span class="lineNum">     884 </span>                :            :         for (size_t j = 0; j &lt; n; ++j)
+<span class="lineNum">     885 </span>                :            :             if (s[j] == *i)
+<span class="lineNum">     886 </span>                :            :                 return (size_t)(i - cstr_);
+<span class="lineNum">     887 </span>                :            :     }
+<span class="lineNum">     888 </span>                :            :     return npos;
+<span class="lineNum">     889 </span>                :            : }
+<span class="lineNum">     890 </span>                :            : 
+<span class="lineNum">     891 </span>                :            : inline
+<span class="lineNum">     892 </span>                :            : size_t String::find_first_of(char c, size_t pos) const
+<span class="lineNum">     893 </span>                :            : {
+<span class="lineNum">     894 </span>                :            :     return find_first_of(&amp;c, pos, 1);
+<span class="lineNum">     895 </span>                :            : }
+<span class="lineNum">     896 </span>                :            : 
+<span class="lineNum">     897 </span>                :            : inline
+<span class="lineNum">     898 </span>                :            : size_t String::find_first_of(const String&amp; str, size_t pos) const
+<span class="lineNum">     899 </span>                :            : {
+<span class="lineNum">     900 </span>                :            :     return find_first_of(str.c_str(), pos, str.len_);
+<span class="lineNum">     901 </span>                :            : }
+<span class="lineNum">     902 </span>                :            : 
+<span class="lineNum">     903 </span>                :            : inline
+<span class="lineNum">     904 </span>                :            : size_t String::find_first_of(const char* s, size_t pos) const
+<span class="lineNum">     905 </span>                :            : {
+<span class="lineNum">     906 </span>                :            :     if (len_ == 0) return npos;
+<span class="lineNum">     907 </span>                :            :     if (pos &gt;= len_ || !s[0]) return npos;
+<span class="lineNum">     908 </span>                :            :     const char* lmax = cstr_ + len_;
+<span class="lineNum">     909 </span>                :            :     for (const char* i = cstr_ + pos; i &lt; lmax; ++i)
+<span class="lineNum">     910 </span>                :            :     {
+<span class="lineNum">     911 </span>                :            :         for (size_t j = 0; s[j]; ++j)
+<span class="lineNum">     912 </span>                :            :             if (s[j] == *i)
+<span class="lineNum">     913 </span>                :            :                 return (size_t)(i - cstr_);
+<span class="lineNum">     914 </span>                :            :     }
+<span class="lineNum">     915 </span>                :            :     return npos;
+<span class="lineNum">     916 </span>                :            : }
+<span class="lineNum">     917 </span>                :            : 
+<span class="lineNum">     918 </span>                :            : inline
+<span class="lineNum">     919 </span>                :            : size_t String::find_last_of(const char* s, size_t pos, size_t n) const
+<span class="lineNum">     920 </span>                :            : {
+<span class="lineNum">     921 </span>                :            :     if (len_ == 0) return npos;
+<span class="lineNum">     922 </span>                :            :     if (pos &gt;= len_) pos = len_ - 1;
+<span class="lineNum">     923 </span>                :            :     for (const char* i = cstr_ + pos; i &gt;= cstr_; --i)
+<span class="lineNum">     924 </span>                :            :     {
+<span class="lineNum">     925 </span>                :            :         for (size_t j = 0; j &lt; n; ++j)
+<span class="lineNum">     926 </span>                :            :             if (s[j] == *i)
+<span class="lineNum">     927 </span>                :            :                 return (size_t)(i - cstr_);
+<span class="lineNum">     928 </span>                :            :     }
+<span class="lineNum">     929 </span>                :            :     return npos;
+<span class="lineNum">     930 </span>                :            : }
+<span class="lineNum">     931 </span>                :            : 
+<span class="lineNum">     932 </span>                :            : inline
+<span class="lineNum">     933 </span>                :            : size_t String::find_last_of(char c, size_t pos) const
+<span class="lineNum">     934 </span>                :            : {
+<span class="lineNum">     935 </span>                :            :     return find_last_of(&amp;c, pos, 1);
+<span class="lineNum">     936 </span>                :            : }
+<span class="lineNum">     937 </span>                :            : 
+<span class="lineNum">     938 </span>                :            : inline
+<span class="lineNum">     939 </span>                :            : size_t String::find_last_of(const String&amp; str, size_t pos) const
+<span class="lineNum">     940 </span>                :            : {
+<span class="lineNum">     941 </span>                :            :     return find_last_of(str.c_str(), pos, str.len_);
+<span class="lineNum">     942 </span>                :            : }
+<span class="lineNum">     943 </span>                :            : 
+<span class="lineNum">     944 </span>                :            : inline
+<span class="lineNum">     945 </span>                :            : size_t String::find_last_of(const char* s, size_t pos) const
+<span class="lineNum">     946 </span>                :            : {
+<span class="lineNum">     947 </span>                :            :     if (len_ == 0) return npos;
+<span class="lineNum">     948 </span>                :            :     if (pos &gt;= len_) pos = len_ - 1;
+<span class="lineNum">     949 </span>                :            :     for (const char* i = cstr_ + pos; i &gt;= cstr_; --i)
+<span class="lineNum">     950 </span>                :            :     {
+<span class="lineNum">     951 </span>                :            :         for (size_t j = 0; s[j]; ++j)
+<span class="lineNum">     952 </span>                :            :             if (s[j] == *i)
+<span class="lineNum">     953 </span>                :            :                 return (size_t)(i - cstr_);
+<span class="lineNum">     954 </span>                :            :     }
+<span class="lineNum">     955 </span>                :            :     return npos;
+<span class="lineNum">     956 </span>                :            : }
+<span class="lineNum">     957 </span>                :            : 
+<span class="lineNum">     958 </span>                :            : inline
+<span class="lineNum">     959 </span>                :            : String String::toLowerCase() const
+<span class="lineNum">     960 </span>                :            : {
+<span class="lineNum">     961 </span>                :            :     String res(cstr_, len_);
+<span class="lineNum">     962 </span>                :            : 
+<span class="lineNum">     963 </span>                :            :     for (size_t i = 0; i &lt; len_; ++i)
+<span class="lineNum">     964 </span>                :            :         res.cstr_[i] = (char) ::tolower(cstr_[i]);
+<span class="lineNum">     965 </span>                :            : 
+<span class="lineNum">     966 </span>                :            :     return res;
+<span class="lineNum">     967 </span>                :            : }
+<span class="lineNum">     968 </span>                :            : 
+<span class="lineNum">     969 </span>                :            : //! @endcond
+<span class="lineNum">     970 </span>                :            : 
+<span class="lineNum">     971 </span>                :            : // ************************* cv::String non-member functions *************************
+<span class="lineNum">     972 </span>                :            : 
+<span class="lineNum">     973 </span>                :            : //! @relates cv::String
+<span class="lineNum">     974 </span>                :            : //! @{
+<span class="lineNum">     975 </span>                :            : 
+<span class="lineNum">     976 </span>                :            : inline
+<span class="lineNum">     977 </span>                :            : String operator + (const String&amp; lhs, const String&amp; rhs)
+<span class="lineNum">     978 </span>                :            : {
+<span class="lineNum">     979 </span>                :            :     String s;
+<span class="lineNum">     980 </span>                :            :     s.allocate(lhs.len_ + rhs.len_);
+<span class="lineNum">     981 </span>                :            :     memcpy(s.cstr_, lhs.cstr_, lhs.len_);
+<span class="lineNum">     982 </span>                :            :     memcpy(s.cstr_ + lhs.len_, rhs.cstr_, rhs.len_);
+<span class="lineNum">     983 </span>                :            :     return s;
+<span class="lineNum">     984 </span>                :            : }
+<span class="lineNum">     985 </span>                :            : 
+<span class="lineNum">     986 </span>                :            : inline
+<span class="lineNum">     987 </span>                :            : String operator + (const String&amp; lhs, const char* rhs)
+<span class="lineNum">     988 </span>                :            : {
+<span class="lineNum">     989 </span>                :            :     String s;
+<span class="lineNum">     990 </span>                :            :     size_t rhslen = strlen(rhs);
+<span class="lineNum">     991 </span>                :            :     s.allocate(lhs.len_ + rhslen);
+<span class="lineNum">     992 </span>                :            :     memcpy(s.cstr_, lhs.cstr_, lhs.len_);
+<span class="lineNum">     993 </span>                :            :     memcpy(s.cstr_ + lhs.len_, rhs, rhslen);
+<span class="lineNum">     994 </span>                :            :     return s;
+<span class="lineNum">     995 </span>                :            : }
+<span class="lineNum">     996 </span>                :            : 
+<span class="lineNum">     997 </span>                :            : inline
+<span class="lineNum">     998 </span>                :            : String operator + (const char* lhs, const String&amp; rhs)
+<span class="lineNum">     999 </span>                :            : {
+<span class="lineNum">    1000 </span>                :            :     String s;
+<span class="lineNum">    1001 </span>                :            :     size_t lhslen = strlen(lhs);
+<span class="lineNum">    1002 </span>                :            :     s.allocate(lhslen + rhs.len_);
+<span class="lineNum">    1003 </span>                :            :     memcpy(s.cstr_, lhs, lhslen);
+<span class="lineNum">    1004 </span>                :            :     memcpy(s.cstr_ + lhslen, rhs.cstr_, rhs.len_);
+<span class="lineNum">    1005 </span>                :            :     return s;
+<span class="lineNum">    1006 </span>                :            : }
+<span class="lineNum">    1007 </span>                :            : 
+<span class="lineNum">    1008 </span>                :            : inline
+<span class="lineNum">    1009 </span>                :            : String operator + (const String&amp; lhs, char rhs)
+<span class="lineNum">    1010 </span>                :            : {
+<span class="lineNum">    1011 </span>                :            :     String s;
+<span class="lineNum">    1012 </span>                :            :     s.allocate(lhs.len_ + 1);
+<span class="lineNum">    1013 </span>                :            :     memcpy(s.cstr_, lhs.cstr_, lhs.len_);
+<span class="lineNum">    1014 </span>                :            :     s.cstr_[lhs.len_] = rhs;
+<span class="lineNum">    1015 </span>                :            :     return s;
+<span class="lineNum">    1016 </span>                :            : }
+<span class="lineNum">    1017 </span>                :            : 
+<span class="lineNum">    1018 </span>                :            : inline
+<span class="lineNum">    1019 </span>                :            : String operator + (char lhs, const String&amp; rhs)
+<span class="lineNum">    1020 </span>                :            : {
+<span class="lineNum">    1021 </span>                :            :     String s;
+<span class="lineNum">    1022 </span>                :            :     s.allocate(rhs.len_ + 1);
+<span class="lineNum">    1023 </span>                :            :     s.cstr_[0] = lhs;
+<span class="lineNum">    1024 </span>                :            :     memcpy(s.cstr_ + 1, rhs.cstr_, rhs.len_);
+<span class="lineNum">    1025 </span>                :            :     return s;
+<span class="lineNum">    1026 </span>                :            : }
+<span class="lineNum">    1027 </span>                :            : 
+<span class="lineNum">    1028 </span>                :            : static inline bool operator== (const String&amp; lhs, const String&amp; rhs) { return 0 == lhs.compare(rhs); }
+<span class="lineNum">    1029 </span>                :            : static inline bool operator== (const char*   lhs, const String&amp; rhs) { return 0 == rhs.compare(lhs); }
+<span class="lineNum">    1030 </span>                :            : static inline bool operator== (const String&amp; lhs, const char*   rhs) { return 0 == lhs.compare(rhs); }
+<span class="lineNum">    1031 </span>                :            : static inline bool operator!= (const String&amp; lhs, const String&amp; rhs) { return 0 != lhs.compare(rhs); }
+<span class="lineNum">    1032 </span>                :            : static inline bool operator!= (const char*   lhs, const String&amp; rhs) { return 0 != rhs.compare(lhs); }
+<span class="lineNum">    1033 </span>                :            : static inline bool operator!= (const String&amp; lhs, const char*   rhs) { return 0 != lhs.compare(rhs); }
+<span class="lineNum">    1034 </span>                :            : static inline bool operator&lt;  (const String&amp; lhs, const String&amp; rhs) { return lhs.compare(rhs) &lt;  0; }
+<span class="lineNum">    1035 </span>                :            : static inline bool operator&lt;  (const char*   lhs, const String&amp; rhs) { return rhs.compare(lhs) &gt;  0; }
+<span class="lineNum">    1036 </span>                :            : static inline bool operator&lt;  (const String&amp; lhs, const char*   rhs) { return lhs.compare(rhs) &lt;  0; }
+<span class="lineNum">    1037 </span>                :            : static inline bool operator&lt;= (const String&amp; lhs, const String&amp; rhs) { return lhs.compare(rhs) &lt;= 0; }
+<span class="lineNum">    1038 </span>                :            : static inline bool operator&lt;= (const char*   lhs, const String&amp; rhs) { return rhs.compare(lhs) &gt;= 0; }
+<span class="lineNum">    1039 </span>                :            : static inline bool operator&lt;= (const String&amp; lhs, const char*   rhs) { return lhs.compare(rhs) &lt;= 0; }
+<span class="lineNum">    1040 </span>                :            : static inline bool operator&gt;  (const String&amp; lhs, const String&amp; rhs) { return lhs.compare(rhs) &gt;  0; }
+<span class="lineNum">    1041 </span>                :            : static inline bool operator&gt;  (const char*   lhs, const String&amp; rhs) { return rhs.compare(lhs) &lt;  0; }
+<span class="lineNum">    1042 </span>                :            : static inline bool operator&gt;  (const String&amp; lhs, const char*   rhs) { return lhs.compare(rhs) &gt;  0; }
+<span class="lineNum">    1043 </span>                :            : static inline bool operator&gt;= (const String&amp; lhs, const String&amp; rhs) { return lhs.compare(rhs) &gt;= 0; }
+<span class="lineNum">    1044 </span>                :            : static inline bool operator&gt;= (const char*   lhs, const String&amp; rhs) { return rhs.compare(lhs) &lt;= 0; }
+<span class="lineNum">    1045 </span>                :            : static inline bool operator&gt;= (const String&amp; lhs, const char*   rhs) { return lhs.compare(rhs) &gt;= 0; }
+<span class="lineNum">    1046 </span>                :            : 
+<span class="lineNum">    1047 </span>                :            : //! @} relates cv::String
+<span class="lineNum">    1048 </span>                :            : 
+<span class="lineNum">    1049 </span>                :            : } // cv
+<span class="lineNum">    1050 </span>                :            : 
+<span class="lineNum">    1051 </span>                :            : #ifndef OPENCV_NOSTL_TRANSITIONAL
+<span class="lineNum">    1052 </span>                :            : namespace std
+<span class="lineNum">    1053 </span>                :            : {
+<span class="lineNum">    1054 </span>                :            :     static inline void swap(cv::String&amp; a, cv::String&amp; b) { a.swap(b); }
+<span class="lineNum">    1055 </span>                :            : }
+<span class="lineNum">    1056 </span>                :            : #else
+<span class="lineNum">    1057 </span>                :            : namespace cv
+<span class="lineNum">    1058 </span>                :            : {
+<span class="lineNum">    1059 </span>                :            :     template&lt;&gt; inline
+<span class="lineNum">    1060 </span>                :            :     void swap&lt;cv::String&gt;(cv::String&amp; a, cv::String&amp; b)
+<span class="lineNum">    1061 </span>                :            :     {
+<span class="lineNum">    1062 </span>                :            :         a.swap(b);
+<span class="lineNum">    1063 </span>                :            :     }
+<span class="lineNum">    1064 </span>                :            : }
+<span class="lineNum">    1065 </span>                :            : #endif
+<span class="lineNum">    1066 </span>                :            : 
+<span class="lineNum">    1067 </span>                :            : #include &quot;opencv2/core/ptr.inl.hpp&quot;
+<span class="lineNum">    1068 </span>                :            : 
+<span class="lineNum">    1069 </span>                :            : #endif //__OPENCV_CORE_CVSTD_HPP__
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

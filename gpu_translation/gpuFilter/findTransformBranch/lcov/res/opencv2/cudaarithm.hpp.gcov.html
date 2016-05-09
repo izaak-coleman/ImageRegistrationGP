@@ -1,0 +1,931 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - ex_test.info - opencv2/cudaarithm.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">opencv2</a> - cudaarithm.hpp<span style="font-size: 80%;"> (source / <a href="cudaarithm.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">ex_test.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-03-07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">11</td>
+            <td class="headerCovTableEntry">22</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : /*M///////////////////////////////////////////////////////////////////////////////////////</a>
+<span class="lineNum">       2 </span>                :            : //
+<span class="lineNum">       3 </span>                :            : //  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING.
+<span class="lineNum">       4 </span>                :            : //
+<span class="lineNum">       5 </span>                :            : //  By downloading, copying, installing or using the software you agree to this license.
+<span class="lineNum">       6 </span>                :            : //  If you do not agree to this license, do not download, install,
+<span class="lineNum">       7 </span>                :            : //  copy or use the software.
+<span class="lineNum">       8 </span>                :            : //
+<span class="lineNum">       9 </span>                :            : //
+<span class="lineNum">      10 </span>                :            : //                           License Agreement
+<span class="lineNum">      11 </span>                :            : //                For Open Source Computer Vision Library
+<span class="lineNum">      12 </span>                :            : //
+<span class="lineNum">      13 </span>                :            : // Copyright (C) 2000-2008, Intel Corporation, all rights reserved.
+<span class="lineNum">      14 </span>                :            : // Copyright (C) 2009, Willow Garage Inc., all rights reserved.
+<span class="lineNum">      15 </span>                :            : // Third party copyrights are property of their respective owners.
+<span class="lineNum">      16 </span>                :            : //
+<span class="lineNum">      17 </span>                :            : // Redistribution and use in source and binary forms, with or without modification,
+<span class="lineNum">      18 </span>                :            : // are permitted provided that the following conditions are met:
+<span class="lineNum">      19 </span>                :            : //
+<span class="lineNum">      20 </span>                :            : //   * Redistribution's of source code must retain the above copyright notice,
+<span class="lineNum">      21 </span>                :            : //     this list of conditions and the following disclaimer.
+<span class="lineNum">      22 </span>                :            : //
+<span class="lineNum">      23 </span>                :            : //   * Redistribution's in binary form must reproduce the above copyright notice,
+<span class="lineNum">      24 </span>                :            : //     this list of conditions and the following disclaimer in the documentation
+<span class="lineNum">      25 </span>                :            : //     and/or other materials provided with the distribution.
+<span class="lineNum">      26 </span>                :            : //
+<span class="lineNum">      27 </span>                :            : //   * The name of the copyright holders may not be used to endorse or promote products
+<span class="lineNum">      28 </span>                :            : //     derived from this software without specific prior written permission.
+<span class="lineNum">      29 </span>                :            : //
+<span class="lineNum">      30 </span>                :            : // This software is provided by the copyright holders and contributors &quot;as is&quot; and
+<span class="lineNum">      31 </span>                :            : // any express or implied warranties, including, but not limited to, the implied
+<span class="lineNum">      32 </span>                :            : // warranties of merchantability and fitness for a particular purpose are disclaimed.
+<span class="lineNum">      33 </span>                :            : // In no event shall the Intel Corporation or contributors be liable for any direct,
+<span class="lineNum">      34 </span>                :            : // indirect, incidental, special, exemplary, or consequential damages
+<span class="lineNum">      35 </span>                :            : // (including, but not limited to, procurement of substitute goods or services;
+<span class="lineNum">      36 </span>                :            : // loss of use, data, or profits; or business interruption) however caused
+<span class="lineNum">      37 </span>                :            : // and on any theory of liability, whether in contract, strict liability,
+<span class="lineNum">      38 </span>                :            : // or tort (including negligence or otherwise) arising in any way out of
+<span class="lineNum">      39 </span>                :            : // the use of this software, even if advised of the possibility of such damage.
+<span class="lineNum">      40 </span>                :            : //
+<span class="lineNum">      41 </span>                :            : //M*/
+<span class="lineNum">      42 </span>                :            : 
+<span class="lineNum">      43 </span>                :            : #ifndef __OPENCV_CUDAARITHM_HPP__
+<span class="lineNum">      44 </span>                :            : #define __OPENCV_CUDAARITHM_HPP__
+<span class="lineNum">      45 </span>                :            : 
+<span class="lineNum">      46 </span>                :            : #ifndef __cplusplus
+<span class="lineNum">      47 </span>                :            : #  error cudaarithm.hpp header must be compiled as C++
+<span class="lineNum">      48 </span>                :            : #endif
+<span class="lineNum">      49 </span>                :            : 
+<span class="lineNum">      50 </span>                :            : #include &quot;opencv2/core/cuda.hpp&quot;
+<span class="lineNum">      51 </span>                :            : 
+<span class="lineNum">      52 </span>                :            : /**
+<span class="lineNum">      53 </span>                :            :   @addtogroup cuda
+<span class="lineNum">      54 </span>                :            :   @{
+<span class="lineNum">      55 </span>                :            :     @defgroup cudaarithm Operations on Matrices
+<span class="lineNum">      56 </span>                :            :     @{
+<span class="lineNum">      57 </span>                :            :         @defgroup cudaarithm_core Core Operations on Matrices
+<span class="lineNum">      58 </span>                :            :         @defgroup cudaarithm_elem Per-element Operations
+<span class="lineNum">      59 </span>                :            :         @defgroup cudaarithm_reduce Matrix Reductions
+<span class="lineNum">      60 </span>                :            :         @defgroup cudaarithm_arithm Arithm Operations on Matrices
+<span class="lineNum">      61 </span>                :            :     @}
+<span class="lineNum">      62 </span>                :            :   @}
+<span class="lineNum">      63 </span>                :            :  */
+<span class="lineNum">      64 </span>                :            : 
+<span class="lineNum">      65 </span>                :            : namespace cv { namespace cuda {
+<span class="lineNum">      66 </span>                :            : 
+<span class="lineNum">      67 </span>                :            : //! @addtogroup cudaarithm
+<span class="lineNum">      68 </span>                :            : //! @{
+<span class="lineNum">      69 </span>                :            : 
+<span class="lineNum">      70 </span>                :            : //! @addtogroup cudaarithm_elem
+<span class="lineNum">      71 </span>                :            : //! @{
+<span class="lineNum">      72 </span>                :            : 
+<span class="lineNum">      73 </span>                :            : /** @brief Computes a matrix-matrix or matrix-scalar sum.
+<span class="lineNum">      74 </span>                :            : 
+<span class="lineNum">      75 </span>                :            : @param src1 First source matrix or scalar.
+<span class="lineNum">      76 </span>                :            : @param src2 Second source matrix or scalar. Matrix should have the same size and type as src1 .
+<span class="lineNum">      77 </span>                :            : @param dst Destination matrix that has the same size and number of channels as the input array(s).
+<span class="lineNum">      78 </span>                :            : The depth is defined by dtype or src1 depth.
+<span class="lineNum">      79 </span>                :            : @param mask Optional operation mask, 8-bit single channel array, that specifies elements of the
+<span class="lineNum">      80 </span>                :            : destination array to be changed.
+<span class="lineNum">      81 </span>                :            : @param dtype Optional depth of the output array.
+<span class="lineNum">      82 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">      83 </span>                :            : 
+<span class="lineNum">      84 </span>                :            : @sa add
+<span class="lineNum">      85 </span>                :            :  */
+<span class="lineNum">      86 </span>  [<span class="branchCov" title="Branch 1 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 4 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span> :<span class="lineCov">       1014 : CV_EXPORTS void add(InputArray src1, InputArray src2, OutputArray dst, InputArray mask = noArray(), int dtype = -1, Stream&amp; stream = Stream::Null());</span>
+<span class="lineNum">         </span> <span class="branchCov" title="Branch 7 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 8 was not taken"> - </span>][<span class="branchCov" title="Branch 10 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
+<span class="lineNum">      87 </span>                :            : 
+<span class="lineNum">      88 </span>                :            : /** @brief Computes a matrix-matrix or matrix-scalar difference.
+<span class="lineNum">      89 </span>                :            : 
+<span class="lineNum">      90 </span>                :            : @param src1 First source matrix or scalar.
+<span class="lineNum">      91 </span>                :            : @param src2 Second source matrix or scalar. Matrix should have the same size and type as src1 .
+<span class="lineNum">      92 </span>                :            : @param dst Destination matrix that has the same size and number of channels as the input array(s).
+<span class="lineNum">      93 </span>                :            : The depth is defined by dtype or src1 depth.
+<span class="lineNum">      94 </span>                :            : @param mask Optional operation mask, 8-bit single channel array, that specifies elements of the
+<span class="lineNum">      95 </span>                :            : destination array to be changed.
+<span class="lineNum">      96 </span>                :            : @param dtype Optional depth of the output array.
+<span class="lineNum">      97 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">      98 </span>                :            : 
+<span class="lineNum">      99 </span>                :            : @sa subtract
+<span class="lineNum">     100 </span>                :            :  */
+<span class="lineNum">     101 </span>                :            : CV_EXPORTS void subtract(InputArray src1, InputArray src2, OutputArray dst, InputArray mask = noArray(), int dtype = -1, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     102 </span>                :            : 
+<span class="lineNum">     103 </span>                :            : /** @brief Computes a matrix-matrix or matrix-scalar per-element product.
+<span class="lineNum">     104 </span>                :            : 
+<span class="lineNum">     105 </span>                :            : @param src1 First source matrix or scalar.
+<span class="lineNum">     106 </span>                :            : @param src2 Second source matrix or scalar.
+<span class="lineNum">     107 </span>                :            : @param dst Destination matrix that has the same size and number of channels as the input array(s).
+<span class="lineNum">     108 </span>                :            : The depth is defined by dtype or src1 depth.
+<span class="lineNum">     109 </span>                :            : @param scale Optional scale factor.
+<span class="lineNum">     110 </span>                :            : @param dtype Optional depth of the output array.
+<span class="lineNum">     111 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     112 </span>                :            : 
+<span class="lineNum">     113 </span>                :            : @sa multiply
+<span class="lineNum">     114 </span>                :            :  */
+<span class="lineNum">     115 </span>[<span class="branchCov" title="Branch 1 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span>][<span class="branchCov" title="Branch 4 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]:<span class="lineCov">       1352 : CV_EXPORTS void multiply(InputArray src1, InputArray src2, OutputArray dst, double scale = 1, int dtype = -1, Stream&amp; stream = Stream::Null());</span>
+<span class="lineNum">         </span>[<span class="branchCov" title="Branch 7 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 8 was not taken"> - </span>][<span class="branchCov" title="Branch 10 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
+<span class="lineNum">     116 </span>                :            : 
+<span class="lineNum">     117 </span>                :            : /** @brief Computes a matrix-matrix or matrix-scalar division.
+<span class="lineNum">     118 </span>                :            : 
+<span class="lineNum">     119 </span>                :            : @param src1 First source matrix or a scalar.
+<span class="lineNum">     120 </span>                :            : @param src2 Second source matrix or scalar.
+<span class="lineNum">     121 </span>                :            : @param dst Destination matrix that has the same size and number of channels as the input array(s).
+<span class="lineNum">     122 </span>                :            : The depth is defined by dtype or src1 depth.
+<span class="lineNum">     123 </span>                :            : @param scale Optional scale factor.
+<span class="lineNum">     124 </span>                :            : @param dtype Optional depth of the output array.
+<span class="lineNum">     125 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     126 </span>                :            : 
+<span class="lineNum">     127 </span>                :            : This function, in contrast to divide, uses a round-down rounding mode.
+<span class="lineNum">     128 </span>                :            : 
+<span class="lineNum">     129 </span>                :            : @sa divide
+<span class="lineNum">     130 </span>                :            :  */
+<span class="lineNum">     131 </span>                :            : CV_EXPORTS void divide(InputArray src1, InputArray src2, OutputArray dst, double scale = 1, int dtype = -1, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     132 </span>                :            : 
+<span class="lineNum">     133 </span>                :            : /** @brief Computes per-element absolute difference of two matrices (or of a matrix and scalar).
+<span class="lineNum">     134 </span>                :            : 
+<span class="lineNum">     135 </span>                :            : @param src1 First source matrix or scalar.
+<span class="lineNum">     136 </span>                :            : @param src2 Second source matrix or scalar.
+<span class="lineNum">     137 </span>                :            : @param dst Destination matrix that has the same size and type as the input array(s).
+<span class="lineNum">     138 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     139 </span>                :            : 
+<span class="lineNum">     140 </span>                :            : @sa absdiff
+<span class="lineNum">     141 </span>                :            :  */
+<span class="lineNum">     142 </span>                :            : CV_EXPORTS void absdiff(InputArray src1, InputArray src2, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     143 </span>                :            : 
+<span class="lineNum">     144 </span>                :            : /** @brief Computes an absolute value of each matrix element.
+<span class="lineNum">     145 </span>                :            : 
+<span class="lineNum">     146 </span>                :            : @param src Source matrix.
+<span class="lineNum">     147 </span>                :            : @param dst Destination matrix with the same size and type as src .
+<span class="lineNum">     148 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     149 </span>                :            : 
+<span class="lineNum">     150 </span>                :            : @sa abs
+<span class="lineNum">     151 </span>                :            :  */
+<span class="lineNum">     152 </span>                :            : CV_EXPORTS void abs(InputArray src, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     153 </span>                :            : 
+<span class="lineNum">     154 </span>                :            : /** @brief Computes a square value of each matrix element.
+<span class="lineNum">     155 </span>                :            : 
+<span class="lineNum">     156 </span>                :            : @param src Source matrix.
+<span class="lineNum">     157 </span>                :            : @param dst Destination matrix with the same size and type as src .
+<span class="lineNum">     158 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     159 </span>                :            :  */
+<span class="lineNum">     160 </span>                :            : CV_EXPORTS void sqr(InputArray src, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     161 </span>                :            : 
+<span class="lineNum">     162 </span>                :            : /** @brief Computes a square root of each matrix element.
+<span class="lineNum">     163 </span>                :            : 
+<span class="lineNum">     164 </span>                :            : @param src Source matrix.
+<span class="lineNum">     165 </span>                :            : @param dst Destination matrix with the same size and type as src .
+<span class="lineNum">     166 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     167 </span>                :            : 
+<span class="lineNum">     168 </span>                :            : @sa sqrt
+<span class="lineNum">     169 </span>                :            :  */
+<span class="lineNum">     170 </span>                :            : CV_EXPORTS void sqrt(InputArray src, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     171 </span>                :            : 
+<span class="lineNum">     172 </span>                :            : /** @brief Computes an exponent of each matrix element.
+<span class="lineNum">     173 </span>                :            : 
+<span class="lineNum">     174 </span>                :            : @param src Source matrix.
+<span class="lineNum">     175 </span>                :            : @param dst Destination matrix with the same size and type as src .
+<span class="lineNum">     176 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     177 </span>                :            : 
+<span class="lineNum">     178 </span>                :            : @sa exp
+<span class="lineNum">     179 </span>                :            :  */
+<span class="lineNum">     180 </span>                :            : CV_EXPORTS void exp(InputArray src, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     181 </span>                :            : 
+<span class="lineNum">     182 </span>                :            : /** @brief Computes a natural logarithm of absolute value of each matrix element.
+<span class="lineNum">     183 </span>                :            : 
+<span class="lineNum">     184 </span>                :            : @param src Source matrix.
+<span class="lineNum">     185 </span>                :            : @param dst Destination matrix with the same size and type as src .
+<span class="lineNum">     186 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     187 </span>                :            : 
+<span class="lineNum">     188 </span>                :            : @sa log
+<span class="lineNum">     189 </span>                :            :  */
+<span class="lineNum">     190 </span>                :            : CV_EXPORTS void log(InputArray src, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     191 </span>                :            : 
+<span class="lineNum">     192 </span>                :            : /** @brief Raises every matrix element to a power.
+<span class="lineNum">     193 </span>                :            : 
+<span class="lineNum">     194 </span>                :            : @param src Source matrix.
+<span class="lineNum">     195 </span>                :            : @param power Exponent of power.
+<span class="lineNum">     196 </span>                :            : @param dst Destination matrix with the same size and type as src .
+<span class="lineNum">     197 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     198 </span>                :            : 
+<span class="lineNum">     199 </span>                :            : The function pow raises every element of the input matrix to power :
+<span class="lineNum">     200 </span>                :            : 
+<span class="lineNum">     201 </span>                :            : \f[\texttt{dst} (I) =  \fork{\texttt{src}(I)^power}{if \texttt{power} is integer}{|\texttt{src}(I)|^power}{otherwise}\f]
+<span class="lineNum">     202 </span>                :            : 
+<span class="lineNum">     203 </span>                :            : @sa pow
+<span class="lineNum">     204 </span>                :            :  */
+<span class="lineNum">     205 </span>                :            : CV_EXPORTS void pow(InputArray src, double power, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     206 </span>                :            : 
+<span class="lineNum">     207 </span>                :            : /** @brief Compares elements of two matrices (or of a matrix and scalar).
+<span class="lineNum">     208 </span>                :            : 
+<span class="lineNum">     209 </span>                :            : @param src1 First source matrix or scalar.
+<span class="lineNum">     210 </span>                :            : @param src2 Second source matrix or scalar.
+<span class="lineNum">     211 </span>                :            : @param dst Destination matrix that has the same size and type as the input array(s).
+<span class="lineNum">     212 </span>                :            : @param cmpop Flag specifying the relation between the elements to be checked:
+<span class="lineNum">     213 </span>                :            : -   **CMP_EQ:** a(.) == b(.)
+<span class="lineNum">     214 </span>                :            : -   **CMP_GT:** a(.) \&gt; b(.)
+<span class="lineNum">     215 </span>                :            : -   **CMP_GE:** a(.) \&gt;= b(.)
+<span class="lineNum">     216 </span>                :            : -   **CMP_LT:** a(.) \&lt; b(.)
+<span class="lineNum">     217 </span>                :            : -   **CMP_LE:** a(.) \&lt;= b(.)
+<span class="lineNum">     218 </span>                :            : -   **CMP_NE:** a(.) != b(.)
+<span class="lineNum">     219 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     220 </span>                :            : 
+<span class="lineNum">     221 </span>                :            : @sa compare
+<span class="lineNum">     222 </span>                :            :  */
+<span class="lineNum">     223 </span>                :            : CV_EXPORTS void compare(InputArray src1, InputArray src2, OutputArray dst, int cmpop, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     224 </span>                :            : 
+<span class="lineNum">     225 </span>                :            : /** @brief Performs a per-element bitwise inversion.
+<span class="lineNum">     226 </span>                :            : 
+<span class="lineNum">     227 </span>                :            : @param src Source matrix.
+<span class="lineNum">     228 </span>                :            : @param dst Destination matrix with the same size and type as src .
+<span class="lineNum">     229 </span>                :            : @param mask Optional operation mask. 8-bit single channel image.
+<span class="lineNum">     230 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     231 </span>                :            :  */
+<span class="lineNum">     232 </span>                :            : CV_EXPORTS void bitwise_not(InputArray src, OutputArray dst, InputArray mask = noArray(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     233 </span>                :            : 
+<span class="lineNum">     234 </span>                :            : /** @brief Performs a per-element bitwise disjunction of two matrices (or of matrix and scalar).
+<span class="lineNum">     235 </span>                :            : 
+<span class="lineNum">     236 </span>                :            : @param src1 First source matrix or scalar.
+<span class="lineNum">     237 </span>                :            : @param src2 Second source matrix or scalar.
+<span class="lineNum">     238 </span>                :            : @param dst Destination matrix that has the same size and type as the input array(s).
+<span class="lineNum">     239 </span>                :            : @param mask Optional operation mask. 8-bit single channel image.
+<span class="lineNum">     240 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     241 </span>                :            :  */
+<span class="lineNum">     242 </span>                :            : CV_EXPORTS void bitwise_or(InputArray src1, InputArray src2, OutputArray dst, InputArray mask = noArray(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     243 </span>                :            : 
+<span class="lineNum">     244 </span>                :            : /** @brief Performs a per-element bitwise conjunction of two matrices (or of matrix and scalar).
+<span class="lineNum">     245 </span>                :            : 
+<span class="lineNum">     246 </span>                :            : @param src1 First source matrix or scalar.
+<span class="lineNum">     247 </span>                :            : @param src2 Second source matrix or scalar.
+<span class="lineNum">     248 </span>                :            : @param dst Destination matrix that has the same size and type as the input array(s).
+<span class="lineNum">     249 </span>                :            : @param mask Optional operation mask. 8-bit single channel image.
+<span class="lineNum">     250 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     251 </span>                :            :  */
+<span class="lineNum">     252 </span>                :            : CV_EXPORTS void bitwise_and(InputArray src1, InputArray src2, OutputArray dst, InputArray mask = noArray(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     253 </span>                :            : 
+<span class="lineNum">     254 </span>                :            : /** @brief Performs a per-element bitwise exclusive or operation of two matrices (or of matrix and scalar).
+<span class="lineNum">     255 </span>                :            : 
+<span class="lineNum">     256 </span>                :            : @param src1 First source matrix or scalar.
+<span class="lineNum">     257 </span>                :            : @param src2 Second source matrix or scalar.
+<span class="lineNum">     258 </span>                :            : @param dst Destination matrix that has the same size and type as the input array(s).
+<span class="lineNum">     259 </span>                :            : @param mask Optional operation mask. 8-bit single channel image.
+<span class="lineNum">     260 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     261 </span>                :            :  */
+<span class="lineNum">     262 </span>                :            : CV_EXPORTS void bitwise_xor(InputArray src1, InputArray src2, OutputArray dst, InputArray mask = noArray(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     263 </span>                :            : 
+<span class="lineNum">     264 </span>                :            : /** @brief Performs pixel by pixel right shift of an image by a constant value.
+<span class="lineNum">     265 </span>                :            : 
+<span class="lineNum">     266 </span>                :            : @param src Source matrix. Supports 1, 3 and 4 channels images with integers elements.
+<span class="lineNum">     267 </span>                :            : @param val Constant values, one per channel.
+<span class="lineNum">     268 </span>                :            : @param dst Destination matrix with the same size and type as src .
+<span class="lineNum">     269 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     270 </span>                :            :  */
+<span class="lineNum">     271 </span>                :            : CV_EXPORTS void rshift(InputArray src, Scalar_&lt;int&gt; val, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     272 </span>                :            : 
+<span class="lineNum">     273 </span>                :            : /** @brief Performs pixel by pixel right left of an image by a constant value.
+<span class="lineNum">     274 </span>                :            : 
+<span class="lineNum">     275 </span>                :            : @param src Source matrix. Supports 1, 3 and 4 channels images with CV_8U , CV_16U or CV_32S
+<span class="lineNum">     276 </span>                :            : depth.
+<span class="lineNum">     277 </span>                :            : @param val Constant values, one per channel.
+<span class="lineNum">     278 </span>                :            : @param dst Destination matrix with the same size and type as src .
+<span class="lineNum">     279 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     280 </span>                :            :  */
+<span class="lineNum">     281 </span>                :            : CV_EXPORTS void lshift(InputArray src, Scalar_&lt;int&gt; val, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     282 </span>                :            : 
+<span class="lineNum">     283 </span>                :            : /** @brief Computes the per-element minimum of two matrices (or a matrix and a scalar).
+<span class="lineNum">     284 </span>                :            : 
+<span class="lineNum">     285 </span>                :            : @param src1 First source matrix or scalar.
+<span class="lineNum">     286 </span>                :            : @param src2 Second source matrix or scalar.
+<span class="lineNum">     287 </span>                :            : @param dst Destination matrix that has the same size and type as the input array(s).
+<span class="lineNum">     288 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     289 </span>                :            : 
+<span class="lineNum">     290 </span>                :            : @sa min
+<span class="lineNum">     291 </span>                :            :  */
+<span class="lineNum">     292 </span>                :            : CV_EXPORTS void min(InputArray src1, InputArray src2, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     293 </span>                :            : 
+<span class="lineNum">     294 </span>                :            : /** @brief Computes the per-element maximum of two matrices (or a matrix and a scalar).
+<span class="lineNum">     295 </span>                :            : 
+<span class="lineNum">     296 </span>                :            : @param src1 First source matrix or scalar.
+<span class="lineNum">     297 </span>                :            : @param src2 Second source matrix or scalar.
+<span class="lineNum">     298 </span>                :            : @param dst Destination matrix that has the same size and type as the input array(s).
+<span class="lineNum">     299 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     300 </span>                :            : 
+<span class="lineNum">     301 </span>                :            : @sa max
+<span class="lineNum">     302 </span>                :            :  */
+<span class="lineNum">     303 </span>                :            : CV_EXPORTS void max(InputArray src1, InputArray src2, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     304 </span>                :            : 
+<span class="lineNum">     305 </span>                :            : /** @brief Computes the weighted sum of two arrays.
+<span class="lineNum">     306 </span>                :            : 
+<span class="lineNum">     307 </span>                :            : @param src1 First source array.
+<span class="lineNum">     308 </span>                :            : @param alpha Weight for the first array elements.
+<span class="lineNum">     309 </span>                :            : @param src2 Second source array of the same size and channel number as src1 .
+<span class="lineNum">     310 </span>                :            : @param beta Weight for the second array elements.
+<span class="lineNum">     311 </span>                :            : @param dst Destination array that has the same size and number of channels as the input arrays.
+<span class="lineNum">     312 </span>                :            : @param gamma Scalar added to each sum.
+<span class="lineNum">     313 </span>                :            : @param dtype Optional depth of the destination array. When both input arrays have the same depth,
+<span class="lineNum">     314 </span>                :            : dtype can be set to -1, which will be equivalent to src1.depth().
+<span class="lineNum">     315 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     316 </span>                :            : 
+<span class="lineNum">     317 </span>                :            : The function addWeighted calculates the weighted sum of two arrays as follows:
+<span class="lineNum">     318 </span>                :            : 
+<span class="lineNum">     319 </span>                :            : \f[\texttt{dst} (I)= \texttt{saturate} ( \texttt{src1} (I)* \texttt{alpha} +  \texttt{src2} (I)* \texttt{beta} +  \texttt{gamma} )\f]
+<span class="lineNum">     320 </span>                :            : 
+<span class="lineNum">     321 </span>                :            : where I is a multi-dimensional index of array elements. In case of multi-channel arrays, each
+<span class="lineNum">     322 </span>                :            : channel is processed independently.
+<span class="lineNum">     323 </span>                :            : 
+<span class="lineNum">     324 </span>                :            : @sa addWeighted
+<span class="lineNum">     325 </span>                :            :  */
+<span class="lineNum">     326 </span>                :            : CV_EXPORTS void addWeighted(InputArray src1, double alpha, InputArray src2, double beta, double gamma, OutputArray dst,
+<span class="lineNum">     327 </span>                :            :                             int dtype = -1, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     328 </span>                :            : 
+<span class="lineNum">     329 </span>                :            : //! adds scaled array to another one (dst = alpha*src1 + src2)
+<span class="lineNum">     330 </span>                :            : static inline void scaleAdd(InputArray src1, double alpha, InputArray src2, OutputArray dst, Stream&amp; stream = Stream::Null())
+<span class="lineNum">     331 </span>                :            : {
+<span class="lineNum">     332 </span>                :            :     addWeighted(src1, alpha, src2, 1.0, 0.0, dst, -1, stream);
+<span class="lineNum">     333 </span>                :            : }
+<span class="lineNum">     334 </span>                :            : 
+<span class="lineNum">     335 </span>                :            : /** @brief Applies a fixed-level threshold to each array element.
+<span class="lineNum">     336 </span>                :            : 
+<span class="lineNum">     337 </span>                :            : @param src Source array (single-channel).
+<span class="lineNum">     338 </span>                :            : @param dst Destination array with the same size and type as src .
+<span class="lineNum">     339 </span>                :            : @param thresh Threshold value.
+<span class="lineNum">     340 </span>                :            : @param maxval Maximum value to use with THRESH_BINARY and THRESH_BINARY_INV threshold types.
+<span class="lineNum">     341 </span>                :            : @param type Threshold type. For details, see threshold . The THRESH_OTSU and THRESH_TRIANGLE
+<span class="lineNum">     342 </span>                :            : threshold types are not supported.
+<span class="lineNum">     343 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     344 </span>                :            : 
+<span class="lineNum">     345 </span>                :            : @sa threshold
+<span class="lineNum">     346 </span>                :            :  */
+<span class="lineNum">     347 </span>                :            : CV_EXPORTS double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     348 </span>                :            : 
+<span class="lineNum">     349 </span>                :            : /** @brief Computes magnitudes of complex matrix elements.
+<span class="lineNum">     350 </span>                :            : 
+<span class="lineNum">     351 </span>                :            : @param xy Source complex matrix in the interleaved format ( CV_32FC2 ).
+<span class="lineNum">     352 </span>                :            : @param magnitude Destination matrix of float magnitudes ( CV_32FC1 ).
+<span class="lineNum">     353 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     354 </span>                :            : 
+<span class="lineNum">     355 </span>                :            : @sa magnitude
+<span class="lineNum">     356 </span>                :            :  */
+<span class="lineNum">     357 </span>                :            : CV_EXPORTS void magnitude(InputArray xy, OutputArray magnitude, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     358 </span>                :            : 
+<span class="lineNum">     359 </span>                :            : /** @brief Computes squared magnitudes of complex matrix elements.
+<span class="lineNum">     360 </span>                :            : 
+<span class="lineNum">     361 </span>                :            : @param xy Source complex matrix in the interleaved format ( CV_32FC2 ).
+<span class="lineNum">     362 </span>                :            : @param magnitude Destination matrix of float magnitude squares ( CV_32FC1 ).
+<span class="lineNum">     363 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     364 </span>                :            :  */
+<span class="lineNum">     365 </span>                :            : CV_EXPORTS void magnitudeSqr(InputArray xy, OutputArray magnitude, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     366 </span>                :            : 
+<span class="lineNum">     367 </span>                :            : /** @overload
+<span class="lineNum">     368 </span>                :            :  computes magnitude of each (x(i), y(i)) vector
+<span class="lineNum">     369 </span>                :            :  supports only floating-point source
+<span class="lineNum">     370 </span>                :            : @param x Source matrix containing real components ( CV_32FC1 ).
+<span class="lineNum">     371 </span>                :            : @param y Source matrix containing imaginary components ( CV_32FC1 ).
+<span class="lineNum">     372 </span>                :            : @param magnitude Destination matrix of float magnitudes ( CV_32FC1 ).
+<span class="lineNum">     373 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     374 </span>                :            :  */
+<span class="lineNum">     375 </span>                :            : CV_EXPORTS void magnitude(InputArray x, InputArray y, OutputArray magnitude, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     376 </span>                :            : 
+<span class="lineNum">     377 </span>                :            : /** @overload
+<span class="lineNum">     378 </span>                :            :  computes squared magnitude of each (x(i), y(i)) vector
+<span class="lineNum">     379 </span>                :            :  supports only floating-point source
+<span class="lineNum">     380 </span>                :            : @param x Source matrix containing real components ( CV_32FC1 ).
+<span class="lineNum">     381 </span>                :            : @param y Source matrix containing imaginary components ( CV_32FC1 ).
+<span class="lineNum">     382 </span>                :            : @param magnitude Destination matrix of float magnitude squares ( CV_32FC1 ).
+<span class="lineNum">     383 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     384 </span>                :            : */
+<span class="lineNum">     385 </span>                :            : CV_EXPORTS void magnitudeSqr(InputArray x, InputArray y, OutputArray magnitude, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     386 </span>                :            : 
+<span class="lineNum">     387 </span>                :            : /** @brief Computes polar angles of complex matrix elements.
+<span class="lineNum">     388 </span>                :            : 
+<span class="lineNum">     389 </span>                :            : @param x Source matrix containing real components ( CV_32FC1 ).
+<span class="lineNum">     390 </span>                :            : @param y Source matrix containing imaginary components ( CV_32FC1 ).
+<span class="lineNum">     391 </span>                :            : @param angle Destination matrix of angles ( CV_32FC1 ).
+<span class="lineNum">     392 </span>                :            : @param angleInDegrees Flag for angles that must be evaluated in degrees.
+<span class="lineNum">     393 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     394 </span>                :            : 
+<span class="lineNum">     395 </span>                :            : @sa phase
+<span class="lineNum">     396 </span>                :            :  */
+<span class="lineNum">     397 </span>                :            : CV_EXPORTS void phase(InputArray x, InputArray y, OutputArray angle, bool angleInDegrees = false, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     398 </span>                :            : 
+<span class="lineNum">     399 </span>                :            : /** @brief Converts Cartesian coordinates into polar.
+<span class="lineNum">     400 </span>                :            : 
+<span class="lineNum">     401 </span>                :            : @param x Source matrix containing real components ( CV_32FC1 ).
+<span class="lineNum">     402 </span>                :            : @param y Source matrix containing imaginary components ( CV_32FC1 ).
+<span class="lineNum">     403 </span>                :            : @param magnitude Destination matrix of float magnitudes ( CV_32FC1 ).
+<span class="lineNum">     404 </span>                :            : @param angle Destination matrix of angles ( CV_32FC1 ).
+<span class="lineNum">     405 </span>                :            : @param angleInDegrees Flag for angles that must be evaluated in degrees.
+<span class="lineNum">     406 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     407 </span>                :            : 
+<span class="lineNum">     408 </span>                :            : @sa cartToPolar
+<span class="lineNum">     409 </span>                :            :  */
+<span class="lineNum">     410 </span>                :            : CV_EXPORTS void cartToPolar(InputArray x, InputArray y, OutputArray magnitude, OutputArray angle, bool angleInDegrees = false, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     411 </span>                :            : 
+<span class="lineNum">     412 </span>                :            : /** @brief Converts polar coordinates into Cartesian.
+<span class="lineNum">     413 </span>                :            : 
+<span class="lineNum">     414 </span>                :            : @param magnitude Source matrix containing magnitudes ( CV_32FC1 ).
+<span class="lineNum">     415 </span>                :            : @param angle Source matrix containing angles ( CV_32FC1 ).
+<span class="lineNum">     416 </span>                :            : @param x Destination matrix of real components ( CV_32FC1 ).
+<span class="lineNum">     417 </span>                :            : @param y Destination matrix of imaginary components ( CV_32FC1 ).
+<span class="lineNum">     418 </span>                :            : @param angleInDegrees Flag that indicates angles in degrees.
+<span class="lineNum">     419 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     420 </span>                :            :  */
+<span class="lineNum">     421 </span>                :            : CV_EXPORTS void polarToCart(InputArray magnitude, InputArray angle, OutputArray x, OutputArray y, bool angleInDegrees = false, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     422 </span>                :            : 
+<span class="lineNum">     423 </span>                :            : //! @} cudaarithm_elem
+<span class="lineNum">     424 </span>                :            : 
+<span class="lineNum">     425 </span>                :            : //! @addtogroup cudaarithm_core
+<span class="lineNum">     426 </span>                :            : //! @{
+<span class="lineNum">     427 </span>                :            : 
+<span class="lineNum">     428 </span>                :            : /** @brief Makes a multi-channel matrix out of several single-channel matrices.
+<span class="lineNum">     429 </span>                :            : 
+<span class="lineNum">     430 </span>                :            : @param src Array/vector of source matrices.
+<span class="lineNum">     431 </span>                :            : @param n Number of source matrices.
+<span class="lineNum">     432 </span>                :            : @param dst Destination matrix.
+<span class="lineNum">     433 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     434 </span>                :            : 
+<span class="lineNum">     435 </span>                :            : @sa merge
+<span class="lineNum">     436 </span>                :            :  */
+<span class="lineNum">     437 </span>                :            : CV_EXPORTS void merge(const GpuMat* src, size_t n, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     438 </span>                :            : /** @overload */
+<span class="lineNum">     439 </span>                :            : CV_EXPORTS void merge(const std::vector&lt;GpuMat&gt;&amp; src, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     440 </span>                :            : 
+<span class="lineNum">     441 </span>                :            : /** @brief Copies each plane of a multi-channel matrix into an array.
+<span class="lineNum">     442 </span>                :            : 
+<span class="lineNum">     443 </span>                :            : @param src Source matrix.
+<span class="lineNum">     444 </span>                :            : @param dst Destination array/vector of single-channel matrices.
+<span class="lineNum">     445 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     446 </span>                :            : 
+<span class="lineNum">     447 </span>                :            : @sa split
+<span class="lineNum">     448 </span>                :            :  */
+<span class="lineNum">     449 </span>                :            : CV_EXPORTS void split(InputArray src, GpuMat* dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     450 </span>                :            : /** @overload */
+<span class="lineNum">     451 </span>                :            : CV_EXPORTS void split(InputArray src, std::vector&lt;GpuMat&gt;&amp; dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     452 </span>                :            : 
+<span class="lineNum">     453 </span>                :            : /** @brief Transposes a matrix.
+<span class="lineNum">     454 </span>                :            : 
+<span class="lineNum">     455 </span>                :            : @param src1 Source matrix. 1-, 4-, 8-byte element sizes are supported for now.
+<span class="lineNum">     456 </span>                :            : @param dst Destination matrix.
+<span class="lineNum">     457 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     458 </span>                :            : 
+<span class="lineNum">     459 </span>                :            : @sa transpose
+<span class="lineNum">     460 </span>                :            :  */
+<span class="lineNum">     461 </span>                :            : CV_EXPORTS void transpose(InputArray src1, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     462 </span>                :            : 
+<span class="lineNum">     463 </span>                :            : /** @brief Flips a 2D matrix around vertical, horizontal, or both axes.
+<span class="lineNum">     464 </span>                :            : 
+<span class="lineNum">     465 </span>                :            : @param src Source matrix. Supports 1, 3 and 4 channels images with CV_8U, CV_16U, CV_32S or
+<span class="lineNum">     466 </span>                :            : CV_32F depth.
+<span class="lineNum">     467 </span>                :            : @param dst Destination matrix.
+<span class="lineNum">     468 </span>                :            : @param flipCode Flip mode for the source:
+<span class="lineNum">     469 </span>                :            : -   0 Flips around x-axis.
+<span class="lineNum">     470 </span>                :            : -   \&gt; 0 Flips around y-axis.
+<span class="lineNum">     471 </span>                :            : -   \&lt; 0 Flips around both axes.
+<span class="lineNum">     472 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     473 </span>                :            : 
+<span class="lineNum">     474 </span>                :            : @sa flip
+<span class="lineNum">     475 </span>                :            :  */
+<span class="lineNum">     476 </span>                :            : CV_EXPORTS void flip(InputArray src, OutputArray dst, int flipCode, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     477 </span>                :            : 
+<span class="lineNum">     478 </span>                :            : /** @brief Base class for transform using lookup table.
+<span class="lineNum">     479 </span>                :            :  */
+<span class="lineNum">     480 </span>                :            : class CV_EXPORTS LookUpTable : public Algorithm
+<span class="lineNum">     481 </span>                :            : {
+<span class="lineNum">     482 </span>                :            : public:
+<span class="lineNum">     483 </span>                :            :     /** @brief Transforms the source matrix into the destination matrix using the given look-up table:
+<span class="lineNum">     484 </span>                :            :     dst(I) = lut(src(I)) .
+<span class="lineNum">     485 </span>                :            : 
+<span class="lineNum">     486 </span>                :            :     @param src Source matrix. CV_8UC1 and CV_8UC3 matrices are supported for now.
+<span class="lineNum">     487 </span>                :            :     @param dst Destination matrix.
+<span class="lineNum">     488 </span>                :            :     @param stream Stream for the asynchronous version.
+<span class="lineNum">     489 </span>                :            :      */
+<span class="lineNum">     490 </span>                :            :     virtual void transform(InputArray src, OutputArray dst, Stream&amp; stream = Stream::Null()) = 0;
+<span class="lineNum">     491 </span>                :            : };
+<span class="lineNum">     492 </span>                :            : 
+<span class="lineNum">     493 </span>                :            : /** @brief Creates implementation for cuda::LookUpTable .
+<span class="lineNum">     494 </span>                :            : 
+<span class="lineNum">     495 </span>                :            : @param lut Look-up table of 256 elements. It is a continuous CV_8U matrix.
+<span class="lineNum">     496 </span>                :            :  */
+<span class="lineNum">     497 </span>                :            : CV_EXPORTS Ptr&lt;LookUpTable&gt; createLookUpTable(InputArray lut);
+<span class="lineNum">     498 </span>                :            : 
+<span class="lineNum">     499 </span>                :            : /** @brief Forms a border around an image.
+<span class="lineNum">     500 </span>                :            : 
+<span class="lineNum">     501 </span>                :            : @param src Source image. CV_8UC1 , CV_8UC4 , CV_32SC1 , and CV_32FC1 types are supported.
+<span class="lineNum">     502 </span>                :            : @param dst Destination image with the same type as src. The size is
+<span class="lineNum">     503 </span>                :            : Size(src.cols+left+right, src.rows+top+bottom) .
+<span class="lineNum">     504 </span>                :            : @param top
+<span class="lineNum">     505 </span>                :            : @param bottom
+<span class="lineNum">     506 </span>                :            : @param left
+<span class="lineNum">     507 </span>                :            : @param right Number of pixels in each direction from the source image rectangle to extrapolate.
+<span class="lineNum">     508 </span>                :            : For example: top=1, bottom=1, left=1, right=1 mean that 1 pixel-wide border needs to be built.
+<span class="lineNum">     509 </span>                :            : @param borderType Border type. See borderInterpolate for details. BORDER_REFLECT101 ,
+<span class="lineNum">     510 </span>                :            : BORDER_REPLICATE , BORDER_CONSTANT , BORDER_REFLECT and BORDER_WRAP are supported for now.
+<span class="lineNum">     511 </span>                :            : @param value Border value.
+<span class="lineNum">     512 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     513 </span>                :            :  */
+<span class="lineNum">     514 </span>                :            : CV_EXPORTS void copyMakeBorder(InputArray src, OutputArray dst, int top, int bottom, int left, int right, int borderType,
+<span class="lineNum">     515 </span>                :            :                                Scalar value = Scalar(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     516 </span>                :            : 
+<span class="lineNum">     517 </span>                :            : //! @} cudaarithm_core
+<span class="lineNum">     518 </span>                :            : 
+<span class="lineNum">     519 </span>                :            : //! @addtogroup cudaarithm_reduce
+<span class="lineNum">     520 </span>                :            : //! @{
+<span class="lineNum">     521 </span>                :            : 
+<span class="lineNum">     522 </span>                :            : /** @brief Returns the norm of a matrix (or difference of two matrices).
+<span class="lineNum">     523 </span>                :            : 
+<span class="lineNum">     524 </span>                :            : @param src1 Source matrix. Any matrices except 64F are supported.
+<span class="lineNum">     525 </span>                :            : @param normType Norm type. NORM_L1 , NORM_L2 , and NORM_INF are supported for now.
+<span class="lineNum">     526 </span>                :            : @param mask optional operation mask; it must have the same size as src1 and CV_8UC1 type.
+<span class="lineNum">     527 </span>                :            : 
+<span class="lineNum">     528 </span>                :            : @sa norm
+<span class="lineNum">     529 </span>                :            :  */
+<span class="lineNum">     530 </span>        [<span class="branchCov" title="Branch 1 was taken 2028 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span>]:<span class="lineCov">       2028 : CV_EXPORTS double norm(InputArray src1, int normType, InputArray mask = noArray());</span>
+<span class="lineNum">     531 </span>                :            : /** @overload */
+<span class="lineNum">     532 </span>                :            : CV_EXPORTS void calcNorm(InputArray src, OutputArray dst, int normType, InputArray mask = noArray(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     533 </span>                :            : 
+<span class="lineNum">     534 </span>                :            : /** @brief Returns the difference of two matrices.
+<span class="lineNum">     535 </span>                :            : 
+<span class="lineNum">     536 </span>                :            : @param src1 Source matrix. Any matrices except 64F are supported.
+<span class="lineNum">     537 </span>                :            : @param src2 Second source matrix (if any) with the same size and type as src1.
+<span class="lineNum">     538 </span>                :            : @param normType Norm type. NORM_L1 , NORM_L2 , and NORM_INF are supported for now.
+<span class="lineNum">     539 </span>                :            : 
+<span class="lineNum">     540 </span>                :            : @sa norm
+<span class="lineNum">     541 </span>                :            :  */
+<span class="lineNum">     542 </span>                :            : CV_EXPORTS double norm(InputArray src1, InputArray src2, int normType=NORM_L2);
+<span class="lineNum">     543 </span>                :            : /** @overload */
+<span class="lineNum">     544 </span>                :            : CV_EXPORTS void calcNormDiff(InputArray src1, InputArray src2, OutputArray dst, int normType=NORM_L2, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     545 </span>                :            : 
+<span class="lineNum">     546 </span>                :            : /** @brief Returns the sum of matrix elements.
+<span class="lineNum">     547 </span>                :            : 
+<span class="lineNum">     548 </span>                :            : @param src Source image of any depth except for CV_64F .
+<span class="lineNum">     549 </span>                :            : @param mask optional operation mask; it must have the same size as src1 and CV_8UC1 type.
+<span class="lineNum">     550 </span>                :            : 
+<span class="lineNum">     551 </span>                :            : @sa sum
+<span class="lineNum">     552 </span>                :            :  */
+<span class="lineNum">     553 </span>                :            : CV_EXPORTS Scalar sum(InputArray src, InputArray mask = noArray());
+<span class="lineNum">     554 </span>                :            : /** @overload */
+<span class="lineNum">     555 </span>                :            : CV_EXPORTS void calcSum(InputArray src, OutputArray dst, InputArray mask = noArray(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     556 </span>                :            : 
+<span class="lineNum">     557 </span>                :            : /** @brief Returns the sum of absolute values for matrix elements.
+<span class="lineNum">     558 </span>                :            : 
+<span class="lineNum">     559 </span>                :            : @param src Source image of any depth except for CV_64F .
+<span class="lineNum">     560 </span>                :            : @param mask optional operation mask; it must have the same size as src1 and CV_8UC1 type.
+<span class="lineNum">     561 </span>                :            :  */
+<span class="lineNum">     562 </span>                :            : CV_EXPORTS Scalar absSum(InputArray src, InputArray mask = noArray());
+<span class="lineNum">     563 </span>                :            : /** @overload */
+<span class="lineNum">     564 </span>                :            : CV_EXPORTS void calcAbsSum(InputArray src, OutputArray dst, InputArray mask = noArray(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     565 </span>                :            : 
+<span class="lineNum">     566 </span>                :            : /** @brief Returns the squared sum of matrix elements.
+<span class="lineNum">     567 </span>                :            : 
+<span class="lineNum">     568 </span>                :            : @param src Source image of any depth except for CV_64F .
+<span class="lineNum">     569 </span>                :            : @param mask optional operation mask; it must have the same size as src1 and CV_8UC1 type.
+<span class="lineNum">     570 </span>                :            :  */
+<span class="lineNum">     571 </span>                :            : CV_EXPORTS Scalar sqrSum(InputArray src, InputArray mask = noArray());
+<span class="lineNum">     572 </span>                :            : /** @overload */
+<span class="lineNum">     573 </span>                :            : CV_EXPORTS void calcSqrSum(InputArray src, OutputArray dst, InputArray mask = noArray(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     574 </span>                :            : 
+<span class="lineNum">     575 </span>                :            : /** @brief Finds global minimum and maximum matrix elements and returns their values.
+<span class="lineNum">     576 </span>                :            : 
+<span class="lineNum">     577 </span>                :            : @param src Single-channel source image.
+<span class="lineNum">     578 </span>                :            : @param minVal Pointer to the returned minimum value. Use NULL if not required.
+<span class="lineNum">     579 </span>                :            : @param maxVal Pointer to the returned maximum value. Use NULL if not required.
+<span class="lineNum">     580 </span>                :            : @param mask Optional mask to select a sub-matrix.
+<span class="lineNum">     581 </span>                :            : 
+<span class="lineNum">     582 </span>                :            : The function does not work with CV_64F images on GPUs with the compute capability \&lt; 1.3.
+<span class="lineNum">     583 </span>                :            : 
+<span class="lineNum">     584 </span>                :            : @sa minMaxLoc
+<span class="lineNum">     585 </span>                :            :  */
+<span class="lineNum">     586 </span>                :            : CV_EXPORTS void minMax(InputArray src, double* minVal, double* maxVal, InputArray mask = noArray());
+<span class="lineNum">     587 </span>                :            : /** @overload */
+<span class="lineNum">     588 </span>                :            : CV_EXPORTS void findMinMax(InputArray src, OutputArray dst, InputArray mask = noArray(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     589 </span>                :            : 
+<span class="lineNum">     590 </span>                :            : /** @brief Finds global minimum and maximum matrix elements and returns their values with locations.
+<span class="lineNum">     591 </span>                :            : 
+<span class="lineNum">     592 </span>                :            : @param src Single-channel source image.
+<span class="lineNum">     593 </span>                :            : @param minVal Pointer to the returned minimum value. Use NULL if not required.
+<span class="lineNum">     594 </span>                :            : @param maxVal Pointer to the returned maximum value. Use NULL if not required.
+<span class="lineNum">     595 </span>                :            : @param minLoc Pointer to the returned minimum location. Use NULL if not required.
+<span class="lineNum">     596 </span>                :            : @param maxLoc Pointer to the returned maximum location. Use NULL if not required.
+<span class="lineNum">     597 </span>                :            : @param mask Optional mask to select a sub-matrix.
+<span class="lineNum">     598 </span>                :            : 
+<span class="lineNum">     599 </span>                :            : The function does not work with CV_64F images on GPU with the compute capability \&lt; 1.3.
+<span class="lineNum">     600 </span>                :            : 
+<span class="lineNum">     601 </span>                :            : @sa minMaxLoc
+<span class="lineNum">     602 </span>                :            :  */
+<span class="lineNum">     603 </span>                :            : CV_EXPORTS void minMaxLoc(InputArray src, double* minVal, double* maxVal, Point* minLoc, Point* maxLoc,
+<span class="lineNum">     604 </span>                :            :                           InputArray mask = noArray());
+<span class="lineNum">     605 </span>                :            : /** @overload */
+<span class="lineNum">     606 </span>                :            : CV_EXPORTS void findMinMaxLoc(InputArray src, OutputArray minMaxVals, OutputArray loc,
+<span class="lineNum">     607 </span>                :            :                               InputArray mask = noArray(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     608 </span>                :            : 
+<span class="lineNum">     609 </span>                :            : /** @brief Counts non-zero matrix elements.
+<span class="lineNum">     610 </span>                :            : 
+<span class="lineNum">     611 </span>                :            : @param src Single-channel source image.
+<span class="lineNum">     612 </span>                :            : 
+<span class="lineNum">     613 </span>                :            : The function does not work with CV_64F images on GPUs with the compute capability \&lt; 1.3.
+<span class="lineNum">     614 </span>                :            : 
+<span class="lineNum">     615 </span>                :            : @sa countNonZero
+<span class="lineNum">     616 </span>                :            :  */
+<span class="lineNum">     617 </span>                :            : CV_EXPORTS int countNonZero(InputArray src);
+<span class="lineNum">     618 </span>                :            : /** @overload */
+<span class="lineNum">     619 </span>                :            : CV_EXPORTS void countNonZero(InputArray src, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     620 </span>                :            : 
+<span class="lineNum">     621 </span>                :            : /** @brief Reduces a matrix to a vector.
+<span class="lineNum">     622 </span>                :            : 
+<span class="lineNum">     623 </span>                :            : @param mtx Source 2D matrix.
+<span class="lineNum">     624 </span>                :            : @param vec Destination vector. Its size and type is defined by dim and dtype parameters.
+<span class="lineNum">     625 </span>                :            : @param dim Dimension index along which the matrix is reduced. 0 means that the matrix is reduced
+<span class="lineNum">     626 </span>                :            : to a single row. 1 means that the matrix is reduced to a single column.
+<span class="lineNum">     627 </span>                :            : @param reduceOp Reduction operation that could be one of the following:
+<span class="lineNum">     628 </span>                :            : -   **CV_REDUCE_SUM** The output is the sum of all rows/columns of the matrix.
+<span class="lineNum">     629 </span>                :            : -   **CV_REDUCE_AVG** The output is the mean vector of all rows/columns of the matrix.
+<span class="lineNum">     630 </span>                :            : -   **CV_REDUCE_MAX** The output is the maximum (column/row-wise) of all rows/columns of the
+<span class="lineNum">     631 </span>                :            : matrix.
+<span class="lineNum">     632 </span>                :            : -   **CV_REDUCE_MIN** The output is the minimum (column/row-wise) of all rows/columns of the
+<span class="lineNum">     633 </span>                :            : matrix.
+<span class="lineNum">     634 </span>                :            : @param dtype When it is negative, the destination vector will have the same type as the source
+<span class="lineNum">     635 </span>                :            : matrix. Otherwise, its type will be CV_MAKE_TYPE(CV_MAT_DEPTH(dtype), mtx.channels()) .
+<span class="lineNum">     636 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     637 </span>                :            : 
+<span class="lineNum">     638 </span>                :            : The function reduce reduces the matrix to a vector by treating the matrix rows/columns as a set of
+<span class="lineNum">     639 </span>                :            : 1D vectors and performing the specified operation on the vectors until a single row/column is
+<span class="lineNum">     640 </span>                :            : obtained. For example, the function can be used to compute horizontal and vertical projections of a
+<span class="lineNum">     641 </span>                :            : raster image. In case of CV_REDUCE_SUM and CV_REDUCE_AVG , the output may have a larger element
+<span class="lineNum">     642 </span>                :            : bit-depth to preserve accuracy. And multi-channel arrays are also supported in these two reduction
+<span class="lineNum">     643 </span>                :            : modes.
+<span class="lineNum">     644 </span>                :            : 
+<span class="lineNum">     645 </span>                :            : @sa reduce
+<span class="lineNum">     646 </span>                :            :  */
+<span class="lineNum">     647 </span>                :            : CV_EXPORTS void reduce(InputArray mtx, OutputArray vec, int dim, int reduceOp, int dtype = -1, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     648 </span>                :            : 
+<span class="lineNum">     649 </span>                :            : /** @brief Computes a mean value and a standard deviation of matrix elements.
+<span class="lineNum">     650 </span>                :            : 
+<span class="lineNum">     651 </span>                :            : @param mtx Source matrix. CV_8UC1 matrices are supported for now.
+<span class="lineNum">     652 </span>                :            : @param mean Mean value.
+<span class="lineNum">     653 </span>                :            : @param stddev Standard deviation value.
+<span class="lineNum">     654 </span>                :            : 
+<span class="lineNum">     655 </span>                :            : @sa meanStdDev
+<span class="lineNum">     656 </span>                :            :  */
+<span class="lineNum">     657 </span>                :            : CV_EXPORTS void meanStdDev(InputArray mtx, Scalar&amp; mean, Scalar&amp; stddev);
+<span class="lineNum">     658 </span>                :            : /** @overload */
+<span class="lineNum">     659 </span>                :            : CV_EXPORTS void meanStdDev(InputArray mtx, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     660 </span>                :            : 
+<span class="lineNum">     661 </span>                :            : /** @brief Computes a standard deviation of integral images.
+<span class="lineNum">     662 </span>                :            : 
+<span class="lineNum">     663 </span>                :            : @param src Source image. Only the CV_32SC1 type is supported.
+<span class="lineNum">     664 </span>                :            : @param sqr Squared source image. Only the CV_32FC1 type is supported.
+<span class="lineNum">     665 </span>                :            : @param dst Destination image with the same type and size as src .
+<span class="lineNum">     666 </span>                :            : @param rect Rectangular window.
+<span class="lineNum">     667 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     668 </span>                :            :  */
+<span class="lineNum">     669 </span>                :            : CV_EXPORTS void rectStdDev(InputArray src, InputArray sqr, OutputArray dst, Rect rect, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     670 </span>                :            : 
+<span class="lineNum">     671 </span>                :            : /** @brief Normalizes the norm or value range of an array.
+<span class="lineNum">     672 </span>                :            : 
+<span class="lineNum">     673 </span>                :            : @param src Input array.
+<span class="lineNum">     674 </span>                :            : @param dst Output array of the same size as src .
+<span class="lineNum">     675 </span>                :            : @param alpha Norm value to normalize to or the lower range boundary in case of the range
+<span class="lineNum">     676 </span>                :            : normalization.
+<span class="lineNum">     677 </span>                :            : @param beta Upper range boundary in case of the range normalization; it is not used for the norm
+<span class="lineNum">     678 </span>                :            : normalization.
+<span class="lineNum">     679 </span>                :            : @param norm_type Normalization type ( NORM_MINMAX , NORM_L2 , NORM_L1 or NORM_INF ).
+<span class="lineNum">     680 </span>                :            : @param dtype When negative, the output array has the same type as src; otherwise, it has the same
+<span class="lineNum">     681 </span>                :            : number of channels as src and the depth =CV_MAT_DEPTH(dtype).
+<span class="lineNum">     682 </span>                :            : @param mask Optional operation mask.
+<span class="lineNum">     683 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     684 </span>                :            : 
+<span class="lineNum">     685 </span>                :            : @sa normalize
+<span class="lineNum">     686 </span>                :            :  */
+<span class="lineNum">     687 </span>                :            : CV_EXPORTS void normalize(InputArray src, OutputArray dst, double alpha, double beta,
+<span class="lineNum">     688 </span>                :            :                           int norm_type, int dtype, InputArray mask = noArray(),
+<span class="lineNum">     689 </span>                :            :                           Stream&amp; stream = Stream::Null());
+<span class="lineNum">     690 </span>                :            : 
+<span class="lineNum">     691 </span>                :            : /** @brief Computes an integral image.
+<span class="lineNum">     692 </span>                :            : 
+<span class="lineNum">     693 </span>                :            : @param src Source image. Only CV_8UC1 images are supported for now.
+<span class="lineNum">     694 </span>                :            : @param sum Integral image containing 32-bit unsigned integer values packed into CV_32SC1 .
+<span class="lineNum">     695 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     696 </span>                :            : 
+<span class="lineNum">     697 </span>                :            : @sa integral
+<span class="lineNum">     698 </span>                :            :  */
+<span class="lineNum">     699 </span>                :            : CV_EXPORTS void integral(InputArray src, OutputArray sum, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     700 </span>                :            : 
+<span class="lineNum">     701 </span>                :            : /** @brief Computes a squared integral image.
+<span class="lineNum">     702 </span>                :            : 
+<span class="lineNum">     703 </span>                :            : @param src Source image. Only CV_8UC1 images are supported for now.
+<span class="lineNum">     704 </span>                :            : @param sqsum Squared integral image containing 64-bit unsigned integer values packed into
+<span class="lineNum">     705 </span>                :            : CV_64FC1 .
+<span class="lineNum">     706 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     707 </span>                :            :  */
+<span class="lineNum">     708 </span>                :            : CV_EXPORTS void sqrIntegral(InputArray src, OutputArray sqsum, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     709 </span>                :            : 
+<span class="lineNum">     710 </span>                :            : //! @} cudaarithm_reduce
+<span class="lineNum">     711 </span>                :            : 
+<span class="lineNum">     712 </span>                :            : //! @addtogroup cudaarithm_arithm
+<span class="lineNum">     713 </span>                :            : //! @{
+<span class="lineNum">     714 </span>                :            : 
+<span class="lineNum">     715 </span>                :            : /** @brief Performs generalized matrix multiplication.
+<span class="lineNum">     716 </span>                :            : 
+<span class="lineNum">     717 </span>                :            : @param src1 First multiplied input matrix that should have CV_32FC1 , CV_64FC1 , CV_32FC2 , or
+<span class="lineNum">     718 </span>                :            : CV_64FC2 type.
+<span class="lineNum">     719 </span>                :            : @param src2 Second multiplied input matrix of the same type as src1 .
+<span class="lineNum">     720 </span>                :            : @param alpha Weight of the matrix product.
+<span class="lineNum">     721 </span>                :            : @param src3 Third optional delta matrix added to the matrix product. It should have the same type
+<span class="lineNum">     722 </span>                :            : as src1 and src2 .
+<span class="lineNum">     723 </span>                :            : @param beta Weight of src3 .
+<span class="lineNum">     724 </span>                :            : @param dst Destination matrix. It has the proper size and the same type as input matrices.
+<span class="lineNum">     725 </span>                :            : @param flags Operation flags:
+<span class="lineNum">     726 </span>                :            : -   **GEMM_1_T** transpose src1
+<span class="lineNum">     727 </span>                :            : -   **GEMM_2_T** transpose src2
+<span class="lineNum">     728 </span>                :            : -   **GEMM_3_T** transpose src3
+<span class="lineNum">     729 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     730 </span>                :            : 
+<span class="lineNum">     731 </span>                :            : The function performs generalized matrix multiplication similar to the gemm functions in BLAS level
+<span class="lineNum">     732 </span>                :            : 3. For example, gemm(src1, src2, alpha, src3, beta, dst, GEMM_1_T + GEMM_3_T) corresponds to
+<span class="lineNum">     733 </span>                :            : 
+<span class="lineNum">     734 </span>                :            : \f[\texttt{dst} =  \texttt{alpha} \cdot \texttt{src1} ^T  \cdot \texttt{src2} +  \texttt{beta} \cdot \texttt{src3} ^T\f]
+<span class="lineNum">     735 </span>                :            : 
+<span class="lineNum">     736 </span>                :            : @note Transposition operation doesn't support CV_64FC2 input type.
+<span class="lineNum">     737 </span>                :            : 
+<span class="lineNum">     738 </span>                :            : @sa gemm
+<span class="lineNum">     739 </span>                :            :  */
+<span class="lineNum">     740 </span>                :            : CV_EXPORTS void gemm(InputArray src1, InputArray src2, double alpha,
+<span class="lineNum">     741 </span>  [<span class="branchCov" title="Branch 1 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 4 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span>]:<span class="lineCov">        676 :                      InputArray src3, double beta, OutputArray dst, int flags = 0, Stream&amp; stream = Stream::Null());</span>
+<span class="lineNum">     742 </span>                :            : 
+<span class="lineNum">     743 </span>                :            : /** @brief Performs a per-element multiplication of two Fourier spectrums.
+<span class="lineNum">     744 </span>                :            : 
+<span class="lineNum">     745 </span>                :            : @param src1 First spectrum.
+<span class="lineNum">     746 </span>                :            : @param src2 Second spectrum with the same size and type as a .
+<span class="lineNum">     747 </span>                :            : @param dst Destination spectrum.
+<span class="lineNum">     748 </span>                :            : @param flags Mock parameter used for CPU/CUDA interfaces similarity.
+<span class="lineNum">     749 </span>                :            : @param conjB Optional flag to specify if the second spectrum needs to be conjugated before the
+<span class="lineNum">     750 </span>                :            : multiplication.
+<span class="lineNum">     751 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     752 </span>                :            : 
+<span class="lineNum">     753 </span>                :            : Only full (not packed) CV_32FC2 complex spectrums in the interleaved format are supported for now.
+<span class="lineNum">     754 </span>                :            : 
+<span class="lineNum">     755 </span>                :            : @sa mulSpectrums
+<span class="lineNum">     756 </span>                :            :  */
+<span class="lineNum">     757 </span>                :            : CV_EXPORTS void mulSpectrums(InputArray src1, InputArray src2, OutputArray dst, int flags, bool conjB=false, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     758 </span>                :            : 
+<span class="lineNum">     759 </span>                :            : /** @brief Performs a per-element multiplication of two Fourier spectrums and scales the result.
+<span class="lineNum">     760 </span>                :            : 
+<span class="lineNum">     761 </span>                :            : @param src1 First spectrum.
+<span class="lineNum">     762 </span>                :            : @param src2 Second spectrum with the same size and type as a .
+<span class="lineNum">     763 </span>                :            : @param dst Destination spectrum.
+<span class="lineNum">     764 </span>                :            : @param flags Mock parameter used for CPU/CUDA interfaces similarity, simply add a `0` value.
+<span class="lineNum">     765 </span>                :            : @param scale Scale constant.
+<span class="lineNum">     766 </span>                :            : @param conjB Optional flag to specify if the second spectrum needs to be conjugated before the
+<span class="lineNum">     767 </span>                :            : multiplication.
+<span class="lineNum">     768 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     769 </span>                :            : 
+<span class="lineNum">     770 </span>                :            : Only full (not packed) CV_32FC2 complex spectrums in the interleaved format are supported for now.
+<span class="lineNum">     771 </span>                :            : 
+<span class="lineNum">     772 </span>                :            : @sa mulSpectrums
+<span class="lineNum">     773 </span>                :            :  */
+<span class="lineNum">     774 </span>                :            : CV_EXPORTS void mulAndScaleSpectrums(InputArray src1, InputArray src2, OutputArray dst, int flags, float scale, bool conjB=false, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     775 </span>                :            : 
+<span class="lineNum">     776 </span>                :            : /** @brief Performs a forward or inverse discrete Fourier transform (1D or 2D) of the floating point matrix.
+<span class="lineNum">     777 </span>                :            : 
+<span class="lineNum">     778 </span>                :            : @param src Source matrix (real or complex).
+<span class="lineNum">     779 </span>                :            : @param dst Destination matrix (real or complex).
+<span class="lineNum">     780 </span>                :            : @param dft_size Size of a discrete Fourier transform.
+<span class="lineNum">     781 </span>                :            : @param flags Optional flags:
+<span class="lineNum">     782 </span>                :            : -   **DFT_ROWS** transforms each individual row of the source matrix.
+<span class="lineNum">     783 </span>                :            : -   **DFT_SCALE** scales the result: divide it by the number of elements in the transform
+<span class="lineNum">     784 </span>                :            : (obtained from dft_size ).
+<span class="lineNum">     785 </span>                :            : -   **DFT_INVERSE** inverts DFT. Use for complex-complex cases (real-complex and complex-real
+<span class="lineNum">     786 </span>                :            : cases are always forward and inverse, respectively).
+<span class="lineNum">     787 </span>                :            : -   **DFT_REAL_OUTPUT** specifies the output as real. The source matrix is the result of
+<span class="lineNum">     788 </span>                :            : real-complex transform, so the destination matrix must be real.
+<span class="lineNum">     789 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     790 </span>                :            : 
+<span class="lineNum">     791 </span>                :            : Use to handle real matrices ( CV32FC1 ) and complex matrices in the interleaved format ( CV32FC2 ).
+<span class="lineNum">     792 </span>                :            : 
+<span class="lineNum">     793 </span>                :            : The source matrix should be continuous, otherwise reallocation and data copying is performed. The
+<span class="lineNum">     794 </span>                :            : function chooses an operation mode depending on the flags, size, and channel count of the source
+<span class="lineNum">     795 </span>                :            : matrix:
+<span class="lineNum">     796 </span>                :            : 
+<span class="lineNum">     797 </span>                :            : -   If the source matrix is complex and the output is not specified as real, the destination
+<span class="lineNum">     798 </span>                :            : matrix is complex and has the dft_size size and CV_32FC2 type. The destination matrix
+<span class="lineNum">     799 </span>                :            : contains a full result of the DFT (forward or inverse).
+<span class="lineNum">     800 </span>                :            : -   If the source matrix is complex and the output is specified as real, the function assumes that
+<span class="lineNum">     801 </span>                :            : its input is the result of the forward transform (see the next item). The destination matrix
+<span class="lineNum">     802 </span>                :            : has the dft_size size and CV_32FC1 type. It contains the result of the inverse DFT.
+<span class="lineNum">     803 </span>                :            : -   If the source matrix is real (its type is CV_32FC1 ), forward DFT is performed. The result of
+<span class="lineNum">     804 </span>                :            : the DFT is packed into complex ( CV_32FC2 ) matrix. So, the width of the destination matrix
+<span class="lineNum">     805 </span>                :            : is dft_size.width / 2 + 1 . But if the source is a single column, the height is reduced
+<span class="lineNum">     806 </span>                :            : instead of the width.
+<span class="lineNum">     807 </span>                :            : 
+<span class="lineNum">     808 </span>                :            : @sa dft
+<span class="lineNum">     809 </span>                :            :  */
+<span class="lineNum">     810 </span>                :            : CV_EXPORTS void dft(InputArray src, OutputArray dst, Size dft_size, int flags=0, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     811 </span>                :            : 
+<span class="lineNum">     812 </span>                :            : /** @brief Base class for convolution (or cross-correlation) operator. :
+<span class="lineNum">     813 </span>                :            :  */
+<span class="lineNum">     814 </span>                :            : class CV_EXPORTS Convolution : public Algorithm
+<span class="lineNum">     815 </span>                :            : {
+<span class="lineNum">     816 </span>                :            : public:
+<span class="lineNum">     817 </span>                :            :     /** @brief Computes a convolution (or cross-correlation) of two images.
+<span class="lineNum">     818 </span>                :            : 
+<span class="lineNum">     819 </span>                :            :     @param image Source image. Only CV_32FC1 images are supported for now.
+<span class="lineNum">     820 </span>                :            :     @param templ Template image. The size is not greater than the image size. The type is the same as
+<span class="lineNum">     821 </span>                :            :     image .
+<span class="lineNum">     822 </span>                :            :     @param result Result image. If image is *W x H* and templ is *w x h*, then result must be *W-w+1 x
+<span class="lineNum">     823 </span>                :            :     H-h+1*.
+<span class="lineNum">     824 </span>                :            :     @param ccorr Flags to evaluate cross-correlation instead of convolution.
+<span class="lineNum">     825 </span>                :            :     @param stream Stream for the asynchronous version.
+<span class="lineNum">     826 </span>                :            :      */
+<span class="lineNum">     827 </span>                :            :     virtual void convolve(InputArray image, InputArray templ, OutputArray result, bool ccorr = false, Stream&amp; stream = Stream::Null()) = 0;
+<span class="lineNum">     828 </span>                :            : };
+<span class="lineNum">     829 </span>                :            : 
+<span class="lineNum">     830 </span>                :            : /** @brief Creates implementation for cuda::Convolution .
+<span class="lineNum">     831 </span>                :            : 
+<span class="lineNum">     832 </span>                :            : @param user_block_size Block size. If you leave default value Size(0,0) then automatic
+<span class="lineNum">     833 </span>                :            : estimation of block size will be used (which is optimized for speed). By varying user_block_size
+<span class="lineNum">     834 </span>                :            : you can reduce memory requirements at the cost of speed.
+<span class="lineNum">     835 </span>                :            :  */
+<span class="lineNum">     836 </span>                :            : CV_EXPORTS Ptr&lt;Convolution&gt; createConvolution(Size user_block_size = Size());
+<span class="lineNum">     837 </span>                :            : 
+<span class="lineNum">     838 </span>                :            : //! @} cudaarithm_arithm
+<span class="lineNum">     839 </span>                :            : 
+<span class="lineNum">     840 </span>                :            : //! @} cudaarithm
+<span class="lineNum">     841 </span>                :            : 
+<span class="lineNum">     842 </span>                :            : }} // namespace cv { namespace cuda {
+<span class="lineNum">     843 </span>                :            : 
+<span class="lineNum">     844 </span>                :            : #endif /* __OPENCV_CUDAARITHM_HPP__ */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
