@@ -1,5 +1,7 @@
 #!/bin/bash
 
+touch device/src/epiphany_main.c
+
 set -e
 
 BUILD_DEVICE="yes"
