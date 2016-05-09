@@ -29,15 +29,15 @@ void gpuDotProduct(cuda::GpuMat gpusrc1, cuda::GpuMat gpusrc2, cuda::GpuMat dest
 static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType);
 
 static void image_jacobian_affine_ECC(const cuda::GpuMat& gpu_src1, 
-																			const cuda::GpuMat& gpu_src2,
+                                      const cuda::GpuMat& gpu_src2,
                                       const cuda::GpuMat& gpu_src3, 
-																			const cuda::GpuMat& gpu_src4,
+                                      const cuda::GpuMat& gpu_src4,
                                       Mat& dst);
 
 
 static void image_jacobian_euclidean_ECC(const Mat& src1, const Mat& src2,
                                          const Mat& src3, const Mat& src4,
-					       												 const Mat& src5, Mat& dst);
+                                          const Mat& src5, Mat& dst);
 
 
 static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat& dst);
@@ -49,12 +49,12 @@ static void project_onto_jacobian_ECC(const cuda::GpuMat& src1, const cuda::GpuM
 static void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const int motionType);
 
 double modified_findTransformECC(InputArray templateImage,
-				 InputArray inputImage,
-				 InputOutputArray warpMatrix,
-				 int motionType,
-				 TermCriteria criteria,
-				 Mat inputMask
-				 );
+         InputArray inputImage,
+         InputOutputArray warpMatrix,
+         int motionType,
+         TermCriteria criteria,
+         Mat inputMask
+         );
 
 
 //------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
   if (argc != 4)
     {
       std::cout << " Usage: findTransform <TemplateImage>" << 
-			" <InputImage> <OutputWarp.cpp>" << std::endl;
+      " <InputImage> <OutputWarp.cpp>" << std::endl;
       return -1;
     }
   
@@ -91,22 +91,22 @@ int main(int argc, char** argv)
   int number_of_iterations = 3000;
   double termination_eps = 1e-10;
   cv::TermCriteria criteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS,
-			number_of_iterations, termination_eps);
+      number_of_iterations, termination_eps);
 
   Mat inputMask;
  
   // Run find_transformECC to find the warp matrix
-	std::clock_t function;
-	function = std::clock();
+  std::clock_t function;
+  function = std::clock();
   double cc = modified_findTransformECC (
-					 template_image,
-					 input_image,
-					 warp_matrix,
-					 warp_mode,
-					 criteria,
-					 inputMask);
+           template_image,
+           input_image,
+           warp_matrix,
+           warp_mode,
+           criteria,
+           inputMask);
 
-	std::cout << std::endl << "Time taken ecc " << (std::clock() - function)/(double) CLOCKS_PER_SEC << std::endl;
+  std::cout << std::endl << "Time taken ecc " << (std::clock() - function)/(double) CLOCKS_PER_SEC << std::endl;
  
   // Reserve a matrix to store the warped image
   cv::Mat warped_image = cv::Mat(template_image.rows, template_image.cols, CV_32FC1);
@@ -114,14 +114,14 @@ int main(int argc, char** argv)
   // Apply the warp matrix to the input image to produce a warped image 
   // (i.e. aligned to the template image)
   cv::warpAffine(input_image, warped_image, warp_matrix, 
-			warped_image.size(), cv::INTER_LINEAR + cv::WARP_INVERSE_MAP);
+      warped_image.size(), cv::INTER_LINEAR + cv::WARP_INVERSE_MAP);
  
   // Save values in the warp matrix to the filename provided on command-line
   saveWarp(outputWarpMatrix, warp_matrix, warp_mode);
 
   std::cout << "Enhanced correlation coefficient" << 
-			" between the template image and the final" << 
-			" warped input image = " << cc << std::endl; 
+      " between the template image and the final" << 
+      " warped input image = " << cc << std::endl; 
 
   // Show final output
   cv::namedWindow( "Warped Image", CV_WINDOW_AUTOSIZE );
@@ -147,7 +147,7 @@ static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType)
   std::ofstream outfile(fileName.c_str());
   if( !outfile ) {
     std::cerr << "error in saving "
-	      << "Couldn't open file '" << fileName.c_str() << "'!" << std::endl;
+        << "Couldn't open file '" << fileName.c_str() << "'!" << std::endl;
     ret_value = 0;
   }
   else {//save the warp's elements
@@ -219,10 +219,10 @@ static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat
 
 
 static void image_jacobian_affine_ECC(const cuda::GpuMat& gpu_src1, 
-																			const cuda::GpuMat& gpu_src2,
+                                      const cuda::GpuMat& gpu_src2,
                                       const cuda::GpuMat& gpu_src3, 
-																			const cuda::GpuMat& gpu_src4,
-																			Mat& dst)
+                                      const cuda::GpuMat& gpu_src4,
+                                      Mat& dst)
 {
 
     CV_Assert(gpu_src1.size() == gpu_src2.size());
@@ -234,23 +234,23 @@ static void image_jacobian_affine_ECC(const cuda::GpuMat& gpu_src1,
 
     CV_Assert(dst.type() == CV_32FC1);
 
-		cuda::GpuMat gpu_dst;
+    cuda::GpuMat gpu_dst;
 
-		gpu_dst.upload(dst);
+    gpu_dst.upload(dst);
 
     const int w = gpu_src1.cols;
 
     //compute Jacobian blocks (6 blocks)
-		
+    
     // gpu_dst.colRange(0,w) = gpu_src1.mul(gpu_src3);//1
     cuda::multiply(gpu_src1, gpu_src3, gpu_dst.colRange(0,w));//1
-		cuda::multiply(gpu_src2, gpu_src3, gpu_dst.colRange(w,2*w));
-		cuda::multiply(gpu_src1, gpu_src4, gpu_dst.colRange(2*w, 3*w));
-		cuda::multiply(gpu_src2, gpu_src4, gpu_dst.colRange(3*w,4*w));
-		gpu_src1.copyTo(gpu_dst.colRange(4*w,5*w));
-		gpu_src2.copyTo(gpu_dst.colRange(5*w,6*w));
+    cuda::multiply(gpu_src2, gpu_src3, gpu_dst.colRange(w,2*w));
+    cuda::multiply(gpu_src1, gpu_src4, gpu_dst.colRange(2*w, 3*w));
+    cuda::multiply(gpu_src2, gpu_src4, gpu_dst.colRange(3*w,4*w));
+    gpu_src1.copyTo(gpu_dst.colRange(4*w,5*w));
+    gpu_src2.copyTo(gpu_dst.colRange(5*w,6*w));
 
-		gpu_dst.download(dst);
+    gpu_dst.download(dst);
 }
 
 
@@ -272,24 +272,24 @@ static void project_onto_jacobian_ECC(const cuda::GpuMat& gpusrc1, const cuda::G
 
     float* dstPtr = dst.ptr<float>(0);
 
-		Mat src1, src2;
-		gpusrc1.download(src1);
-		gpusrc2.download(src2);
+    Mat src1, src2;
+    gpusrc1.download(src1);
+    gpusrc2.download(src2);
 
-		cuda::GpuMat gpu_mat;
-		cuda::GpuMat dotProdContainer;
+    cuda::GpuMat gpu_mat;
+    cuda::GpuMat dotProdContainer;
 
-		double norm;
+    double norm;
 
-		if (src1.cols !=src2.cols){//dst.cols==1
+    if (src1.cols !=src2.cols){//dst.cols==1
         w  = src2.cols;
         for (int i=0; i < dst.rows; i++){
-						gpuDotProduct(gpusrc2, gpusrc1.colRange(i*w, (i+1)*w), dotProdContainer);
-						uchar *value = dotProdContainer.ptr(0);
-						std::cout << "value: " << *value << std::endl;
+            gpuDotProduct(gpusrc2, gpusrc1.colRange(i*w, (i+1)*w), dotProdContainer);
+            uchar *value = dotProdContainer.ptr(0);
+            std::cout << "value: " << *value << std::endl;
             dstPtr[i] = (float) src2.dot(src1.colRange(i*w,(i+1)*w));
-						std::cout << "destPtr: " << dstPtr[i] << std::endl;
-				}
+            std::cout << "destPtr: " << dstPtr[i] << std::endl;
+        }
     }
 
     else {
@@ -299,9 +299,9 @@ static void project_onto_jacobian_ECC(const cuda::GpuMat& gpusrc1, const cuda::G
         for (int i=0; i<dst.rows; i++){
             mat = Mat(src1.colRange(i*w, (i+1)*w));  // gpu has colrange
             gpu_mat.upload(mat);
-						norm = cuda::norm(gpu_mat, NORM_L2);
-						dstPtr[i*(dst.rows+1)] = (float) pow(norm,2); //diagonal elements
-						gpu_mat.download(mat);
+            norm = cuda::norm(gpu_mat, NORM_L2);
+            dstPtr[i*(dst.rows+1)] = (float) pow(norm,2); //diagonal elements
+            gpu_mat.download(mat);
 
             for (int j=i+1; j<dst.cols; j++){ //j starts from i+1
                 dstPtr[i*dst.cols+j] = (float) mat.dot(src2.colRange(j*w, (j+1)*w));
@@ -357,22 +357,22 @@ void gpuDotProduct(cuda::GpuMat src1, cuda::GpuMat src2, cuda::GpuMat fold){
   // sum elements of fold
   int col_lastResult=1, col_currentResult=1;
   for(int i=1; col_currentResult < fold.cols; i++){
-    col_lastResult = pow(2, i-1);			// last whole number log2
-    col_currentResult = pow(2, i);			// current whole number log2
+    col_lastResult = pow(2, i-1);      // last whole number log2
+    col_currentResult = pow(2, i);      // current whole number log2
   }
 
   // add offset to remainder of fold, to make log of fold.cols a whole number
-  int col_distanceFromLog2End = src1.cols - col_lastResult;		// offset from log2
-	
+  int col_distanceFromLog2End = src1.cols - col_lastResult;    // offset from log2
+  
   cuda::GpuMat col_offcut, col_destSection;
   col_offcut = fold.colRange(col_lastResult, fold.cols);
   col_destSection = fold.colRange((col_lastResult - col_distanceFromLog2End), col_lastResult);
   cuda::add(col_destSection, col_offcut, col_destSection);
 
 
-  fold = fold.colRange(0, col_lastResult);		// update the new size of dest
+  fold = fold.colRange(0, col_lastResult);    // update the new size of dest
 
-	// fold!
+  // fold!
   while(fold.cols != 1) {
 
   cuda::GpuMat rightHalf, leftHalf;
@@ -391,21 +391,21 @@ void gpuDotProduct(cuda::GpuMat src1, cuda::GpuMat src2, cuda::GpuMat fold){
   // sum elements of fold
   int row_lastResult=1, row_currentResult=1;
   for(int i=1; row_currentResult < fold.rows; i++){
-    row_lastResult = pow(2, i-1);			// last whole number log2
-    row_currentResult= pow(2, i);			// current whole number log2
+    row_lastResult = pow(2, i-1);      // last whole number log2
+    row_currentResult= pow(2, i);      // current whole number log2
   }
 
   // add offset to remainder of fold, to make log of fold.cols a whole number
-  int row_distanceFromLog2End = src1.rows - row_lastResult;		// offset from log2
+  int row_distanceFromLog2End = src1.rows - row_lastResult;    // offset from log2
   cuda::GpuMat row_offcut, row_destSection;
   row_offcut = fold.rowRange(row_lastResult, fold.rows);
   row_destSection = fold.rowRange((row_lastResult - row_distanceFromLog2End), row_lastResult);
   cuda::add(row_destSection, row_offcut, row_destSection);
 
 
-  fold = fold.rowRange(0, row_lastResult);		// update the new size of fold
+  fold = fold.rowRange(0, row_lastResult);    // update the new size of fold
 
-	// fold!
+  // fold!
   while(fold.rows!= 1) {
 
   cuda::GpuMat rightHalf, leftHalf;
@@ -427,11 +427,11 @@ void gpuDotProduct(cuda::GpuMat src1, cuda::GpuMat src2, cuda::GpuMat fold){
 
 
 double modified_findTransformECC(InputArray templateImage,
-				 InputArray inputImage,
-				 InputOutputArray warpMatrix,
-				 int motionType,
-				 TermCriteria criteria,
-				 Mat inputMask)
+         InputArray inputImage,
+         InputOutputArray warpMatrix,
+         int motionType,
+         TermCriteria criteria,
+         Mat inputMask)
 {
 
 
@@ -464,9 +464,9 @@ double modified_findTransformECC(InputArray templateImage,
     const double termination_eps    = (criteria.type & TermCriteria::EPS)   ? criteria.epsilon  :  -1;
 
     int paramTemp = 6;//default: affine
-		if (motionType == MOTION_TRANSLATION) {
-			paramTemp = 2;
-		}
+    if (motionType == MOTION_TRANSLATION) {
+      paramTemp = 2;
+    }
     const int numberOfParameters = paramTemp;
 
     const int ws = src.cols;
@@ -487,12 +487,12 @@ double modified_findTransformECC(InputArray templateImage,
     for (j=0; j<hs; j++)
         YcoPtr[j] = (float) j;
 
-		// move X/Ygrid to the gpu for the entire registration
+    // move X/Ygrid to the gpu for the entire registration
     repeat(Xcoord, hs, 1, Xgrid);
     repeat(Ycoord, 1, ws, Ygrid);
-		cuda::GpuMat gpu_Xgrid, gpu_Ygrid;
-		gpu_Xgrid.upload(Xgrid);
-		gpu_Ygrid.upload(Ygrid);
+    cuda::GpuMat gpu_Xgrid, gpu_Ygrid;
+    gpu_Xgrid.upload(Xgrid);
+    gpu_Ygrid.upload(Ygrid);
 
     Xcoord.release();
     Ycoord.release();
@@ -501,13 +501,13 @@ double modified_findTransformECC(InputArray templateImage,
     Mat templateFloat = Mat(hs, ws, CV_32F);// to store the (smoothed) template
     Mat imageFloat    = Mat(hd, wd, CV_32F);// to store the (smoothed) input image
     Mat imageWarped   = Mat(hs, ws, CV_32F);// to store the warped zero-mean input image
-    Mat imageMask		= Mat(hs, ws, CV_8U); //to store the final mask
+    Mat imageMask    = Mat(hs, ws, CV_8U); //to store the final mask
     
     Mat inputMaskMat = inputMask;
     //to use it for mask warping
     Mat preMask;
     
-		if(inputMask.empty())
+    if(inputMask.empty())
         preMask = Mat::ones(hd, wd, CV_8U);
     else
         threshold(inputMask, preMask, 0, 1, THRESH_BINARY);
@@ -573,83 +573,83 @@ double modified_findTransformECC(InputArray templateImage,
 
     for (int i = 1; (i <= numberOfIterations) && (fabs(rho-last_rho)>= termination_eps); i++)
     {
-			// upload Mats to gpu 
-			gpu_imageFloat.upload(imageFloat);
-			gpu_imageMask.upload(imageMask);
-			gpu_imageWarped.upload(imageWarped);
-			gpu_gradientX.upload(gradientX);
-			gpu_gradientY.upload(gradientY);
-			gpu_gradientXWarped.upload(gradientXWarped);
-			gpu_gradientYWarped.upload(gradientYWarped);
-			gpu_preMask.upload(preMask);
+      // upload Mats to gpu 
+      gpu_imageFloat.upload(imageFloat);
+      gpu_imageMask.upload(imageMask);
+      gpu_imageWarped.upload(imageWarped);
+      gpu_gradientX.upload(gradientX);
+      gpu_gradientY.upload(gradientY);
+      gpu_gradientXWarped.upload(gradientXWarped);
+      gpu_gradientYWarped.upload(gradientYWarped);
+      gpu_preMask.upload(preMask);
 
         // warp-back portion of the inputImage and gradients to the coordinate space of the templateImage
         
-			cuda::warpAffine(gpu_imageFloat, gpu_imageWarped,     map, imageWarped.size(),     imageFlags);
-			cuda::warpAffine(gpu_gradientX,  gpu_gradientXWarped, map, gradientXWarped.size(), imageFlags);
-			cuda::warpAffine(gpu_gradientY,  gpu_gradientYWarped, map, gradientYWarped.size(), imageFlags);
-			cuda::warpAffine(gpu_preMask,    gpu_imageMask,       map, imageMask.size(),       maskFlags);
+      cuda::warpAffine(gpu_imageFloat, gpu_imageWarped,     map, imageWarped.size(),     imageFlags);
+      cuda::warpAffine(gpu_gradientX,  gpu_gradientXWarped, map, gradientXWarped.size(), imageFlags);
+      cuda::warpAffine(gpu_gradientY,  gpu_gradientYWarped, map, gradientYWarped.size(), imageFlags);
+      cuda::warpAffine(gpu_preMask,    gpu_imageMask,       map, imageMask.size(),       maskFlags);
         
-			// download modified Mats to cpu versions for subsequent analysis
-			gpu_imageWarped.download(imageWarped);
-			gpu_imageMask.download(imageMask);
-	
+      // download modified Mats to cpu versions for subsequent analysis
+      gpu_imageWarped.download(imageWarped);
+      gpu_imageMask.download(imageMask);
+  
       Scalar imgMean, imgStd, tmpMean, tmpStd;
-			meanStdDev(imageWarped,   imgMean, imgStd, imageMask);
-			meanStdDev(templateFloat, tmpMean, tmpStd, imageMask);
+      meanStdDev(imageWarped,   imgMean, imgStd, imageMask);
+      meanStdDev(templateFloat, tmpMean, tmpStd, imageMask);
 
-			gpu_imageWarped.upload(imageWarped);
-			gpu_imageMask.upload(imageMask);
+      gpu_imageWarped.upload(imageWarped);
+      gpu_imageMask.upload(imageMask);
 
-			cuda::subtract(gpu_imageWarped, imgMean, gpu_imageWarped, gpu_imageMask);//zero-mean input
-			
-			cuda::GpuMat gpu_templateZM;
-			// Create templateFloat matrix on the GPU
-			cuda::GpuMat gpu_templateFloat;
+      cuda::subtract(gpu_imageWarped, imgMean, gpu_imageWarped, gpu_imageMask);//zero-mean input
+      
+      cuda::GpuMat gpu_templateZM;
+      // Create templateFloat matrix on the GPU
+      cuda::GpuMat gpu_templateFloat;
 
-			gpu_templateFloat.upload(templateFloat);
-			
-			// Initialize templateZM on the CPU
+      gpu_templateFloat.upload(templateFloat);
+      
+      // Initialize templateZM on the CPU
       templateZM = Mat::zeros(templateZM.rows, templateZM.cols, templateZM.type());
-			
-			gpu_templateZM.upload(templateZM);
-			
-			cuda::subtract(gpu_templateFloat, tmpMean, gpu_templateZM,  gpu_imageMask);//zero-mean template
-		
-			gpu_gradientX.download(gradientX);
-			gpu_gradientY.download(gradientY);
-			gpu_imageFloat.download(imageFloat);
-			gpu_imageMask.download(imageMask);
-			gpu_imageWarped.download(imageWarped);
-			gpu_preMask.download(preMask);
-			gpu_templateFloat.download(templateFloat);
-			gpu_templateZM.download(templateZM);
+      
+      gpu_templateZM.upload(templateZM);
+      
+      cuda::subtract(gpu_templateFloat, tmpMean, gpu_templateZM,  gpu_imageMask);//zero-mean template
+    
+      gpu_gradientX.download(gradientX);
+      gpu_gradientY.download(gradientY);
+      gpu_imageFloat.download(imageFloat);
+      gpu_imageMask.download(imageMask);
+      gpu_imageWarped.download(imageWarped);
+      gpu_preMask.download(preMask);
+      gpu_templateFloat.download(templateFloat);
+      gpu_templateZM.download(templateZM);
 
-			const double tmpNorm = std::sqrt(cuda::countNonZero(gpu_imageMask)*(tmpStd.val[0])*(tmpStd.val[0]));
-			const double imgNorm = std::sqrt(cuda::countNonZero(gpu_imageMask)*(imgStd.val[0])*(imgStd.val[0]));
-			
+      const double tmpNorm = std::sqrt(cuda::countNonZero(gpu_imageMask)*(tmpStd.val[0])*(tmpStd.val[0]));
+      const double imgNorm = std::sqrt(cuda::countNonZero(gpu_imageMask)*(imgStd.val[0])*(imgStd.val[0]));
+      
         // image_jacobian_affine has been switched to CUDA
-				// delete or upgrade others 
+        // delete or upgrade others 
         switch (motionType){
             case MOTION_AFFINE:
-								// need to compute on gpu then download to cpu
+                // need to compute on gpu then download to cpu
                 image_jacobian_affine_ECC(gpu_gradientXWarped, 
-									gpu_gradientYWarped, gpu_Xgrid, gpu_Ygrid, jacobian);
-								gpu_gradientXWarped.download(gradientXWarped);
-								gpu_gradientYWarped.download(gradientYWarped);
+                  gpu_gradientYWarped, gpu_Xgrid, gpu_Ygrid, jacobian);
+                gpu_gradientXWarped.download(gradientXWarped);
+                gpu_gradientYWarped.download(gradientYWarped);
                 break;
 
             case MOTION_TRANSLATION:
-								// cpu based function, so need to download BEFORE, 
-								// to ensure cpu Mats are up to date
-								gpu_gradientXWarped.download(gradientXWarped);
-								gpu_gradientYWarped.download(gradientYWarped);
+                // cpu based function, so need to download BEFORE, 
+                // to ensure cpu Mats are up to date
+                gpu_gradientXWarped.download(gradientXWarped);
+                gpu_gradientYWarped.download(gradientYWarped);
                 image_jacobian_translation_ECC(gradientXWarped, gradientYWarped, jacobian);
                 break;
-				}
+        }
 
-			cuda::GpuMat gpu_jacobian; // TEMP upload POSITION
-			gpu_jacobian.upload(jacobian);
+      cuda::GpuMat gpu_jacobian; // TEMP upload POSITION
+      gpu_jacobian.upload(jacobian);
       // calculate Hessian and its inverse
       project_onto_jacobian_ECC(gpu_jacobian, gpu_jacobian, hessian);
 
@@ -663,100 +663,100 @@ double modified_findTransformECC(InputArray templateImage,
       if (cvIsNaN(rho)) {
         CV_Error(Error::StsNoConv, "NaN encountered.");
       }
-			
-			gpu_imageWarped.upload(imageWarped);
-			gpu_templateZM.upload(templateZM);
-			
+      
+      gpu_imageWarped.upload(imageWarped);
+      gpu_templateZM.upload(templateZM);
+      
       // project images into jacobian
       project_onto_jacobian_ECC( gpu_jacobian, gpu_imageWarped, imageProjection);
       project_onto_jacobian_ECC(gpu_jacobian, gpu_templateZM, templateProjection);
 
-			gpu_imageWarped.download(imageWarped);
-			gpu_templateZM.download(templateZM);
+      gpu_imageWarped.download(imageWarped);
+      gpu_templateZM.download(templateZM);
 
 
       // calculate the parameter lambda to account for illumination variation
-		  //imageProjectionHessian = hessianInv*imageProjection;
+      //imageProjectionHessian = hessianInv*imageProjection;
 
       // code to initialize gemm
-		  cuda::GpuMat gpu_hessianInv, gpu_imageProjection, gpu_imageProjectionHessian;
-		  gpu_hessianInv.upload(hessianInv);
-		  gpu_imageProjection.upload(imageProjection);
-		  gpu_imageProjectionHessian.upload(imageProjectionHessian);
+      cuda::GpuMat gpu_hessianInv, gpu_imageProjection, gpu_imageProjectionHessian;
+      gpu_hessianInv.upload(hessianInv);
+      gpu_imageProjection.upload(imageProjection);
+      gpu_imageProjectionHessian.upload(imageProjectionHessian);
 
 
-		  /* -------------- gemm equation --------------------
-		   *   dst = alpha * src1 * src2 + beta * src3 
-		   * we only requre src1 * src2 so alpha set to 1
-		   * src3 is a matrix of 0 and beta set to 1
-		   */
+      /* -------------- gemm equation --------------------
+       *   dst = alpha * src1 * src2 + beta * src3 
+       * we only requre src1 * src2 so alpha set to 1
+       * src3 is a matrix of 0 and beta set to 1
+       */
 
-		  // generate src3 
-		  Mat beta = Mat::zeros(gpu_imageProjectionHessian.rows,
-		                        gpu_imageProjectionHessian.cols, 
-		  											gpu_imageProjection.type());
-		  // upload beta (src3) to gpu
-		  cuda::GpuMat gpu_beta;
-		  gpu_beta.upload(beta);
+      // generate src3 
+      Mat beta = Mat::zeros(gpu_imageProjectionHessian.rows,
+                            gpu_imageProjectionHessian.cols, 
+                            gpu_imageProjection.type());
+      // upload beta (src3) to gpu
+      cuda::GpuMat gpu_beta;
+      gpu_beta.upload(beta);
 
-		  // mulltiply
-		  cuda::gemm(gpu_hessianInv, 
-		  					 gpu_imageProjection, 1, 
-		  					 gpu_beta, 1,		// no beta required to array of 0
-		  					 gpu_imageProjectionHessian);
+      // mulltiply
+      cuda::gemm(gpu_hessianInv, 
+                 gpu_imageProjection, 1, 
+                 gpu_beta, 1,    // no beta required to array of 0
+                 gpu_imageProjectionHessian);
 
-		  // download
-		  gpu_imageProjectionHessian.download(imageProjectionHessian);
-		  gpu_imageProjection.download(imageProjection);
-		  gpu_hessianInv.download(hessianInv);
+      // download
+      gpu_imageProjectionHessian.download(imageProjectionHessian);
+      gpu_imageProjection.download(imageProjection);
+      gpu_hessianInv.download(hessianInv);
 
-		  const double lambda_n = (imgNorm*imgNorm) - imageProjection.dot(imageProjectionHessian);
+      const double lambda_n = (imgNorm*imgNorm) - imageProjection.dot(imageProjectionHessian);
       const double lambda_d = correlation - templateProjection.dot(imageProjectionHessian);
      
-		 	if (lambda_d <= 0.0)
+       if (lambda_d <= 0.0)
       {
           rho = -1;
           CV_Error(Error::StsNoConv, "The algorithm stopped before its convergence. The correlation is going to be minimized. Images may be uncorrelated or non-overlapped");
 
       }
      
-		  const double lambda = (lambda_n/lambda_d);
+      const double lambda = (lambda_n/lambda_d);
 
       //estimate the update step delta_p
-		  cuda::GpuMat gpu_error;
-		  
-		  error = lambda*templateZM;
-		  
-		  gpu_error.upload(error);
-		  gpu_imageWarped.upload(imageWarped);
-		  
-		  cuda::subtract(gpu_error, gpu_imageWarped,gpu_error);
-		  
-		  gpu_imageWarped.download(imageWarped);
-		  gpu_error.download(error);
+      cuda::GpuMat gpu_error;
+      
+      error = lambda*templateZM;
+      
+      gpu_error.upload(error);
+      gpu_imageWarped.upload(imageWarped);
+      
+      cuda::subtract(gpu_error, gpu_imageWarped,gpu_error);
+      
+      gpu_imageWarped.download(imageWarped);
+      gpu_error.download(error);
 
-			
-		  	
+      
+        
       project_onto_jacobian_ECC(gpu_jacobian, gpu_error, errorProjection);
       
-		  cuda::GpuMat gpu_errorProjection, gpu_deltaP, gpu_b;
-		  gpu_errorProjection.upload(errorProjection);
-		  gpu_hessianInv.upload(hessianInv);
-		  gpu_deltaP.upload(deltaP);
+      cuda::GpuMat gpu_errorProjection, gpu_deltaP, gpu_b;
+      gpu_errorProjection.upload(errorProjection);
+      gpu_hessianInv.upload(hessianInv);
+      gpu_deltaP.upload(deltaP);
 
-		  // generate betamatrix (src3)
-		  Mat b = Mat::zeros(deltaP.rows, deltaP.cols, deltaP.type());
-		  gpu_b.upload(b);
+      // generate betamatrix (src3)
+      Mat b = Mat::zeros(deltaP.rows, deltaP.cols, deltaP.type());
+      gpu_b.upload(b);
 
-		  // multiply matricies
-		  cuda::gemm(gpu_hessianInv, 
-		             gpu_errorProjection,1, 
-		  					 gpu_b, 1, gpu_deltaP);
+      // multiply matricies
+      cuda::gemm(gpu_hessianInv, 
+                 gpu_errorProjection,1, 
+                 gpu_b, 1, gpu_deltaP);
 
-		  // download result
-		  gpu_errorProjection.download(errorProjection);
-		  gpu_hessianInv.download(hessianInv);
-		  gpu_deltaP.download(deltaP);
+      // download result
+      gpu_errorProjection.download(errorProjection);
+      gpu_hessianInv.download(hessianInv);
+      gpu_deltaP.download(deltaP);
 
 
       // update warping matrix
