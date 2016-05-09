@@ -64,7 +64,7 @@
 
 /////////////////////////////
 // FOR USING DRAM instead of local mem
-//#define _USE_DRAM_
+#define _USE_DRAM_
 /////////////////////////////
 
 typedef unsigned int e_coreid_t;
@@ -324,19 +324,21 @@ int main(int argc, char *argv[])
 	sz = TIMERS * sizeof(uint32_t);
 	e_read(pEpiphany, 0, 0, addr, (void *) (&time_p[0]), sz);
 
-//	for (int i=0; i<TIMERS; i++)
-//		printf("time_p[%d] = %u\n", i, time_p[i]);
+	//for (int i=0; i<TIMERS; i++)
+	//	printf("time_p[%d] = %u\n", i, time_p[i]);
 
-	time_d[7] = time_p[1] - time_p[2]; // calc()
-	time_d[9] = time_p[0] - time_p[9]; // Total cycles
+	// *** "Original type" of timers - seem incorrect and give weird results
+	//time_d[7] = time_p[1] - time_p[2]; // calc()
+	//time_d[9] = time_p[0] - time_p[9]; // Total cycles
 
-	 printf(       "Finished calculation in %u cycles (%5.3f msec @ %3.0f MHz)\n\n", time_d[9], (time_d[9] * 1000.0 / eMHz), (eMHz / 1e6));
-	fprintf(fo, "%% Finished calculation in %u cycles (%5.3f msec @ %3.0f MHz)\n\n", time_d[9], (time_d[9] * 1000.0 / eMHz), (eMHz / 1e6));
+	//printf(       "Finished calculation in %u cycles (%5.3f msec @ %3.0f MHz)\n\n", time_d[9], (time_d[9] * 1000.0 / eMHz), (eMHz / 1e6));
+	//fprintf(fo, "%% Finished calculation in %u cycles (%5.3f msec @ %3.0f MHz)\n\n", time_d[9], (time_d[9] * 1000.0 / eMHz), (eMHz / 1e6));
+	//printf(       "Calculations     - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
+	// ***
 
-	 printf(       "Calculations     - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
+	// Timers using sys/time.h [sensible results, robust]
 	 printf(       "Memory overhead (in)  - (%5.3f msec)\n", (timer[2].tv_usec - timer[1].tv_usec)/1000.0);
-	 //printf(       "Alt time of full process on Epiphany     - (%5.3f msec)\n", (timer[4].tv_usec - timer[3].tv_usec)/1000.0);
-	 printf(       "Full processing time on Epiphany     - (%5.3f msec)\n", (timer[4].tv_usec - timer[3].tv_usec)/1000.0);
+	 printf(       "Processing time on Epiphany     - (%5.3f msec)\n", (timer[4].tv_usec - timer[3].tv_usec)/1000.0);
 	 printf(       "\n");
 
 	 printf(       "Reading processed image back to host\n");
