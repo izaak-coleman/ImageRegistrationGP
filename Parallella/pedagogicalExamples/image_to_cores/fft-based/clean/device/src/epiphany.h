@@ -52,12 +52,7 @@
 #define _PING   0
 #define _PONG   1
 
-//DEBUG TO BE REMOVED?
-#ifdef __Debug__
-#define dstate(x) { me.mystate = (x); }
-#else
 #define dstate(x)
-#endif
 
 #define TIMERS 10
 
@@ -71,11 +66,7 @@
 #endif
 #endif
 
-#ifdef __Debug__
-typedef struct  /*__attribute__((packed))*/ {
-#else
 typedef struct {
-#endif
 	int        corenum;
 	int        row;
 	int        col;
@@ -117,10 +108,5 @@ typedef struct {
 	mbox_t          *pCore; // ptr to cores mailbox
 } shared_buf_ptr_t;
 
-
-  //typedef enum {
-  //      e_fft_fwd = 0, //CHANGE?
-  //      e_fft_bwd = 1, //CHANGE?
-  //} fft_dir_t;
 
 #endif // __EPIPHANY_H__

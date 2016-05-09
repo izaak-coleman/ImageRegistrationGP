@@ -26,7 +26,7 @@
 // This program is the accelerator part of the project.
 //
 // This program runs on the Epiphany system and answers the host with the
-// calculation result of the operand matrices.
+// calculation result of the operand matrix.
 
 
 #include <e-lib.h>
@@ -35,12 +35,6 @@
 #include "dmalib.h"
 #include "dram_buffers.h"
 #include "static_buffers.h"
-
-/*
-void FFT2D(fft_dir_t dir); //TO BE REMOVED
-void corner_turn(int pingpong); //TO BE REMOVED
-void LPF(int lgNN); //TO BE REMOVED
-*/
 
 void init();
 void calc();
@@ -60,12 +54,9 @@ int main(int argc, char *argv[])
 	status = 0;
 
 	// Initialize data structures - mainly target pointers 
-	//dstate(1);  //CHECK - debugging info - REMOVE? [remove all dstate parts, not needed for us]
 	init();
-	//dstate(2);
 
 	do {
-		//dstate(3);
 		if (me.corenum == 0)
 		{
 			// Wait for calc() call from the host. When a rising
@@ -89,7 +80,6 @@ int main(int argc, char *argv[])
 			while (me.go_sync == 0) {};
 		}
 		// Signal "go" to next core.
-		//dstate(4);
 		*me.tgt_go_sync = me.corenum + 1;
 
 		// Load _Score rows from DRAM.
@@ -119,25 +109,6 @@ int main(int argc, char *argv[])
 		me.time_p[2] = e_ctimer_get(E_CTIMER_0); //CHECK!!
 		*/
 
-		/*
-		//OLD "CALCULATE" parts
-		//dstate(5);
-		
-		// Calculate. During this time, the host polls the
-		// Core 0's mailbox, waiting for a falling
-		// edge indicating the end of the calculation.   //WHAT is a falling edge?
-		me.time_p[1] = e_ctimer_get(E_CTIMER_0);
-		FFT2D(e_fft_fwd);
-
-		me.time_p[6] = e_ctimer_get(E_CTIMER_0);
-		LPF(_lgSedge);
-
-		me.time_p[7] = e_ctimer_get(E_CTIMER_0);
-		FFT2D(e_fft_bwd);
-
-		me.time_p[8] = e_ctimer_get(E_CTIMER_0);
-		//dstate(6);
-		*/
 
 		// Save _Score rows to DRAM.
 #ifdef _USE_DRAM_
@@ -150,33 +121,22 @@ int main(int argc, char *argv[])
 #endif // _USE_DRAM_
 
 		// If this is the first core, wait until all cores finished calculation and signal the host.
-		//dstate(7);
 		if (me.corenum == 0)
 		{
 			while (me.go_sync == ((e_group_config.group_rows * e_group_config.group_cols) + 1)) {};
 			// Signal own End-Of-Calculation to previous core.
 			me.go_sync = 0;
 	        // Wait until next core ends calculation.
-			//dstate(8);
 			while (*me.tgt_go_sync > 0) {};
-			//dstate(9);
 
 			me.time_p[9] = e_ctimer_stop(E_CTIMER_0);
-//			me.time_p[0] = 100;
-//			me.time_p[1] = 101;
-//			me.time_p[2] = 102;
-//			me.time_p[9] = 109;
 
 			Mailbox.pCore->ready = 1;
 			Mailbox.pCore->go = 0;
-			//dstate(10);
 		} else {
 	        // If next core ended calculation, signal own End-Of-Calculation to previous core.
-			//dstate(11);
 			while (*me.tgt_go_sync > 0) {};
-			//dstate(12);
 			me.go_sync = 0;
-			//dstate(13);
 		}
 	} while (0);
 
@@ -187,13 +147,8 @@ int main(int argc, char *argv[])
 
 
 void calc() {
-  //int i0, i1, j, l, l1, l2, N, Wc;
-  //cfloat t;
-  //	cfloat *X;
-  //	cfloat *W;
 
   int row=0;
-  //	int Wn_offset = 0;
 	
     
 	for(row=0;row<_Score;row++) { 
@@ -215,152 +170,6 @@ void calc() {
 
 }
 
-///////////////////////////////////////////////////////
-///////////////////////////////////////////////////////
-/*
-void FFT2D(fft_dir_t dir)  //TO BE REMOVED
-{
-	int row, cnum, Wn_offset;
-
-	if (dir == e_fft_fwd)
-		Wn_offset = 0;
-	else
-		Wn_offset = _Sedge >> 1;
-
-	//dstate(100);
-	for (cnum=0; cnum<_Ncores; cnum++)
-		me.sync[cnum] = 0;
-
-	// Reorder vectors w/ bit reversal
-	me.time_p[2] = e_ctimer_get(E_CTIMER_0);
-	bitrev(me.bank[_BankA][_PING], _lgSedge, _Score);
-
-	// Perform 1D-FFT on _Score rows
-	me.time_p[3] = e_ctimer_get(E_CTIMER_0);
-	for (row=0; row<_Score; row++)
-		fft_1d_r2_dit(_lgSedge, (me.bank[_BankA][_PING] + row * _Sedge), me.bank[_BankW][_PING]+Wn_offset, _Sedge);
-
-	//dstate(101);
-	// Do the corner turn
-	me.time_p[4] = e_ctimer_get(E_CTIMER_0);
-	corner_turn(_PING);
-	me.time_p[5] = e_ctimer_get(E_CTIMER_0);
-
-	//dstate(102);
-	// Signal for sync
-	for (cnum=0; cnum<_Ncores; cnum++)
-		*me.tgt_sync[cnum] = 1;
-
-	// Wait for sync from all cores
-	for (cnum=0; cnum<_Ncores; cnum++)
-		while (me.sync[cnum] < 1) {};
-
-	// Reorder vectors w/ bit reversal
-	//dstate(103);
-	bitrev(me.bank[_BankA][_PONG], _lgSedge, _Score);
-
-	// Perform 1D-FFT on _Score rows
-	for (row=0; row<_Score; row++)
-		fft_1d_r2_dit(_lgSedge, (me.bank[_BankA][_PONG] + row * _Sedge), me.bank[_BankW][_PING]+Wn_offset, _Sedge);
-
-	//dstate(104);
-	// Do the corner turn
-	corner_turn(_PONG);
-
-	// Signal for sync
-	//dstate(105);
-	for (cnum=0; cnum<_Ncores; cnum++)
-		*me.tgt_sync[cnum] = 2;
-
-	// Wait for sync from all cores
-	for (cnum=0; cnum<_Ncores; cnum++)
-		while (me.sync[cnum] < 2) {};
-
-	//dstate(106);
-	return;
-}
-*/
-
-///////////////////////////////////////////////////////
-///////////////////////////////////////////////////////
-/*
-void corner_turn(int pingpong)   //TO BE REMOVED
-{
-#ifdef _USE_DMA_I_
-	unsigned cnum;
-
-	for (cnum=0; cnum<_Ncores; cnum++)
-	{
-		//dstate(200 + cnum);
-		dmacpyi((void *) (me.bank[_BankA][pingpong] + _Score * cnum), (void *) (me.tgt_bk[cnum][_BankA][pingpong] + _Score * me.corenum));
-	}
-
-
-
-
-#else
-#	warning "Using memcpy() instead of DMA_I"
-	unsigned row, col, cnum;
-
-	// Transpose cores
-	for (cnum=0; cnum<_Ncores; cnum++)
-	{
-		for (row=0; row<_Score; row++)
-		{
-			for (col=0; col<_Score; col++)
-			{
-				*(me.tgt_bk[cnum][_BankA][pingpong] + _Sedge * col + _Score * me.corenum + row) =
-				        *(me.bank[_BankA][pingpong] + _Sedge * row + _Score * cnum       + col);
-			}
-		}
-	}
-#endif
-
-	return;
-}
-*/
-
-///////////////////////////////////////////////////////
-///////////////////////////////////////////////////////
-/*
-void LPF(int lgNN)   //TO BE REMOVED
-{
-	int row, col, k;
-	#define Fco 2
-
-	if (me.corenum < (8-Fco)*(_Ncores >> 4))
-	{
-		for (row=0, k=0; row<_Score; row++)
-		{
-			for (col=0; col<((8-Fco)*(_Sedge>>4)); col++)
-				me.bank[_BankA][_PING][k++] *= recipro_2_by[lgNN+lgNN];
-			for (     ; col<((8+Fco)*(_Sedge>>4)); col++)
-				me.bank[_BankA][_PING][k++] = 0;
-			for (     ; col<((8+8)*(_Sedge>>4)); col++)
-				me.bank[_BankA][_PING][k++] *= recipro_2_by[lgNN+lgNN];
-		}
-	}
-	else if (me.corenum < (8+Fco)*(_Ncores >> 4))
-	{
-		for (k=0; k<(_Score * _Sedge); )
-			me.bank[_BankA][_PING][k++] = 0;
-	}
-	else
-	{
-		for (row=0, k=0; row<_Score; row++)
-		{
-			for (col=0; col<((8-Fco)*(_Sedge>>4)); col++)
-				me.bank[_BankA][_PING][k++] *= recipro_2_by[lgNN+lgNN];
-			for (     ; col<((8+Fco)*(_Sedge>>4)); col++)
-				me.bank[_BankA][_PING][k++] = 0;
-			for (     ; col<((8+8)*(_Sedge>>4)); col++)
-				me.bank[_BankA][_PING][k++] *= recipro_2_by[lgNN+lgNN];
-		}
-	}
-
-	return;
-}
-*/
 
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////

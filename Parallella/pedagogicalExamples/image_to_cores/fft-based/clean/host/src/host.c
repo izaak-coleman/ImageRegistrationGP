@@ -334,13 +334,9 @@ int main(int argc, char *argv[])
 	fprintf(fo, "%% Finished calculation in %u cycles (%5.3f msec @ %3.0f MHz)\n\n", time_d[9], (time_d[9] * 1000.0 / eMHz), (eMHz / 1e6));
 
 	 printf(       "Calculations     - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
-	 //printf(       "calc()           - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
-	 //printf(       "Overhead         - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
-	 //printf(       "Memory overhead  - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
-	 //printf(       "Memory overhead  - (%7u microsec)\n", timer[3].tv_usec - timer[2].tv_usec);
-	 //printf(       "Alt time of full process on Epiphany     - (%5.3u microsec)\n", timer[1].tv_usec - timer[0].tv_usec);
 	 printf(       "Memory overhead (in)  - (%5.3f msec)\n", (timer[2].tv_usec - timer[1].tv_usec)/1000.0);
-	 printf(       "Alt time of full process on Epiphany     - (%5.3f msec)\n", (timer[4].tv_usec - timer[3].tv_usec)/1000.0);
+	 //printf(       "Alt time of full process on Epiphany     - (%5.3f msec)\n", (timer[4].tv_usec - timer[3].tv_usec)/1000.0);
+	 printf(       "Full processing time on Epiphany     - (%5.3f msec)\n", (timer[4].tv_usec - timer[3].tv_usec)/1000.0);
 	 printf(       "\n");
 
 	 printf(       "Reading processed image back to host\n");

@@ -38,8 +38,6 @@ typedef complex float cfloat;
 
 void rowcpy(volatile cfloat * restrict a, volatile cfloat * restrict b, int NN); //CHECK if needed?
 void generateWn(volatile cfloat * restrict Wn, int lgNN); //CHECK if needed?
-//void bitrev(volatile cfloat * restrict a, int lgNN, int N);
-//void fft_1d_r2_dit(int lgN, volatile cfloat * restrict X, volatile cfloat * restrict W, int wstride);
 
 #define STIMER(time_v)                       \
 if (me.corenum == 0)                         \
