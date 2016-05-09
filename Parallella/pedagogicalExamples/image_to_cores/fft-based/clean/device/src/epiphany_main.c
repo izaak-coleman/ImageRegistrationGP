@@ -212,12 +212,12 @@ void init()
 	me.tgt_go_sync = e_get_global_address(row, col, (void *) (&me.go_sync));
 
 	// Generate Wn //CHECK if needed
-	if(_lgSedge == 6) {
-	generateWn(me.bank[_BankW][_PING], 7);  //TEMP HARDCODED - for testing _lgSedge=6 issues...
-	}
-	else {
+	//if(_lgSedge == 6) {
+	//generateWn(me.bank[_BankW][_PING], 7);  //TEMP HARDCODED - for testing _lgSedge=6 issues...
+	//}
+	//else {
 	generateWn(me.bank[_BankW][_PING], _lgSedge);  //CHECK - what do we do with _lgSedge, or its equivalent?
-	}
+	//}
 
 
 	// Clear the inter-core sync signals
