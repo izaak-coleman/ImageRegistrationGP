@@ -36,7 +36,7 @@ static void image_jacobian_euclidean_ECC(const Mat& src1, const Mat& src2,
 
 static void image_jacobian_affine_ECC(const Mat& src1, const Mat& src2,
                                       const Mat& src3, const Mat& src4,
-					    Mat& dst);
+					    												Mat& dst);
 
 static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat& dst);
 
@@ -52,7 +52,7 @@ double modified_findTransformECC(InputArray templateImage,
 				 Mat inputMask
 				 );
 
-/** static float cuda_dot(const cuda::GpuMat& src1, const cuda::GpuMat& src2); **/
+static double cuda_dot(const cuda::GpuMat& src1, const cuda::GpuMat& src2);
 
 //--------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ int main( int argc, char** argv )
   input_image = cv::imread( inputImageName , 0 );
   
   // Define motion model
-  const int warp_mode = cv::MOTION_AFFINE;
+  const int warp_mode = cv::MOTION_TRANSLATION;
  
   // Set space for warp matrix.
   cv::Mat warp_matrix = cv::Mat::eye(2, 3, CV_32F);
@@ -326,31 +326,28 @@ static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat
 }
 
 
-/*
 static double cuda_dot(const cuda::GpuMat& src1, const cuda::GpuMat& src2){
-	double r = 0;
 
-	cuda::GpuMat dst;
+  Mat empty = Mat::ones(src2.rows, src2.cols, src2.type());
 
-	// add cassert to avoid this if mat is already continuous
-	cuda::createContinuous(src1.rows, src1.cols, src1.type, src1);
-	cuda::createContinuous(src2.rows, src2.cols, src2.type, src2);
+	cuda::GpuMat gpu_dst;
+	gpu_dst.upload(empty);
 
-	size_t len =    
-		
-	// scale length 
-	// 
+	cuda::multiply(src1,src2,gpu_dst);
 
-	cuda::multiply(src1,src2,dst);
+	Mat dst;
+	gpu_dst.download(dst);
 
-	// figure out where/how this adds
-	for(int i = 0; i < dst.rows; i++){
-			r += (float) dst[i];
+	double dotproduct=0;
+
+	for(int row = 0; row < dst.rows; row++){
+		for(int col = 0; col < dst.cols; col++){
+			dotproduct += dst.at<double>(row, col);
+		}
 	}
 
-	return r;
+	return dotproduct;
 } 
-*/
 
 static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst)
 {
@@ -369,19 +366,33 @@ static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst
     int w;
 
     float* dstPtr = dst.ptr<float>(0);
-/**
-    cuda::GpuMat gpu_src1, gpu_src2, gpu_src3, gpu_dst;
+    cuda::GpuMat gpu_src1, gpu_src2; // gpu_src3, gpu_dst;
 
 		gpu_src1.upload(src1);
 		gpu_src2.upload(src2);
-		gpu_dst.upload(dst);
-**/    
+		//gpu_dst.upload(dst);
+
 		if (src1.cols !=src2.cols){//dst.cols==1
         w  = src2.cols;
+				float cdot=0;
+				float gdot=0;
         for (int i=0; i < dst.rows; i++){
             dstPtr[i] = (float) src2.dot(src1.colRange(i*w,(i+1)*w));
-						std::cout << "This is the dest matrix: " << std::endl << dst << std::endl;
-					//	dstPtr[i] = (float) cuda_dot(gpu_src2, gpu_src1.colRange(i*w,(i+1)*w));
+
+
+						std::cout << src2.type() << std::endl << std::endl;
+						Mat dst = Mat(src2.rows, src2.cols, src2.type());
+						multiply(src2, src1.colRange(i*w, (i+1)*w), dst);
+						for(int x=0; x < dst.rows; x++) {
+							for(int j=0; j < dst.cols; j++) {
+							  cdot += dst.at<double>(x,j);
+							}
+						}
+
+            gdot = (float) src2.dot(src1.colRange(i*w,(i+1)*w));
+					  //cdot = (float) cuda_dot(gpu_src2, gpu_src1.colRange(i*w,(i+1)*w));
+						std::cout << "The cuda result: " << cdot << std::endl;
+						std::cout << "The gpu result: " << gdot << std::endl;
 				}
     }
 

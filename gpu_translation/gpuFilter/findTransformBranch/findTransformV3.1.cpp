@@ -24,6 +24,8 @@
 
 using namespace cv;
 
+void gpuDotProduct(cuda::GpuMat gpusrc1, cuda::GpuMat gpusrc2, cuda::GpuMat dest);
+
 static int saveWarp(std::string fileName, const cv::Mat& warp, int motionType);
 
 static void image_jacobian_affine_ECC(const cuda::GpuMat& gpu_src1, 
@@ -42,7 +44,7 @@ static void image_jacobian_translation_ECC(const Mat& src1, const Mat& src2, Mat
 
 
 
-static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst);
+static void project_onto_jacobian_ECC(const cuda::GpuMat& src1, const cuda::GpuMat& src2, Mat& dst);
 
 static void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const int motionType);
 
@@ -252,7 +254,7 @@ static void image_jacobian_affine_ECC(const cuda::GpuMat& gpu_src1,
 }
 
 
-static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst)
+static void project_onto_jacobian_ECC(const cuda::GpuMat& gpusrc1, const cuda::GpuMat& gpusrc2, Mat& dst)
 {
     /* this functions is used for two types of projections. If src1.cols ==src.cols
     it does a blockwise multiplication (like in the outer product of vectors)
@@ -264,19 +266,29 @@ static void project_onto_jacobian_ECC(const Mat& src1, const Mat& src2, Mat& dst
     (i.e. rtanslation:2, euclidean: 3, affine: 6, homography: 8)
 
     */
-    CV_Assert(src1.rows == src2.rows);
-    CV_Assert((src1.cols % src2.cols) == 0);
+    CV_Assert(gpusrc1.rows == gpusrc2.rows);
+    CV_Assert((gpusrc1.cols % gpusrc2.cols) == 0);
     int w;
 
     float* dstPtr = dst.ptr<float>(0);
 
+		Mat src1, src2;
+		gpusrc1.download(src1);
+		gpusrc2.download(src2);
+
 		cuda::GpuMat gpu_mat;
+		cuda::GpuMat dotProdContainer;
+
 		double norm;
 
 		if (src1.cols !=src2.cols){//dst.cols==1
         w  = src2.cols;
         for (int i=0; i < dst.rows; i++){
+						gpuDotProduct(gpusrc2, gpusrc1.colRange(i*w, (i+1)*w), dotProdContainer);
+						uchar *value = dotProdContainer.ptr(0);
+						std::cout << "value: " << *value << std::endl;
             dstPtr[i] = (float) src2.dot(src1.colRange(i*w,(i+1)*w));
+						std::cout << "destPtr: " << dstPtr[i] << std::endl;
 				}
     }
 
@@ -334,6 +346,83 @@ static void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update, const
         mapPtr[2] += updatePtr[4];
         mapPtr[5] += updatePtr[5];
     }
+}
+
+void gpuDotProduct(cuda::GpuMat src1, cuda::GpuMat src2, cuda::GpuMat fold){
+
+  // perform elementwise multiplication
+  cuda::multiply(src1, src2, fold);
+
+ /* ------------------------ Cols folding -----------------------------------*/
+  // sum elements of fold
+  int col_lastResult=1, col_currentResult=1;
+  for(int i=1; col_currentResult < fold.cols; i++){
+    col_lastResult = pow(2, i-1);			// last whole number log2
+    col_currentResult = pow(2, i);			// current whole number log2
+  }
+
+  // add offset to remainder of fold, to make log of fold.cols a whole number
+  int col_distanceFromLog2End = src1.cols - col_lastResult;		// offset from log2
+	
+  cuda::GpuMat col_offcut, col_destSection;
+  col_offcut = fold.colRange(col_lastResult, fold.cols);
+  col_destSection = fold.colRange((col_lastResult - col_distanceFromLog2End), col_lastResult);
+  cuda::add(col_destSection, col_offcut, col_destSection);
+
+
+  fold = fold.colRange(0, col_lastResult);		// update the new size of dest
+
+	// fold!
+  while(fold.cols != 1) {
+
+  cuda::GpuMat rightHalf, leftHalf;
+    // split into right and left halfs
+    rightHalf = fold.colRange(0, (fold.cols/2));
+    leftHalf = fold.colRange((fold.cols/2), (fold.cols));
+  
+    // add halfs together
+    cuda::add(rightHalf, leftHalf, fold);
+    std::cout << "fold cols reduction" << fold.cols << std::endl;
+ }
+
+
+ /* ------------------------ Rows folding -----------------------------------*/
+
+  // sum elements of fold
+  int row_lastResult=1, row_currentResult=1;
+  for(int i=1; row_currentResult < fold.rows; i++){
+    row_lastResult = pow(2, i-1);			// last whole number log2
+    row_currentResult= pow(2, i);			// current whole number log2
+  }
+
+  // add offset to remainder of fold, to make log of fold.cols a whole number
+  int row_distanceFromLog2End = src1.rows - row_lastResult;		// offset from log2
+  cuda::GpuMat row_offcut, row_destSection;
+  row_offcut = fold.rowRange(row_lastResult, fold.rows);
+  row_destSection = fold.rowRange((row_lastResult - row_distanceFromLog2End), row_lastResult);
+  cuda::add(row_destSection, row_offcut, row_destSection);
+
+
+  fold = fold.rowRange(0, row_lastResult);		// update the new size of fold
+
+	// fold!
+  while(fold.rows!= 1) {
+
+  cuda::GpuMat rightHalf, leftHalf;
+    // split into right and left halfs
+    rightHalf = fold.rowRange(0, (fold.rows/2));
+    leftHalf = fold.rowRange((fold.rows/2), (fold.rows));
+  
+    // add halfs together
+    cuda::add(rightHalf, leftHalf, fold);
+    std::cout << "fold row reduction" << fold.rows << std::endl;
+ }
+
+ Mat dest_download;
+ fold.download(dest_download);
+
+ std::cout << "gpuDotProduct dest: " << dest_download << std::endl;
+
 }
 
 
@@ -559,8 +648,10 @@ double modified_findTransformECC(InputArray templateImage,
                 break;
 				}
 
+			cuda::GpuMat gpu_jacobian; // TEMP upload POSITION
+			gpu_jacobian.upload(jacobian);
       // calculate Hessian and its inverse
-      project_onto_jacobian_ECC(jacobian, jacobian, hessian);
+      project_onto_jacobian_ECC(gpu_jacobian, gpu_jacobian, hessian);
 
       hessianInv = hessian.inv();
 
@@ -572,10 +663,16 @@ double modified_findTransformECC(InputArray templateImage,
       if (cvIsNaN(rho)) {
         CV_Error(Error::StsNoConv, "NaN encountered.");
       }
-
+			
+			gpu_imageWarped.upload(imageWarped);
+			gpu_templateZM.upload(templateZM);
+			
       // project images into jacobian
-      project_onto_jacobian_ECC( jacobian, imageWarped, imageProjection);
-      project_onto_jacobian_ECC(jacobian, templateZM, templateProjection);
+      project_onto_jacobian_ECC( gpu_jacobian, gpu_imageWarped, imageProjection);
+      project_onto_jacobian_ECC(gpu_jacobian, gpu_templateZM, templateProjection);
+
+			gpu_imageWarped.download(imageWarped);
+			gpu_templateZM.download(templateZM);
 
 
       // calculate the parameter lambda to account for illumination variation
@@ -637,8 +734,10 @@ double modified_findTransformECC(InputArray templateImage,
 		  
 		  gpu_imageWarped.download(imageWarped);
 		  gpu_error.download(error);
+
+			
 		  	
-      project_onto_jacobian_ECC(jacobian, error, errorProjection);
+      project_onto_jacobian_ECC(gpu_jacobian, gpu_error, errorProjection);
       
 		  cuda::GpuMat gpu_errorProjection, gpu_deltaP, gpu_b;
 		  gpu_errorProjection.upload(errorProjection);

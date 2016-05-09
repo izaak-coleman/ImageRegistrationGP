@@ -1,0 +1,615 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - ex_test.info - opencv2/core/operations.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">opencv2/core</a> - operations.hpp<span style="font-size: 80%;"> (source / <a href="operations.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">ex_test.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-03-07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : /*M///////////////////////////////////////////////////////////////////////////////////////</a>
+<span class="lineNum">       2 </span>                :            : //
+<span class="lineNum">       3 </span>                :            : //  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING.
+<span class="lineNum">       4 </span>                :            : //
+<span class="lineNum">       5 </span>                :            : //  By downloading, copying, installing or using the software you agree to this license.
+<span class="lineNum">       6 </span>                :            : //  If you do not agree to this license, do not download, install,
+<span class="lineNum">       7 </span>                :            : //  copy or use the software.
+<span class="lineNum">       8 </span>                :            : //
+<span class="lineNum">       9 </span>                :            : //
+<span class="lineNum">      10 </span>                :            : //                           License Agreement
+<span class="lineNum">      11 </span>                :            : //                For Open Source Computer Vision Library
+<span class="lineNum">      12 </span>                :            : //
+<span class="lineNum">      13 </span>                :            : // Copyright (C) 2000-2008, Intel Corporation, all rights reserved.
+<span class="lineNum">      14 </span>                :            : // Copyright (C) 2009, Willow Garage Inc., all rights reserved.
+<span class="lineNum">      15 </span>                :            : // Copyright (C) 2013, OpenCV Foundation, all rights reserved.
+<span class="lineNum">      16 </span>                :            : // Copyright (C) 2015, Itseez Inc., all rights reserved.
+<span class="lineNum">      17 </span>                :            : // Third party copyrights are property of their respective owners.
+<span class="lineNum">      18 </span>                :            : //
+<span class="lineNum">      19 </span>                :            : // Redistribution and use in source and binary forms, with or without modification,
+<span class="lineNum">      20 </span>                :            : // are permitted provided that the following conditions are met:
+<span class="lineNum">      21 </span>                :            : //
+<span class="lineNum">      22 </span>                :            : //   * Redistribution's of source code must retain the above copyright notice,
+<span class="lineNum">      23 </span>                :            : //     this list of conditions and the following disclaimer.
+<span class="lineNum">      24 </span>                :            : //
+<span class="lineNum">      25 </span>                :            : //   * Redistribution's in binary form must reproduce the above copyright notice,
+<span class="lineNum">      26 </span>                :            : //     this list of conditions and the following disclaimer in the documentation
+<span class="lineNum">      27 </span>                :            : //     and/or other materials provided with the distribution.
+<span class="lineNum">      28 </span>                :            : //
+<span class="lineNum">      29 </span>                :            : //   * The name of the copyright holders may not be used to endorse or promote products
+<span class="lineNum">      30 </span>                :            : //     derived from this software without specific prior written permission.
+<span class="lineNum">      31 </span>                :            : //
+<span class="lineNum">      32 </span>                :            : // This software is provided by the copyright holders and contributors &quot;as is&quot; and
+<span class="lineNum">      33 </span>                :            : // any express or implied warranties, including, but not limited to, the implied
+<span class="lineNum">      34 </span>                :            : // warranties of merchantability and fitness for a particular purpose are disclaimed.
+<span class="lineNum">      35 </span>                :            : // In no event shall the Intel Corporation or contributors be liable for any direct,
+<span class="lineNum">      36 </span>                :            : // indirect, incidental, special, exemplary, or consequential damages
+<span class="lineNum">      37 </span>                :            : // (including, but not limited to, procurement of substitute goods or services;
+<span class="lineNum">      38 </span>                :            : // loss of use, data, or profits; or business interruption) however caused
+<span class="lineNum">      39 </span>                :            : // and on any theory of liability, whether in contract, strict liability,
+<span class="lineNum">      40 </span>                :            : // or tort (including negligence or otherwise) arising in any way out of
+<span class="lineNum">      41 </span>                :            : // the use of this software, even if advised of the possibility of such damage.
+<span class="lineNum">      42 </span>                :            : //
+<span class="lineNum">      43 </span>                :            : //M*/
+<span class="lineNum">      44 </span>                :            : 
+<span class="lineNum">      45 </span>                :            : #ifndef __OPENCV_CORE_OPERATIONS_HPP__
+<span class="lineNum">      46 </span>                :            : #define __OPENCV_CORE_OPERATIONS_HPP__
+<span class="lineNum">      47 </span>                :            : 
+<span class="lineNum">      48 </span>                :            : #ifndef __cplusplus
+<span class="lineNum">      49 </span>                :            : #  error operations.hpp header must be compiled as C++
+<span class="lineNum">      50 </span>                :            : #endif
+<span class="lineNum">      51 </span>                :            : 
+<span class="lineNum">      52 </span>                :            : #include &lt;cstdio&gt;
+<span class="lineNum">      53 </span>                :            : 
+<span class="lineNum">      54 </span>                :            : //! @cond IGNORED
+<span class="lineNum">      55 </span>                :            : 
+<span class="lineNum">      56 </span>                :            : namespace cv
+<span class="lineNum">      57 </span>                :            : {
+<span class="lineNum">      58 </span>                :            : 
+<span class="lineNum">      59 </span>                :            : ////////////////////////////// Matx methods depending on core API /////////////////////////////
+<span class="lineNum">      60 </span>                :            : 
+<span class="lineNum">      61 </span>                :            : namespace internal
+<span class="lineNum">      62 </span>                :            : {
+<span class="lineNum">      63 </span>                :            : 
+<span class="lineNum">      64 </span>                :            : template&lt;typename _Tp, int m&gt; struct Matx_FastInvOp
+<span class="lineNum">      65 </span>                :            : {
+<span class="lineNum">      66 </span>                :            :     bool operator()(const Matx&lt;_Tp, m, m&gt;&amp; a, Matx&lt;_Tp, m, m&gt;&amp; b, int method) const
+<span class="lineNum">      67 </span>                :            :     {
+<span class="lineNum">      68 </span>                :            :         Matx&lt;_Tp, m, m&gt; temp = a;
+<span class="lineNum">      69 </span>                :            : 
+<span class="lineNum">      70 </span>                :            :         // assume that b is all 0's on input =&gt; make it a unity matrix
+<span class="lineNum">      71 </span>                :            :         for( int i = 0; i &lt; m; i++ )
+<span class="lineNum">      72 </span>                :            :             b(i, i) = (_Tp)1;
+<span class="lineNum">      73 </span>                :            : 
+<span class="lineNum">      74 </span>                :            :         if( method == DECOMP_CHOLESKY )
+<span class="lineNum">      75 </span>                :            :             return Cholesky(temp.val, m*sizeof(_Tp), m, b.val, m*sizeof(_Tp), m);
+<span class="lineNum">      76 </span>                :            : 
+<span class="lineNum">      77 </span>                :            :         return LU(temp.val, m*sizeof(_Tp), m, b.val, m*sizeof(_Tp), m) != 0;
+<span class="lineNum">      78 </span>                :            :     }
+<span class="lineNum">      79 </span>                :            : };
+<span class="lineNum">      80 </span>                :            : 
+<span class="lineNum">      81 </span>                :            : template&lt;typename _Tp&gt; struct Matx_FastInvOp&lt;_Tp, 2&gt;
+<span class="lineNum">      82 </span>                :            : {
+<span class="lineNum">      83 </span>                :            :     bool operator()(const Matx&lt;_Tp, 2, 2&gt;&amp; a, Matx&lt;_Tp, 2, 2&gt;&amp; b, int) const
+<span class="lineNum">      84 </span>                :            :     {
+<span class="lineNum">      85 </span>                :            :         _Tp d = determinant(a);
+<span class="lineNum">      86 </span>                :            :         if( d == 0 )
+<span class="lineNum">      87 </span>                :            :             return false;
+<span class="lineNum">      88 </span>                :            :         d = 1/d;
+<span class="lineNum">      89 </span>                :            :         b(1,1) = a(0,0)*d;
+<span class="lineNum">      90 </span>                :            :         b(0,0) = a(1,1)*d;
+<span class="lineNum">      91 </span>                :            :         b(0,1) = -a(0,1)*d;
+<span class="lineNum">      92 </span>                :            :         b(1,0) = -a(1,0)*d;
+<span class="lineNum">      93 </span>                :            :         return true;
+<span class="lineNum">      94 </span>                :            :     }
+<span class="lineNum">      95 </span>                :            : };
+<span class="lineNum">      96 </span>                :            : 
+<span class="lineNum">      97 </span>                :            : template&lt;typename _Tp&gt; struct Matx_FastInvOp&lt;_Tp, 3&gt;
+<span class="lineNum">      98 </span>                :            : {
+<span class="lineNum">      99 </span>                :            :     bool operator()(const Matx&lt;_Tp, 3, 3&gt;&amp; a, Matx&lt;_Tp, 3, 3&gt;&amp; b, int) const
+<span class="lineNum">     100 </span>                :            :     {
+<span class="lineNum">     101 </span>                :            :         _Tp d = (_Tp)determinant(a);
+<span class="lineNum">     102 </span>                :            :         if( d == 0 )
+<span class="lineNum">     103 </span>                :            :             return false;
+<span class="lineNum">     104 </span>                :            :         d = 1/d;
+<span class="lineNum">     105 </span>                :            :         b(0,0) = (a(1,1) * a(2,2) - a(1,2) * a(2,1)) * d;
+<span class="lineNum">     106 </span>                :            :         b(0,1) = (a(0,2) * a(2,1) - a(0,1) * a(2,2)) * d;
+<span class="lineNum">     107 </span>                :            :         b(0,2) = (a(0,1) * a(1,2) - a(0,2) * a(1,1)) * d;
+<span class="lineNum">     108 </span>                :            : 
+<span class="lineNum">     109 </span>                :            :         b(1,0) = (a(1,2) * a(2,0) - a(1,0) * a(2,2)) * d;
+<span class="lineNum">     110 </span>                :            :         b(1,1) = (a(0,0) * a(2,2) - a(0,2) * a(2,0)) * d;
+<span class="lineNum">     111 </span>                :            :         b(1,2) = (a(0,2) * a(1,0) - a(0,0) * a(1,2)) * d;
+<span class="lineNum">     112 </span>                :            : 
+<span class="lineNum">     113 </span>                :            :         b(2,0) = (a(1,0) * a(2,1) - a(1,1) * a(2,0)) * d;
+<span class="lineNum">     114 </span>                :            :         b(2,1) = (a(0,1) * a(2,0) - a(0,0) * a(2,1)) * d;
+<span class="lineNum">     115 </span>                :            :         b(2,2) = (a(0,0) * a(1,1) - a(0,1) * a(1,0)) * d;
+<span class="lineNum">     116 </span>                :            :         return true;
+<span class="lineNum">     117 </span>                :            :     }
+<span class="lineNum">     118 </span>                :            : };
+<span class="lineNum">     119 </span>                :            : 
+<span class="lineNum">     120 </span>                :            : 
+<span class="lineNum">     121 </span>                :            : template&lt;typename _Tp, int m, int n&gt; struct Matx_FastSolveOp
+<span class="lineNum">     122 </span>                :            : {
+<span class="lineNum">     123 </span>                :            :     bool operator()(const Matx&lt;_Tp, m, m&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b,
+<span class="lineNum">     124 </span>                :            :                     Matx&lt;_Tp, m, n&gt;&amp; x, int method) const
+<span class="lineNum">     125 </span>                :            :     {
+<span class="lineNum">     126 </span>                :            :         Matx&lt;_Tp, m, m&gt; temp = a;
+<span class="lineNum">     127 </span>                :            :         x = b;
+<span class="lineNum">     128 </span>                :            :         if( method == DECOMP_CHOLESKY )
+<span class="lineNum">     129 </span>                :            :             return Cholesky(temp.val, m*sizeof(_Tp), m, x.val, n*sizeof(_Tp), n);
+<span class="lineNum">     130 </span>                :            : 
+<span class="lineNum">     131 </span>                :            :         return LU(temp.val, m*sizeof(_Tp), m, x.val, n*sizeof(_Tp), n) != 0;
+<span class="lineNum">     132 </span>                :            :     }
+<span class="lineNum">     133 </span>                :            : };
+<span class="lineNum">     134 </span>                :            : 
+<span class="lineNum">     135 </span>                :            : template&lt;typename _Tp&gt; struct Matx_FastSolveOp&lt;_Tp, 2, 1&gt;
+<span class="lineNum">     136 </span>                :            : {
+<span class="lineNum">     137 </span>                :            :     bool operator()(const Matx&lt;_Tp, 2, 2&gt;&amp; a, const Matx&lt;_Tp, 2, 1&gt;&amp; b,
+<span class="lineNum">     138 </span>                :            :                     Matx&lt;_Tp, 2, 1&gt;&amp; x, int) const
+<span class="lineNum">     139 </span>                :            :     {
+<span class="lineNum">     140 </span>                :            :         _Tp d = determinant(a);
+<span class="lineNum">     141 </span>                :            :         if( d == 0 )
+<span class="lineNum">     142 </span>                :            :             return false;
+<span class="lineNum">     143 </span>                :            :         d = 1/d;
+<span class="lineNum">     144 </span>                :            :         x(0) = (b(0)*a(1,1) - b(1)*a(0,1))*d;
+<span class="lineNum">     145 </span>                :            :         x(1) = (b(1)*a(0,0) - b(0)*a(1,0))*d;
+<span class="lineNum">     146 </span>                :            :         return true;
+<span class="lineNum">     147 </span>                :            :     }
+<span class="lineNum">     148 </span>                :            : };
+<span class="lineNum">     149 </span>                :            : 
+<span class="lineNum">     150 </span>                :            : template&lt;typename _Tp&gt; struct Matx_FastSolveOp&lt;_Tp, 3, 1&gt;
+<span class="lineNum">     151 </span>                :            : {
+<span class="lineNum">     152 </span>                :            :     bool operator()(const Matx&lt;_Tp, 3, 3&gt;&amp; a, const Matx&lt;_Tp, 3, 1&gt;&amp; b,
+<span class="lineNum">     153 </span>                :            :                     Matx&lt;_Tp, 3, 1&gt;&amp; x, int) const
+<span class="lineNum">     154 </span>                :            :     {
+<span class="lineNum">     155 </span>                :            :         _Tp d = (_Tp)determinant(a);
+<span class="lineNum">     156 </span>                :            :         if( d == 0 )
+<span class="lineNum">     157 </span>                :            :             return false;
+<span class="lineNum">     158 </span>                :            :         d = 1/d;
+<span class="lineNum">     159 </span>                :            :         x(0) = d*(b(0)*(a(1,1)*a(2,2) - a(1,2)*a(2,1)) -
+<span class="lineNum">     160 </span>                :            :                 a(0,1)*(b(1)*a(2,2) - a(1,2)*b(2)) +
+<span class="lineNum">     161 </span>                :            :                 a(0,2)*(b(1)*a(2,1) - a(1,1)*b(2)));
+<span class="lineNum">     162 </span>                :            : 
+<span class="lineNum">     163 </span>                :            :         x(1) = d*(a(0,0)*(b(1)*a(2,2) - a(1,2)*b(2)) -
+<span class="lineNum">     164 </span>                :            :                 b(0)*(a(1,0)*a(2,2) - a(1,2)*a(2,0)) +
+<span class="lineNum">     165 </span>                :            :                 a(0,2)*(a(1,0)*b(2) - b(1)*a(2,0)));
+<span class="lineNum">     166 </span>                :            : 
+<span class="lineNum">     167 </span>                :            :         x(2) = d*(a(0,0)*(a(1,1)*b(2) - b(1)*a(2,1)) -
+<span class="lineNum">     168 </span>                :            :                 a(0,1)*(a(1,0)*b(2) - b(1)*a(2,0)) +
+<span class="lineNum">     169 </span>                :            :                 b(0)*(a(1,0)*a(2,1) - a(1,1)*a(2,0)));
+<span class="lineNum">     170 </span>                :            :         return true;
+<span class="lineNum">     171 </span>                :            :     }
+<span class="lineNum">     172 </span>                :            : };
+<span class="lineNum">     173 </span>                :            : 
+<span class="lineNum">     174 </span>                :            : } // internal
+<span class="lineNum">     175 </span>                :            : 
+<span class="lineNum">     176 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     177 </span>                :            : Matx&lt;_Tp,m,n&gt; Matx&lt;_Tp,m,n&gt;::randu(_Tp a, _Tp b)
+<span class="lineNum">     178 </span>                :            : {
+<span class="lineNum">     179 </span>                :            :     Matx&lt;_Tp,m,n&gt; M;
+<span class="lineNum">     180 </span>                :            :     cv::randu(M, Scalar(a), Scalar(b));
+<span class="lineNum">     181 </span>                :            :     return M;
+<span class="lineNum">     182 </span>                :            : }
+<span class="lineNum">     183 </span>                :            : 
+<span class="lineNum">     184 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     185 </span>                :            : Matx&lt;_Tp,m,n&gt; Matx&lt;_Tp,m,n&gt;::randn(_Tp a, _Tp b)
+<span class="lineNum">     186 </span>                :            : {
+<span class="lineNum">     187 </span>                :            :     Matx&lt;_Tp,m,n&gt; M;
+<span class="lineNum">     188 </span>                :            :     cv::randn(M, Scalar(a), Scalar(b));
+<span class="lineNum">     189 </span>                :            :     return M;
+<span class="lineNum">     190 </span>                :            : }
+<span class="lineNum">     191 </span>                :            : 
+<span class="lineNum">     192 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     193 </span>                :            : Matx&lt;_Tp, n, m&gt; Matx&lt;_Tp, m, n&gt;::inv(int method, bool *p_is_ok /*= NULL*/) const
+<span class="lineNum">     194 </span>                :            : {
+<span class="lineNum">     195 </span>                :            :     Matx&lt;_Tp, n, m&gt; b;
+<span class="lineNum">     196 </span>                :            :     bool ok;
+<span class="lineNum">     197 </span>                :            :     if( method == DECOMP_LU || method == DECOMP_CHOLESKY )
+<span class="lineNum">     198 </span>                :            :         ok = cv::internal::Matx_FastInvOp&lt;_Tp, m&gt;()(*this, b, method);
+<span class="lineNum">     199 </span>                :            :     else
+<span class="lineNum">     200 </span>                :            :     {
+<span class="lineNum">     201 </span>                :            :         Mat A(*this, false), B(b, false);
+<span class="lineNum">     202 </span>                :            :         ok = (invert(A, B, method) != 0);
+<span class="lineNum">     203 </span>                :            :     }
+<span class="lineNum">     204 </span>                :            :     if( NULL != p_is_ok ) { *p_is_ok = ok; }
+<span class="lineNum">     205 </span>                :            :     return ok ? b : Matx&lt;_Tp, n, m&gt;::zeros();
+<span class="lineNum">     206 </span>                :            : }
+<span class="lineNum">     207 </span>                :            : 
+<span class="lineNum">     208 </span>                :            : template&lt;typename _Tp, int m, int n&gt; template&lt;int l&gt; inline
+<span class="lineNum">     209 </span>                :            : Matx&lt;_Tp, n, l&gt; Matx&lt;_Tp, m, n&gt;::solve(const Matx&lt;_Tp, m, l&gt;&amp; rhs, int method) const
+<span class="lineNum">     210 </span>                :            : {
+<span class="lineNum">     211 </span>                :            :     Matx&lt;_Tp, n, l&gt; x;
+<span class="lineNum">     212 </span>                :            :     bool ok;
+<span class="lineNum">     213 </span>                :            :     if( method == DECOMP_LU || method == DECOMP_CHOLESKY )
+<span class="lineNum">     214 </span>                :            :         ok = cv::internal::Matx_FastSolveOp&lt;_Tp, m, l&gt;()(*this, rhs, x, method);
+<span class="lineNum">     215 </span>                :            :     else
+<span class="lineNum">     216 </span>                :            :     {
+<span class="lineNum">     217 </span>                :            :         Mat A(*this, false), B(rhs, false), X(x, false);
+<span class="lineNum">     218 </span>                :            :         ok = cv::solve(A, B, X, method);
+<span class="lineNum">     219 </span>                :            :     }
+<span class="lineNum">     220 </span>                :            : 
+<span class="lineNum">     221 </span>                :            :     return ok ? x : Matx&lt;_Tp, n, l&gt;::zeros();
+<span class="lineNum">     222 </span>                :            : }
+<span class="lineNum">     223 </span>                :            : 
+<span class="lineNum">     224 </span>                :            : 
+<span class="lineNum">     225 </span>                :            : 
+<span class="lineNum">     226 </span>                :            : ////////////////////////// Augmenting algebraic &amp; logical operations //////////////////////////
+<span class="lineNum">     227 </span>                :            : 
+<span class="lineNum">     228 </span>                :            : #define CV_MAT_AUG_OPERATOR1(op, cvop, A, B) \
+<span class="lineNum">     229 </span>                :            :     static inline A&amp; operator op (A&amp; a, const B&amp; b) { cvop; return a; }
+<span class="lineNum">     230 </span>                :            : 
+<span class="lineNum">     231 </span>                :            : #define CV_MAT_AUG_OPERATOR(op, cvop, A, B)   \
+<span class="lineNum">     232 </span>                :            :     CV_MAT_AUG_OPERATOR1(op, cvop, A, B)      \
+<span class="lineNum">     233 </span>                :            :     CV_MAT_AUG_OPERATOR1(op, cvop, const A, B)
+<span class="lineNum">     234 </span>                :            : 
+<span class="lineNum">     235 </span>                :            : #define CV_MAT_AUG_OPERATOR_T(op, cvop, A, B)                   \
+<span class="lineNum">     236 </span>                :            :     template&lt;typename _Tp&gt; CV_MAT_AUG_OPERATOR1(op, cvop, A, B) \
+<span class="lineNum">     237 </span>                :            :     template&lt;typename _Tp&gt; CV_MAT_AUG_OPERATOR1(op, cvop, const A, B)
+<span class="lineNum">     238 </span>                :            : 
+<span class="lineNum">     239 </span>                :            : CV_MAT_AUG_OPERATOR  (+=, cv::add(a,b,a), Mat, Mat)
+<span class="lineNum">     240 </span>                :            : CV_MAT_AUG_OPERATOR  (+=, cv::add(a,b,a), Mat, Scalar)
+<span class="lineNum">     241 </span>                :            : CV_MAT_AUG_OPERATOR_T(+=, cv::add(a,b,a), Mat_&lt;_Tp&gt;, Mat)
+<span class="lineNum">     242 </span>                :            : CV_MAT_AUG_OPERATOR_T(+=, cv::add(a,b,a), Mat_&lt;_Tp&gt;, Scalar)
+<span class="lineNum">     243 </span>                :            : CV_MAT_AUG_OPERATOR_T(+=, cv::add(a,b,a), Mat_&lt;_Tp&gt;, Mat_&lt;_Tp&gt;)
+<span class="lineNum">     244 </span>                :            : 
+<span class="lineNum">     245 </span>                :            : CV_MAT_AUG_OPERATOR  (-=, cv::subtract(a,b,a), Mat, Mat)
+<span class="lineNum">     246 </span>                :            : CV_MAT_AUG_OPERATOR  (-=, cv::subtract(a,b,a), Mat, Scalar)
+<span class="lineNum">     247 </span>                :            : CV_MAT_AUG_OPERATOR_T(-=, cv::subtract(a,b,a), Mat_&lt;_Tp&gt;, Mat)
+<span class="lineNum">     248 </span>                :            : CV_MAT_AUG_OPERATOR_T(-=, cv::subtract(a,b,a), Mat_&lt;_Tp&gt;, Scalar)
+<span class="lineNum">     249 </span>                :            : CV_MAT_AUG_OPERATOR_T(-=, cv::subtract(a,b,a), Mat_&lt;_Tp&gt;, Mat_&lt;_Tp&gt;)
+<span class="lineNum">     250 </span>                :            : 
+<span class="lineNum">     251 </span>                :            : CV_MAT_AUG_OPERATOR  (*=, cv::gemm(a, b, 1, Mat(), 0, a, 0), Mat, Mat)
+<a name="252"><span class="lineNum">     252 </span>                :            : CV_MAT_AUG_OPERATOR_T(*=, cv::gemm(a, b, 1, Mat(), 0, a, 0), Mat_&lt;_Tp&gt;, Mat)</a>
+<span class="lineNum">     253 </span>                :            : CV_MAT_AUG_OPERATOR_T(*=, cv::gemm(a, b, 1, Mat(), 0, a, 0), Mat_&lt;_Tp&gt;, Mat_&lt;_Tp&gt;)
+<span class="lineNum">     254 </span>        [<span class="branchCov" title="Branch 2 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          1 : CV_MAT_AUG_OPERATOR  (*=, a.convertTo(a, -1, b), Mat, double)</span>
+<span class="lineNum">     255 </span>                :            : CV_MAT_AUG_OPERATOR_T(*=, a.convertTo(a, -1, b), Mat_&lt;_Tp&gt;, double)
+<span class="lineNum">     256 </span>                :            : 
+<span class="lineNum">     257 </span>                :            : CV_MAT_AUG_OPERATOR  (/=, cv::divide(a,b,a), Mat, Mat)
+<span class="lineNum">     258 </span>                :            : CV_MAT_AUG_OPERATOR_T(/=, cv::divide(a,b,a), Mat_&lt;_Tp&gt;, Mat)
+<span class="lineNum">     259 </span>                :            : CV_MAT_AUG_OPERATOR_T(/=, cv::divide(a,b,a), Mat_&lt;_Tp&gt;, Mat_&lt;_Tp&gt;)
+<span class="lineNum">     260 </span>                :            : CV_MAT_AUG_OPERATOR  (/=, a.convertTo((Mat&amp;)a, -1, 1./b), Mat, double)
+<span class="lineNum">     261 </span>                :            : CV_MAT_AUG_OPERATOR_T(/=, a.convertTo((Mat&amp;)a, -1, 1./b), Mat_&lt;_Tp&gt;, double)
+<span class="lineNum">     262 </span>                :            : 
+<span class="lineNum">     263 </span>                :            : CV_MAT_AUG_OPERATOR  (&amp;=, cv::bitwise_and(a,b,a), Mat, Mat)
+<span class="lineNum">     264 </span>                :            : CV_MAT_AUG_OPERATOR  (&amp;=, cv::bitwise_and(a,b,a), Mat, Scalar)
+<span class="lineNum">     265 </span>                :            : CV_MAT_AUG_OPERATOR_T(&amp;=, cv::bitwise_and(a,b,a), Mat_&lt;_Tp&gt;, Mat)
+<span class="lineNum">     266 </span>                :            : CV_MAT_AUG_OPERATOR_T(&amp;=, cv::bitwise_and(a,b,a), Mat_&lt;_Tp&gt;, Scalar)
+<span class="lineNum">     267 </span>                :            : CV_MAT_AUG_OPERATOR_T(&amp;=, cv::bitwise_and(a,b,a), Mat_&lt;_Tp&gt;, Mat_&lt;_Tp&gt;)
+<span class="lineNum">     268 </span>                :            : 
+<span class="lineNum">     269 </span>                :            : CV_MAT_AUG_OPERATOR  (|=, cv::bitwise_or(a,b,a), Mat, Mat)
+<span class="lineNum">     270 </span>                :            : CV_MAT_AUG_OPERATOR  (|=, cv::bitwise_or(a,b,a), Mat, Scalar)
+<span class="lineNum">     271 </span>                :            : CV_MAT_AUG_OPERATOR_T(|=, cv::bitwise_or(a,b,a), Mat_&lt;_Tp&gt;, Mat)
+<span class="lineNum">     272 </span>                :            : CV_MAT_AUG_OPERATOR_T(|=, cv::bitwise_or(a,b,a), Mat_&lt;_Tp&gt;, Scalar)
+<span class="lineNum">     273 </span>                :            : CV_MAT_AUG_OPERATOR_T(|=, cv::bitwise_or(a,b,a), Mat_&lt;_Tp&gt;, Mat_&lt;_Tp&gt;)
+<span class="lineNum">     274 </span>                :            : 
+<span class="lineNum">     275 </span>                :            : CV_MAT_AUG_OPERATOR  (^=, cv::bitwise_xor(a,b,a), Mat, Mat)
+<span class="lineNum">     276 </span>                :            : CV_MAT_AUG_OPERATOR  (^=, cv::bitwise_xor(a,b,a), Mat, Scalar)
+<span class="lineNum">     277 </span>                :            : CV_MAT_AUG_OPERATOR_T(^=, cv::bitwise_xor(a,b,a), Mat_&lt;_Tp&gt;, Mat)
+<span class="lineNum">     278 </span>                :            : CV_MAT_AUG_OPERATOR_T(^=, cv::bitwise_xor(a,b,a), Mat_&lt;_Tp&gt;, Scalar)
+<span class="lineNum">     279 </span>                :            : CV_MAT_AUG_OPERATOR_T(^=, cv::bitwise_xor(a,b,a), Mat_&lt;_Tp&gt;, Mat_&lt;_Tp&gt;)
+<span class="lineNum">     280 </span>                :            : 
+<span class="lineNum">     281 </span>                :            : #undef CV_MAT_AUG_OPERATOR_T
+<span class="lineNum">     282 </span>                :            : #undef CV_MAT_AUG_OPERATOR
+<span class="lineNum">     283 </span>                :            : #undef CV_MAT_AUG_OPERATOR1
+<span class="lineNum">     284 </span>                :            : 
+<span class="lineNum">     285 </span>                :            : 
+<span class="lineNum">     286 </span>                :            : 
+<span class="lineNum">     287 </span>                :            : ///////////////////////////////////////////// SVD /////////////////////////////////////////////
+<span class="lineNum">     288 </span>                :            : 
+<span class="lineNum">     289 </span>                :            : inline SVD::SVD() {}
+<span class="lineNum">     290 </span>                :            : inline SVD::SVD( InputArray m, int flags ) { operator ()(m, flags); }
+<span class="lineNum">     291 </span>                :            : inline void SVD::solveZ( InputArray m, OutputArray _dst )
+<span class="lineNum">     292 </span>                :            : {
+<span class="lineNum">     293 </span>                :            :     Mat mtx = m.getMat();
+<span class="lineNum">     294 </span>                :            :     SVD svd(mtx, (mtx.rows &gt;= mtx.cols ? 0 : SVD::FULL_UV));
+<span class="lineNum">     295 </span>                :            :     _dst.create(svd.vt.cols, 1, svd.vt.type());
+<span class="lineNum">     296 </span>                :            :     Mat dst = _dst.getMat();
+<span class="lineNum">     297 </span>                :            :     svd.vt.row(svd.vt.rows-1).reshape(1,svd.vt.cols).copyTo(dst);
+<span class="lineNum">     298 </span>                :            : }
+<span class="lineNum">     299 </span>                :            : 
+<span class="lineNum">     300 </span>                :            : template&lt;typename _Tp, int m, int n, int nm&gt; inline void
+<span class="lineNum">     301 </span>                :            :     SVD::compute( const Matx&lt;_Tp, m, n&gt;&amp; a, Matx&lt;_Tp, nm, 1&gt;&amp; w, Matx&lt;_Tp, m, nm&gt;&amp; u, Matx&lt;_Tp, n, nm&gt;&amp; vt )
+<span class="lineNum">     302 </span>                :            : {
+<span class="lineNum">     303 </span>                :            :     CV_StaticAssert( nm == MIN(m, n), &quot;Invalid size of output vector.&quot;);
+<span class="lineNum">     304 </span>                :            :     Mat _a(a, false), _u(u, false), _w(w, false), _vt(vt, false);
+<span class="lineNum">     305 </span>                :            :     SVD::compute(_a, _w, _u, _vt);
+<span class="lineNum">     306 </span>                :            :     CV_Assert(_w.data == (uchar*)&amp;w.val[0] &amp;&amp; _u.data == (uchar*)&amp;u.val[0] &amp;&amp; _vt.data == (uchar*)&amp;vt.val[0]);
+<span class="lineNum">     307 </span>                :            : }
+<span class="lineNum">     308 </span>                :            : 
+<span class="lineNum">     309 </span>                :            : template&lt;typename _Tp, int m, int n, int nm&gt; inline void
+<span class="lineNum">     310 </span>                :            : SVD::compute( const Matx&lt;_Tp, m, n&gt;&amp; a, Matx&lt;_Tp, nm, 1&gt;&amp; w )
+<span class="lineNum">     311 </span>                :            : {
+<span class="lineNum">     312 </span>                :            :     CV_StaticAssert( nm == MIN(m, n), &quot;Invalid size of output vector.&quot;);
+<span class="lineNum">     313 </span>                :            :     Mat _a(a, false), _w(w, false);
+<span class="lineNum">     314 </span>                :            :     SVD::compute(_a, _w);
+<span class="lineNum">     315 </span>                :            :     CV_Assert(_w.data == (uchar*)&amp;w.val[0]);
+<span class="lineNum">     316 </span>                :            : }
+<span class="lineNum">     317 </span>                :            : 
+<span class="lineNum">     318 </span>                :            : template&lt;typename _Tp, int m, int n, int nm, int nb&gt; inline void
+<span class="lineNum">     319 </span>                :            : SVD::backSubst( const Matx&lt;_Tp, nm, 1&gt;&amp; w, const Matx&lt;_Tp, m, nm&gt;&amp; u,
+<span class="lineNum">     320 </span>                :            :                 const Matx&lt;_Tp, n, nm&gt;&amp; vt, const Matx&lt;_Tp, m, nb&gt;&amp; rhs,
+<span class="lineNum">     321 </span>                :            :                 Matx&lt;_Tp, n, nb&gt;&amp; dst )
+<span class="lineNum">     322 </span>                :            : {
+<span class="lineNum">     323 </span>                :            :     CV_StaticAssert( nm == MIN(m, n), &quot;Invalid size of output vector.&quot;);
+<span class="lineNum">     324 </span>                :            :     Mat _u(u, false), _w(w, false), _vt(vt, false), _rhs(rhs, false), _dst(dst, false);
+<span class="lineNum">     325 </span>                :            :     SVD::backSubst(_w, _u, _vt, _rhs, _dst);
+<span class="lineNum">     326 </span>                :            :     CV_Assert(_dst.data == (uchar*)&amp;dst.val[0]);
+<span class="lineNum">     327 </span>                :            : }
+<span class="lineNum">     328 </span>                :            : 
+<span class="lineNum">     329 </span>                :            : 
+<span class="lineNum">     330 </span>                :            : 
+<span class="lineNum">     331 </span>                :            : /////////////////////////////////// Multiply-with-Carry RNG ///////////////////////////////////
+<span class="lineNum">     332 </span>                :            : 
+<span class="lineNum">     333 </span>                :            : inline RNG::RNG()              { state = 0xffffffff; }
+<span class="lineNum">     334 </span>                :            : inline RNG::RNG(uint64 _state) { state = _state ? _state : 0xffffffff; }
+<span class="lineNum">     335 </span>                :            : 
+<span class="lineNum">     336 </span>                :            : inline RNG::operator uchar()    { return (uchar)next(); }
+<span class="lineNum">     337 </span>                :            : inline RNG::operator schar()    { return (schar)next(); }
+<span class="lineNum">     338 </span>                :            : inline RNG::operator ushort()   { return (ushort)next(); }
+<span class="lineNum">     339 </span>                :            : inline RNG::operator short()    { return (short)next(); }
+<span class="lineNum">     340 </span>                :            : inline RNG::operator int()      { return (int)next(); }
+<span class="lineNum">     341 </span>                :            : inline RNG::operator unsigned() { return next(); }
+<span class="lineNum">     342 </span>                :            : inline RNG::operator float()    { return next()*2.3283064365386962890625e-10f; }
+<span class="lineNum">     343 </span>                :            : inline RNG::operator double()   { unsigned t = next(); return (((uint64)t &lt;&lt; 32) | next()) * 5.4210108624275221700372640043497e-20; }
+<span class="lineNum">     344 </span>                :            : 
+<span class="lineNum">     345 </span>                :            : inline unsigned RNG::operator ()(unsigned N) { return (unsigned)uniform(0,N); }
+<span class="lineNum">     346 </span>                :            : inline unsigned RNG::operator ()()           { return next(); }
+<span class="lineNum">     347 </span>                :            : 
+<span class="lineNum">     348 </span>                :            : inline int    RNG::uniform(int a, int b)       { return a == b ? a : (int)(next() % (b - a) + a); }
+<span class="lineNum">     349 </span>                :            : inline float  RNG::uniform(float a, float b)   { return ((float)*this)*(b - a) + a; }
+<span class="lineNum">     350 </span>                :            : inline double RNG::uniform(double a, double b) { return ((double)*this)*(b - a) + a; }
+<span class="lineNum">     351 </span>                :            : 
+<span class="lineNum">     352 </span>                :            : inline unsigned RNG::next()
+<span class="lineNum">     353 </span>                :            : {
+<span class="lineNum">     354 </span>                :            :     state = (uint64)(unsigned)state* /*CV_RNG_COEFF*/ 4164903690U + (unsigned)(state &gt;&gt; 32);
+<span class="lineNum">     355 </span>                :            :     return (unsigned)state;
+<span class="lineNum">     356 </span>                :            : }
+<span class="lineNum">     357 </span>                :            : 
+<span class="lineNum">     358 </span>                :            : //! returns the next unifomly-distributed random number of the specified type
+<span class="lineNum">     359 </span>                :            : template&lt;typename _Tp&gt; static inline _Tp randu()
+<span class="lineNum">     360 </span>                :            : {
+<span class="lineNum">     361 </span>                :            :   return (_Tp)theRNG();
+<span class="lineNum">     362 </span>                :            : }
+<span class="lineNum">     363 </span>                :            : 
+<span class="lineNum">     364 </span>                :            : ///////////////////////////////// Formatted string generation /////////////////////////////////
+<span class="lineNum">     365 </span>                :            : 
+<span class="lineNum">     366 </span>                :            : CV_EXPORTS String format( const char* fmt, ... );
+<span class="lineNum">     367 </span>                :            : 
+<span class="lineNum">     368 </span>                :            : ///////////////////////////////// Formatted output of cv::Mat /////////////////////////////////
+<span class="lineNum">     369 </span>                :            : 
+<span class="lineNum">     370 </span>                :            : static inline
+<span class="lineNum">     371 </span>                :            : Ptr&lt;Formatted&gt; format(InputArray mtx, int fmt)
+<span class="lineNum">     372 </span>                :            : {
+<span class="lineNum">     373 </span>                :            :     return Formatter::get(fmt)-&gt;format(mtx.getMat());
+<span class="lineNum">     374 </span>                :            : }
+<span class="lineNum">     375 </span>                :            : 
+<span class="lineNum">     376 </span>                :            : static inline
+<span class="lineNum">     377 </span>                :            : int print(Ptr&lt;Formatted&gt; fmtd, FILE* stream = stdout)
+<span class="lineNum">     378 </span>                :            : {
+<span class="lineNum">     379 </span>                :            :     int written = 0;
+<span class="lineNum">     380 </span>                :            :     fmtd-&gt;reset();
+<span class="lineNum">     381 </span>                :            :     for(const char* str = fmtd-&gt;next(); str; str = fmtd-&gt;next())
+<span class="lineNum">     382 </span>                :            :         written += fputs(str, stream);
+<span class="lineNum">     383 </span>                :            : 
+<span class="lineNum">     384 </span>                :            :     return written;
+<span class="lineNum">     385 </span>                :            : }
+<span class="lineNum">     386 </span>                :            : 
+<span class="lineNum">     387 </span>                :            : static inline
+<span class="lineNum">     388 </span>                :            : int print(const Mat&amp; mtx, FILE* stream = stdout)
+<span class="lineNum">     389 </span>                :            : {
+<span class="lineNum">     390 </span>                :            :     return print(Formatter::get()-&gt;format(mtx), stream);
+<span class="lineNum">     391 </span>                :            : }
+<span class="lineNum">     392 </span>                :            : 
+<span class="lineNum">     393 </span>                :            : static inline
+<span class="lineNum">     394 </span>                :            : int print(const UMat&amp; mtx, FILE* stream = stdout)
+<span class="lineNum">     395 </span>                :            : {
+<span class="lineNum">     396 </span>                :            :     return print(Formatter::get()-&gt;format(mtx.getMat(ACCESS_READ)), stream);
+<span class="lineNum">     397 </span>                :            : }
+<span class="lineNum">     398 </span>                :            : 
+<span class="lineNum">     399 </span>                :            : template&lt;typename _Tp&gt; static inline
+<span class="lineNum">     400 </span>                :            : int print(const std::vector&lt;Point_&lt;_Tp&gt; &gt;&amp; vec, FILE* stream = stdout)
+<span class="lineNum">     401 </span>                :            : {
+<span class="lineNum">     402 </span>                :            :     return print(Formatter::get()-&gt;format(Mat(vec)), stream);
+<span class="lineNum">     403 </span>                :            : }
+<span class="lineNum">     404 </span>                :            : 
+<span class="lineNum">     405 </span>                :            : template&lt;typename _Tp&gt; static inline
+<span class="lineNum">     406 </span>                :            : int print(const std::vector&lt;Point3_&lt;_Tp&gt; &gt;&amp; vec, FILE* stream = stdout)
+<span class="lineNum">     407 </span>                :            : {
+<span class="lineNum">     408 </span>                :            :     return print(Formatter::get()-&gt;format(Mat(vec)), stream);
+<span class="lineNum">     409 </span>                :            : }
+<span class="lineNum">     410 </span>                :            : 
+<span class="lineNum">     411 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">     412 </span>                :            : int print(const Matx&lt;_Tp, m, n&gt;&amp; matx, FILE* stream = stdout)
+<span class="lineNum">     413 </span>                :            : {
+<span class="lineNum">     414 </span>                :            :     return print(Formatter::get()-&gt;format(cv::Mat(matx)), stream);
+<span class="lineNum">     415 </span>                :            : }
+<span class="lineNum">     416 </span>                :            : 
+<span class="lineNum">     417 </span>                :            : //! @endcond
+<span class="lineNum">     418 </span>                :            : 
+<span class="lineNum">     419 </span>                :            : /****************************************************************************************\
+<span class="lineNum">     420 </span>                :            : *                                  Auxiliary algorithms                                  *
+<span class="lineNum">     421 </span>                :            : \****************************************************************************************/
+<span class="lineNum">     422 </span>                :            : 
+<span class="lineNum">     423 </span>                :            : /** @brief Splits an element set into equivalency classes.
+<span class="lineNum">     424 </span>                :            : 
+<span class="lineNum">     425 </span>                :            : The generic function partition implements an \f$O(N^2)\f$ algorithm for splitting a set of \f$N\f$ elements
+<span class="lineNum">     426 </span>                :            : into one or more equivalency classes, as described in
+<span class="lineNum">     427 </span>                :            : &lt;http://en.wikipedia.org/wiki/Disjoint-set_data_structure&gt; . The function returns the number of
+<span class="lineNum">     428 </span>                :            : equivalency classes.
+<span class="lineNum">     429 </span>                :            : @param _vec Set of elements stored as a vector.
+<span class="lineNum">     430 </span>                :            : @param labels Output vector of labels. It contains as many elements as vec. Each label labels[i] is
+<span class="lineNum">     431 </span>                :            : a 0-based cluster index of `vec[i]`.
+<span class="lineNum">     432 </span>                :            : @param predicate Equivalence predicate (pointer to a boolean function of two arguments or an
+<span class="lineNum">     433 </span>                :            : instance of the class that has the method bool operator()(const _Tp&amp; a, const _Tp&amp; b) ). The
+<span class="lineNum">     434 </span>                :            : predicate returns true when the elements are certainly in the same class, and returns false if they
+<span class="lineNum">     435 </span>                :            : may or may not be in the same class.
+<span class="lineNum">     436 </span>                :            : @ingroup core_cluster
+<span class="lineNum">     437 </span>                :            : */
+<span class="lineNum">     438 </span>                :            : template&lt;typename _Tp, class _EqPredicate&gt; int
+<span class="lineNum">     439 </span>                :            : partition( const std::vector&lt;_Tp&gt;&amp; _vec, std::vector&lt;int&gt;&amp; labels,
+<span class="lineNum">     440 </span>                :            :           _EqPredicate predicate=_EqPredicate())
+<span class="lineNum">     441 </span>                :            : {
+<span class="lineNum">     442 </span>                :            :     int i, j, N = (int)_vec.size();
+<span class="lineNum">     443 </span>                :            :     const _Tp* vec = &amp;_vec[0];
+<span class="lineNum">     444 </span>                :            : 
+<span class="lineNum">     445 </span>                :            :     const int PARENT=0;
+<span class="lineNum">     446 </span>                :            :     const int RANK=1;
+<span class="lineNum">     447 </span>                :            : 
+<span class="lineNum">     448 </span>                :            :     std::vector&lt;int&gt; _nodes(N*2);
+<span class="lineNum">     449 </span>                :            :     int (*nodes)[2] = (int(*)[2])&amp;_nodes[0];
+<span class="lineNum">     450 </span>                :            : 
+<span class="lineNum">     451 </span>                :            :     // The first O(N) pass: create N single-vertex trees
+<span class="lineNum">     452 </span>                :            :     for(i = 0; i &lt; N; i++)
+<span class="lineNum">     453 </span>                :            :     {
+<span class="lineNum">     454 </span>                :            :         nodes[i][PARENT]=-1;
+<span class="lineNum">     455 </span>                :            :         nodes[i][RANK] = 0;
+<span class="lineNum">     456 </span>                :            :     }
+<span class="lineNum">     457 </span>                :            : 
+<span class="lineNum">     458 </span>                :            :     // The main O(N^2) pass: merge connected components
+<span class="lineNum">     459 </span>                :            :     for( i = 0; i &lt; N; i++ )
+<span class="lineNum">     460 </span>                :            :     {
+<span class="lineNum">     461 </span>                :            :         int root = i;
+<span class="lineNum">     462 </span>                :            : 
+<span class="lineNum">     463 </span>                :            :         // find root
+<span class="lineNum">     464 </span>                :            :         while( nodes[root][PARENT] &gt;= 0 )
+<span class="lineNum">     465 </span>                :            :             root = nodes[root][PARENT];
+<span class="lineNum">     466 </span>                :            : 
+<span class="lineNum">     467 </span>                :            :         for( j = 0; j &lt; N; j++ )
+<span class="lineNum">     468 </span>                :            :         {
+<span class="lineNum">     469 </span>                :            :             if( i == j || !predicate(vec[i], vec[j]))
+<span class="lineNum">     470 </span>                :            :                 continue;
+<span class="lineNum">     471 </span>                :            :             int root2 = j;
+<span class="lineNum">     472 </span>                :            : 
+<span class="lineNum">     473 </span>                :            :             while( nodes[root2][PARENT] &gt;= 0 )
+<span class="lineNum">     474 </span>                :            :                 root2 = nodes[root2][PARENT];
+<span class="lineNum">     475 </span>                :            : 
+<span class="lineNum">     476 </span>                :            :             if( root2 != root )
+<span class="lineNum">     477 </span>                :            :             {
+<span class="lineNum">     478 </span>                :            :                 // unite both trees
+<span class="lineNum">     479 </span>                :            :                 int rank = nodes[root][RANK], rank2 = nodes[root2][RANK];
+<span class="lineNum">     480 </span>                :            :                 if( rank &gt; rank2 )
+<span class="lineNum">     481 </span>                :            :                     nodes[root2][PARENT] = root;
+<span class="lineNum">     482 </span>                :            :                 else
+<span class="lineNum">     483 </span>                :            :                 {
+<span class="lineNum">     484 </span>                :            :                     nodes[root][PARENT] = root2;
+<span class="lineNum">     485 </span>                :            :                     nodes[root2][RANK] += rank == rank2;
+<span class="lineNum">     486 </span>                :            :                     root = root2;
+<span class="lineNum">     487 </span>                :            :                 }
+<span class="lineNum">     488 </span>                :            :                 CV_Assert( nodes[root][PARENT] &lt; 0 );
+<span class="lineNum">     489 </span>                :            : 
+<span class="lineNum">     490 </span>                :            :                 int k = j, parent;
+<span class="lineNum">     491 </span>                :            : 
+<span class="lineNum">     492 </span>                :            :                 // compress the path from node2 to root
+<span class="lineNum">     493 </span>                :            :                 while( (parent = nodes[k][PARENT]) &gt;= 0 )
+<span class="lineNum">     494 </span>                :            :                 {
+<span class="lineNum">     495 </span>                :            :                     nodes[k][PARENT] = root;
+<span class="lineNum">     496 </span>                :            :                     k = parent;
+<span class="lineNum">     497 </span>                :            :                 }
+<span class="lineNum">     498 </span>                :            : 
+<span class="lineNum">     499 </span>                :            :                 // compress the path from node to root
+<span class="lineNum">     500 </span>                :            :                 k = i;
+<span class="lineNum">     501 </span>                :            :                 while( (parent = nodes[k][PARENT]) &gt;= 0 )
+<span class="lineNum">     502 </span>                :            :                 {
+<span class="lineNum">     503 </span>                :            :                     nodes[k][PARENT] = root;
+<span class="lineNum">     504 </span>                :            :                     k = parent;
+<span class="lineNum">     505 </span>                :            :                 }
+<span class="lineNum">     506 </span>                :            :             }
+<span class="lineNum">     507 </span>                :            :         }
+<span class="lineNum">     508 </span>                :            :     }
+<span class="lineNum">     509 </span>                :            : 
+<span class="lineNum">     510 </span>                :            :     // Final O(N) pass: enumerate classes
+<span class="lineNum">     511 </span>                :            :     labels.resize(N);
+<span class="lineNum">     512 </span>                :            :     int nclasses = 0;
+<span class="lineNum">     513 </span>                :            : 
+<span class="lineNum">     514 </span>                :            :     for( i = 0; i &lt; N; i++ )
+<span class="lineNum">     515 </span>                :            :     {
+<span class="lineNum">     516 </span>                :            :         int root = i;
+<span class="lineNum">     517 </span>                :            :         while( nodes[root][PARENT] &gt;= 0 )
+<span class="lineNum">     518 </span>                :            :             root = nodes[root][PARENT];
+<span class="lineNum">     519 </span>                :            :         // re-use the rank as the class label
+<span class="lineNum">     520 </span>                :            :         if( nodes[root][RANK] &gt;= 0 )
+<span class="lineNum">     521 </span>                :            :             nodes[root][RANK] = ~nclasses++;
+<span class="lineNum">     522 </span>                :            :         labels[i] = ~nodes[root][RANK];
+<span class="lineNum">     523 </span>                :            :     }
+<span class="lineNum">     524 </span>                :            : 
+<span class="lineNum">     525 </span>                :            :     return nclasses;
+<span class="lineNum">     526 </span>                :            : }
+<span class="lineNum">     527 </span>                :            : 
+<span class="lineNum">     528 </span>                :            : } // cv
+<span class="lineNum">     529 </span>                :            : 
+<span class="lineNum">     530 </span>                :            : #endif
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

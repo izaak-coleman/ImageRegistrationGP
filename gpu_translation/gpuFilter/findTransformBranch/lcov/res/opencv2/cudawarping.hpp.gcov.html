@@ -1,0 +1,302 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - ex_test.info - opencv2/cudawarping.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">opencv2</a> - cudawarping.hpp<span style="font-size: 80%;"> (source / <a href="cudawarping.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">ex_test.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-03-07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntryLo">50.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : /*M///////////////////////////////////////////////////////////////////////////////////////</a>
+<span class="lineNum">       2 </span>                :            : //
+<span class="lineNum">       3 </span>                :            : //  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING.
+<span class="lineNum">       4 </span>                :            : //
+<span class="lineNum">       5 </span>                :            : //  By downloading, copying, installing or using the software you agree to this license.
+<span class="lineNum">       6 </span>                :            : //  If you do not agree to this license, do not download, install,
+<span class="lineNum">       7 </span>                :            : //  copy or use the software.
+<span class="lineNum">       8 </span>                :            : //
+<span class="lineNum">       9 </span>                :            : //
+<span class="lineNum">      10 </span>                :            : //                           License Agreement
+<span class="lineNum">      11 </span>                :            : //                For Open Source Computer Vision Library
+<span class="lineNum">      12 </span>                :            : //
+<span class="lineNum">      13 </span>                :            : // Copyright (C) 2000-2008, Intel Corporation, all rights reserved.
+<span class="lineNum">      14 </span>                :            : // Copyright (C) 2009, Willow Garage Inc., all rights reserved.
+<span class="lineNum">      15 </span>                :            : // Third party copyrights are property of their respective owners.
+<span class="lineNum">      16 </span>                :            : //
+<span class="lineNum">      17 </span>                :            : // Redistribution and use in source and binary forms, with or without modification,
+<span class="lineNum">      18 </span>                :            : // are permitted provided that the following conditions are met:
+<span class="lineNum">      19 </span>                :            : //
+<span class="lineNum">      20 </span>                :            : //   * Redistribution's of source code must retain the above copyright notice,
+<span class="lineNum">      21 </span>                :            : //     this list of conditions and the following disclaimer.
+<span class="lineNum">      22 </span>                :            : //
+<span class="lineNum">      23 </span>                :            : //   * Redistribution's in binary form must reproduce the above copyright notice,
+<span class="lineNum">      24 </span>                :            : //     this list of conditions and the following disclaimer in the documentation
+<span class="lineNum">      25 </span>                :            : //     and/or other materials provided with the distribution.
+<span class="lineNum">      26 </span>                :            : //
+<span class="lineNum">      27 </span>                :            : //   * The name of the copyright holders may not be used to endorse or promote products
+<span class="lineNum">      28 </span>                :            : //     derived from this software without specific prior written permission.
+<span class="lineNum">      29 </span>                :            : //
+<span class="lineNum">      30 </span>                :            : // This software is provided by the copyright holders and contributors &quot;as is&quot; and
+<span class="lineNum">      31 </span>                :            : // any express or implied warranties, including, but not limited to, the implied
+<span class="lineNum">      32 </span>                :            : // warranties of merchantability and fitness for a particular purpose are disclaimed.
+<span class="lineNum">      33 </span>                :            : // In no event shall the Intel Corporation or contributors be liable for any direct,
+<span class="lineNum">      34 </span>                :            : // indirect, incidental, special, exemplary, or consequential damages
+<span class="lineNum">      35 </span>                :            : // (including, but not limited to, procurement of substitute goods or services;
+<span class="lineNum">      36 </span>                :            : // loss of use, data, or profits; or business interruption) however caused
+<span class="lineNum">      37 </span>                :            : // and on any theory of liability, whether in contract, strict liability,
+<span class="lineNum">      38 </span>                :            : // or tort (including negligence or otherwise) arising in any way out of
+<span class="lineNum">      39 </span>                :            : // the use of this software, even if advised of the possibility of such damage.
+<span class="lineNum">      40 </span>                :            : //
+<span class="lineNum">      41 </span>                :            : //M*/
+<span class="lineNum">      42 </span>                :            : 
+<span class="lineNum">      43 </span>                :            : #ifndef __OPENCV_CUDAWARPING_HPP__
+<span class="lineNum">      44 </span>                :            : #define __OPENCV_CUDAWARPING_HPP__
+<span class="lineNum">      45 </span>                :            : 
+<span class="lineNum">      46 </span>                :            : #ifndef __cplusplus
+<span class="lineNum">      47 </span>                :            : #  error cudawarping.hpp header must be compiled as C++
+<span class="lineNum">      48 </span>                :            : #endif
+<span class="lineNum">      49 </span>                :            : 
+<span class="lineNum">      50 </span>                :            : #include &quot;opencv2/core/cuda.hpp&quot;
+<span class="lineNum">      51 </span>                :            : #include &quot;opencv2/imgproc.hpp&quot;
+<span class="lineNum">      52 </span>                :            : 
+<span class="lineNum">      53 </span>                :            : /**
+<span class="lineNum">      54 </span>                :            :   @addtogroup cuda
+<span class="lineNum">      55 </span>                :            :   @{
+<span class="lineNum">      56 </span>                :            :     @defgroup cudawarping Image Warping
+<span class="lineNum">      57 </span>                :            :   @}
+<span class="lineNum">      58 </span>                :            :  */
+<span class="lineNum">      59 </span>                :            : 
+<span class="lineNum">      60 </span>                :            : namespace cv { namespace cuda {
+<span class="lineNum">      61 </span>                :            : 
+<span class="lineNum">      62 </span>                :            : //! @addtogroup cudawarping
+<span class="lineNum">      63 </span>                :            : //! @{
+<span class="lineNum">      64 </span>                :            : 
+<span class="lineNum">      65 </span>                :            : /** @brief Applies a generic geometrical transformation to an image.
+<span class="lineNum">      66 </span>                :            : 
+<span class="lineNum">      67 </span>                :            : @param src Source image.
+<span class="lineNum">      68 </span>                :            : @param dst Destination image with the size the same as xmap and the type the same as src .
+<span class="lineNum">      69 </span>                :            : @param xmap X values. Only CV_32FC1 type is supported.
+<span class="lineNum">      70 </span>                :            : @param ymap Y values. Only CV_32FC1 type is supported.
+<span class="lineNum">      71 </span>                :            : @param interpolation Interpolation method (see resize ). INTER_NEAREST , INTER_LINEAR and
+<span class="lineNum">      72 </span>                :            : INTER_CUBIC are supported for now.
+<span class="lineNum">      73 </span>                :            : @param borderMode Pixel extrapolation method (see borderInterpolate ). BORDER_REFLECT101 ,
+<span class="lineNum">      74 </span>                :            : BORDER_REPLICATE , BORDER_CONSTANT , BORDER_REFLECT and BORDER_WRAP are supported for now.
+<span class="lineNum">      75 </span>                :            : @param borderValue Value used in case of a constant border. By default, it is 0.
+<span class="lineNum">      76 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">      77 </span>                :            : 
+<span class="lineNum">      78 </span>                :            : The function transforms the source image using the specified map:
+<span class="lineNum">      79 </span>                :            : 
+<span class="lineNum">      80 </span>                :            : \f[\texttt{dst} (x,y) =  \texttt{src} (xmap(x,y), ymap(x,y))\f]
+<span class="lineNum">      81 </span>                :            : 
+<span class="lineNum">      82 </span>                :            : Values of pixels with non-integer coordinates are computed using the bilinear interpolation.
+<span class="lineNum">      83 </span>                :            : 
+<span class="lineNum">      84 </span>                :            : @sa remap
+<span class="lineNum">      85 </span>                :            :  */
+<span class="lineNum">      86 </span>                :            : CV_EXPORTS void remap(InputArray src, OutputArray dst, InputArray xmap, InputArray ymap,
+<span class="lineNum">      87 </span>                :            :                       int interpolation, int borderMode = BORDER_CONSTANT, Scalar borderValue = Scalar(),
+<span class="lineNum">      88 </span>                :            :                       Stream&amp; stream = Stream::Null());
+<span class="lineNum">      89 </span>                :            : 
+<span class="lineNum">      90 </span>                :            : /** @brief Resizes an image.
+<span class="lineNum">      91 </span>                :            : 
+<span class="lineNum">      92 </span>                :            : @param src Source image.
+<span class="lineNum">      93 </span>                :            : @param dst Destination image with the same type as src . The size is dsize (when it is non-zero)
+<span class="lineNum">      94 </span>                :            : or the size is computed from src.size() , fx , and fy .
+<span class="lineNum">      95 </span>                :            : @param dsize Destination image size. If it is zero, it is computed as:
+<span class="lineNum">      96 </span>                :            : \f[\texttt{dsize = Size(round(fx*src.cols), round(fy*src.rows))}\f]
+<span class="lineNum">      97 </span>                :            : Either dsize or both fx and fy must be non-zero.
+<span class="lineNum">      98 </span>                :            : @param fx Scale factor along the horizontal axis. If it is zero, it is computed as:
+<span class="lineNum">      99 </span>                :            : \f[\texttt{(double)dsize.width/src.cols}\f]
+<span class="lineNum">     100 </span>                :            : @param fy Scale factor along the vertical axis. If it is zero, it is computed as:
+<span class="lineNum">     101 </span>                :            : \f[\texttt{(double)dsize.height/src.rows}\f]
+<span class="lineNum">     102 </span>                :            : @param interpolation Interpolation method. INTER_NEAREST , INTER_LINEAR and INTER_CUBIC are
+<span class="lineNum">     103 </span>                :            : supported for now.
+<span class="lineNum">     104 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     105 </span>                :            : 
+<span class="lineNum">     106 </span>                :            : @sa resize
+<span class="lineNum">     107 </span>                :            :  */
+<span class="lineNum">     108 </span>                :            : CV_EXPORTS void resize(InputArray src, OutputArray dst, Size dsize, double fx=0, double fy=0, int interpolation = INTER_LINEAR, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     109 </span>                :            : 
+<span class="lineNum">     110 </span>                :            : /** @brief Applies an affine transformation to an image.
+<span class="lineNum">     111 </span>                :            : 
+<span class="lineNum">     112 </span>                :            : @param src Source image. CV_8U , CV_16U , CV_32S , or CV_32F depth and 1, 3, or 4 channels are
+<span class="lineNum">     113 </span>                :            : supported.
+<span class="lineNum">     114 </span>                :            : @param dst Destination image with the same type as src . The size is dsize .
+<span class="lineNum">     115 </span>                :            : @param M *2x3* transformation matrix.
+<span class="lineNum">     116 </span>                :            : @param dsize Size of the destination image.
+<span class="lineNum">     117 </span>                :            : @param flags Combination of interpolation methods (see resize) and the optional flag
+<span class="lineNum">     118 </span>                :            : WARP_INVERSE_MAP specifying that M is an inverse transformation ( dst=\&gt;src ). Only
+<span class="lineNum">     119 </span>                :            : INTER_NEAREST , INTER_LINEAR , and INTER_CUBIC interpolation methods are supported.
+<span class="lineNum">     120 </span>                :            : @param borderMode
+<span class="lineNum">     121 </span>                :            : @param borderValue
+<span class="lineNum">     122 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     123 </span>                :            : 
+<span class="lineNum">     124 </span>                :            : @sa warpAffine
+<span class="lineNum">     125 </span>                :            :  */
+<span class="lineNum">     126 </span>                :            : CV_EXPORTS void warpAffine(InputArray src, OutputArray dst, InputArray M, Size dsize, int flags = INTER_LINEAR,
+<span class="lineNum">     127 </span>  [<span class="branchCov" title="Branch 1 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span><span class="branchCov" title="Branch 4 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 5 was not taken"> - </span> :<span class="lineCov">       1352 :     int borderMode = BORDER_CONSTANT, Scalar borderValue = Scalar(), Stream&amp; stream = Stream::Null());</span>
+<span class="lineNum">         </span>   <span class="branchCov" title="Branch 7 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 8 was not taken"> - </span><span class="branchCov" title="Branch 10 was taken 338 times"> + </span><span class="branchNoCov" title="Branch 11 was not taken"> - </span>]
+<span class="lineNum">     128 </span>                :            : 
+<span class="lineNum">     129 </span>                :            : /** @brief Builds transformation maps for affine transformation.
+<span class="lineNum">     130 </span>                :            : 
+<span class="lineNum">     131 </span>                :            : @param M *2x3* transformation matrix.
+<span class="lineNum">     132 </span>                :            : @param inverse Flag specifying that M is an inverse transformation ( dst=\&gt;src ).
+<span class="lineNum">     133 </span>                :            : @param dsize Size of the destination image.
+<span class="lineNum">     134 </span>                :            : @param xmap X values with CV_32FC1 type.
+<span class="lineNum">     135 </span>                :            : @param ymap Y values with CV_32FC1 type.
+<span class="lineNum">     136 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     137 </span>                :            : 
+<span class="lineNum">     138 </span>                :            : @sa cuda::warpAffine , cuda::remap
+<span class="lineNum">     139 </span>                :            :  */
+<span class="lineNum">     140 </span>                :            : CV_EXPORTS void buildWarpAffineMaps(InputArray M, bool inverse, Size dsize, OutputArray xmap, OutputArray ymap, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     141 </span>                :            : 
+<span class="lineNum">     142 </span>                :            : /** @brief Applies a perspective transformation to an image.
+<span class="lineNum">     143 </span>                :            : 
+<span class="lineNum">     144 </span>                :            : @param src Source image. CV_8U , CV_16U , CV_32S , or CV_32F depth and 1, 3, or 4 channels are
+<span class="lineNum">     145 </span>                :            : supported.
+<span class="lineNum">     146 </span>                :            : @param dst Destination image with the same type as src . The size is dsize .
+<span class="lineNum">     147 </span>                :            : @param M *3x3* transformation matrix.
+<span class="lineNum">     148 </span>                :            : @param dsize Size of the destination image.
+<span class="lineNum">     149 </span>                :            : @param flags Combination of interpolation methods (see resize ) and the optional flag
+<span class="lineNum">     150 </span>                :            : WARP_INVERSE_MAP specifying that M is the inverse transformation ( dst =\&gt; src ). Only
+<span class="lineNum">     151 </span>                :            : INTER_NEAREST , INTER_LINEAR , and INTER_CUBIC interpolation methods are supported.
+<span class="lineNum">     152 </span>                :            : @param borderMode
+<span class="lineNum">     153 </span>                :            : @param borderValue
+<span class="lineNum">     154 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     155 </span>                :            : 
+<span class="lineNum">     156 </span>                :            : @sa warpPerspective
+<span class="lineNum">     157 </span>                :            :  */
+<span class="lineNum">     158 </span>                :            : CV_EXPORTS void warpPerspective(InputArray src, OutputArray dst, InputArray M, Size dsize, int flags = INTER_LINEAR,
+<span class="lineNum">     159 </span>                :            :     int borderMode = BORDER_CONSTANT, Scalar borderValue = Scalar(), Stream&amp; stream = Stream::Null());
+<span class="lineNum">     160 </span>                :            : 
+<span class="lineNum">     161 </span>                :            : /** @brief Builds transformation maps for perspective transformation.
+<span class="lineNum">     162 </span>                :            : 
+<span class="lineNum">     163 </span>                :            : @param M *3x3* transformation matrix.
+<span class="lineNum">     164 </span>                :            : @param inverse Flag specifying that M is an inverse transformation ( dst=\&gt;src ).
+<span class="lineNum">     165 </span>                :            : @param dsize Size of the destination image.
+<span class="lineNum">     166 </span>                :            : @param xmap X values with CV_32FC1 type.
+<span class="lineNum">     167 </span>                :            : @param ymap Y values with CV_32FC1 type.
+<span class="lineNum">     168 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     169 </span>                :            : 
+<span class="lineNum">     170 </span>                :            : @sa cuda::warpPerspective , cuda::remap
+<span class="lineNum">     171 </span>                :            :  */
+<span class="lineNum">     172 </span>                :            : CV_EXPORTS void buildWarpPerspectiveMaps(InputArray M, bool inverse, Size dsize, OutputArray xmap, OutputArray ymap, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     173 </span>                :            : 
+<span class="lineNum">     174 </span>                :            : /** @brief Rotates an image around the origin (0,0) and then shifts it.
+<span class="lineNum">     175 </span>                :            : 
+<span class="lineNum">     176 </span>                :            : @param src Source image. Supports 1, 3 or 4 channels images with CV_8U , CV_16U or CV_32F
+<span class="lineNum">     177 </span>                :            : depth.
+<span class="lineNum">     178 </span>                :            : @param dst Destination image with the same type as src . The size is dsize .
+<span class="lineNum">     179 </span>                :            : @param dsize Size of the destination image.
+<span class="lineNum">     180 </span>                :            : @param angle Angle of rotation in degrees.
+<span class="lineNum">     181 </span>                :            : @param xShift Shift along the horizontal axis.
+<span class="lineNum">     182 </span>                :            : @param yShift Shift along the vertical axis.
+<span class="lineNum">     183 </span>                :            : @param interpolation Interpolation method. Only INTER_NEAREST , INTER_LINEAR , and INTER_CUBIC
+<span class="lineNum">     184 </span>                :            : are supported.
+<span class="lineNum">     185 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     186 </span>                :            : 
+<span class="lineNum">     187 </span>                :            : @sa cuda::warpAffine
+<span class="lineNum">     188 </span>                :            :  */
+<span class="lineNum">     189 </span>                :            : CV_EXPORTS void rotate(InputArray src, OutputArray dst, Size dsize, double angle, double xShift = 0, double yShift = 0,
+<span class="lineNum">     190 </span>                :            :                        int interpolation = INTER_LINEAR, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     191 </span>                :            : 
+<span class="lineNum">     192 </span>                :            : /** @brief Smoothes an image and downsamples it.
+<span class="lineNum">     193 </span>                :            : 
+<span class="lineNum">     194 </span>                :            : @param src Source image.
+<span class="lineNum">     195 </span>                :            : @param dst Destination image. Will have Size((src.cols+1)/2, (src.rows+1)/2) size and the same
+<span class="lineNum">     196 </span>                :            : type as src .
+<span class="lineNum">     197 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     198 </span>                :            : 
+<span class="lineNum">     199 </span>                :            : @sa pyrDown
+<span class="lineNum">     200 </span>                :            :  */
+<span class="lineNum">     201 </span>                :            : CV_EXPORTS void pyrDown(InputArray src, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     202 </span>                :            : 
+<span class="lineNum">     203 </span>                :            : /** @brief Upsamples an image and then smoothes it.
+<span class="lineNum">     204 </span>                :            : 
+<span class="lineNum">     205 </span>                :            : @param src Source image.
+<span class="lineNum">     206 </span>                :            : @param dst Destination image. Will have Size(src.cols\*2, src.rows\*2) size and the same type as
+<span class="lineNum">     207 </span>                :            : src .
+<span class="lineNum">     208 </span>                :            : @param stream Stream for the asynchronous version.
+<span class="lineNum">     209 </span>                :            :  */
+<span class="lineNum">     210 </span>                :            : CV_EXPORTS void pyrUp(InputArray src, OutputArray dst, Stream&amp; stream = Stream::Null());
+<span class="lineNum">     211 </span>                :            : 
+<span class="lineNum">     212 </span>                :            : //! @}
+<span class="lineNum">     213 </span>                :            : 
+<span class="lineNum">     214 </span>                :            : }} // namespace cv { namespace cuda {
+<span class="lineNum">     215 </span>                :            : 
+<span class="lineNum">     216 </span>                :            : #endif /* __OPENCV_CUDAWARPING_HPP__ */
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

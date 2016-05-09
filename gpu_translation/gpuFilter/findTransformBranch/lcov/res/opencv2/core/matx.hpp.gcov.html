@@ -1,0 +1,1492 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - ex_test.info - opencv2/core/matx.hpp</title>
+  <link rel="stylesheet" type="text/css" href="../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../index.html">top level</a> - <a href="index.html">opencv2/core</a> - matx.hpp<span style="font-size: 80%;"> (source / <a href="matx.hpp.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">ex_test.info</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntry">18</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2016-03-07</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntry">6</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">8</td>
+            <td class="headerCovTableEntry">10</td>
+            <td class="headerCovTableEntryMed">80.0 %</td>
+          </tr>
+          <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : /*M///////////////////////////////////////////////////////////////////////////////////////</a>
+<span class="lineNum">       2 </span>                :            : //
+<span class="lineNum">       3 </span>                :            : //  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING.
+<span class="lineNum">       4 </span>                :            : //
+<span class="lineNum">       5 </span>                :            : //  By downloading, copying, installing or using the software you agree to this license.
+<span class="lineNum">       6 </span>                :            : //  If you do not agree to this license, do not download, install,
+<span class="lineNum">       7 </span>                :            : //  copy or use the software.
+<span class="lineNum">       8 </span>                :            : //
+<span class="lineNum">       9 </span>                :            : //
+<span class="lineNum">      10 </span>                :            : //                          License Agreement
+<span class="lineNum">      11 </span>                :            : //                For Open Source Computer Vision Library
+<span class="lineNum">      12 </span>                :            : //
+<span class="lineNum">      13 </span>                :            : // Copyright (C) 2000-2008, Intel Corporation, all rights reserved.
+<span class="lineNum">      14 </span>                :            : // Copyright (C) 2009, Willow Garage Inc., all rights reserved.
+<span class="lineNum">      15 </span>                :            : // Copyright (C) 2013, OpenCV Foundation, all rights reserved.
+<span class="lineNum">      16 </span>                :            : // Third party copyrights are property of their respective owners.
+<span class="lineNum">      17 </span>                :            : //
+<span class="lineNum">      18 </span>                :            : // Redistribution and use in source and binary forms, with or without modification,
+<span class="lineNum">      19 </span>                :            : // are permitted provided that the following conditions are met:
+<span class="lineNum">      20 </span>                :            : //
+<span class="lineNum">      21 </span>                :            : //   * Redistribution's of source code must retain the above copyright notice,
+<span class="lineNum">      22 </span>                :            : //     this list of conditions and the following disclaimer.
+<span class="lineNum">      23 </span>                :            : //
+<span class="lineNum">      24 </span>                :            : //   * Redistribution's in binary form must reproduce the above copyright notice,
+<span class="lineNum">      25 </span>                :            : //     this list of conditions and the following disclaimer in the documentation
+<span class="lineNum">      26 </span>                :            : //     and/or other materials provided with the distribution.
+<span class="lineNum">      27 </span>                :            : //
+<span class="lineNum">      28 </span>                :            : //   * The name of the copyright holders may not be used to endorse or promote products
+<span class="lineNum">      29 </span>                :            : //     derived from this software without specific prior written permission.
+<span class="lineNum">      30 </span>                :            : //
+<span class="lineNum">      31 </span>                :            : // This software is provided by the copyright holders and contributors &quot;as is&quot; and
+<span class="lineNum">      32 </span>                :            : // any express or implied warranties, including, but not limited to, the implied
+<span class="lineNum">      33 </span>                :            : // warranties of merchantability and fitness for a particular purpose are disclaimed.
+<span class="lineNum">      34 </span>                :            : // In no event shall the Intel Corporation or contributors be liable for any direct,
+<span class="lineNum">      35 </span>                :            : // indirect, incidental, special, exemplary, or consequential damages
+<span class="lineNum">      36 </span>                :            : // (including, but not limited to, procurement of substitute goods or services;
+<span class="lineNum">      37 </span>                :            : // loss of use, data, or profits; or business interruption) however caused
+<span class="lineNum">      38 </span>                :            : // and on any theory of liability, whether in contract, strict liability,
+<span class="lineNum">      39 </span>                :            : // or tort (including negligence or otherwise) arising in any way out of
+<span class="lineNum">      40 </span>                :            : // the use of this software, even if advised of the possibility of such damage.
+<span class="lineNum">      41 </span>                :            : //
+<span class="lineNum">      42 </span>                :            : //M*/
+<span class="lineNum">      43 </span>                :            : 
+<span class="lineNum">      44 </span>                :            : #ifndef __OPENCV_CORE_MATX_HPP__
+<span class="lineNum">      45 </span>                :            : #define __OPENCV_CORE_MATX_HPP__
+<span class="lineNum">      46 </span>                :            : 
+<span class="lineNum">      47 </span>                :            : #ifndef __cplusplus
+<span class="lineNum">      48 </span>                :            : #  error matx.hpp header must be compiled as C++
+<span class="lineNum">      49 </span>                :            : #endif
+<span class="lineNum">      50 </span>                :            : 
+<span class="lineNum">      51 </span>                :            : #include &quot;opencv2/core/cvdef.h&quot;
+<span class="lineNum">      52 </span>                :            : #include &quot;opencv2/core/base.hpp&quot;
+<span class="lineNum">      53 </span>                :            : #include &quot;opencv2/core/traits.hpp&quot;
+<span class="lineNum">      54 </span>                :            : #include &quot;opencv2/core/saturate.hpp&quot;
+<span class="lineNum">      55 </span>                :            : 
+<span class="lineNum">      56 </span>                :            : namespace cv
+<span class="lineNum">      57 </span>                :            : {
+<span class="lineNum">      58 </span>                :            : 
+<span class="lineNum">      59 </span>                :            : //! @addtogroup core_basic
+<span class="lineNum">      60 </span>                :            : //! @{
+<span class="lineNum">      61 </span>                :            : 
+<span class="lineNum">      62 </span>                :            : ////////////////////////////// Small Matrix ///////////////////////////
+<span class="lineNum">      63 </span>                :            : 
+<span class="lineNum">      64 </span>                :            : //! @cond IGNORED
+<span class="lineNum">      65 </span>                :            : struct CV_EXPORTS Matx_AddOp {};
+<span class="lineNum">      66 </span>                :            : struct CV_EXPORTS Matx_SubOp {};
+<span class="lineNum">      67 </span>                :            : struct CV_EXPORTS Matx_ScaleOp {};
+<span class="lineNum">      68 </span>                :            : struct CV_EXPORTS Matx_MulOp {};
+<span class="lineNum">      69 </span>                :            : struct CV_EXPORTS Matx_DivOp {};
+<span class="lineNum">      70 </span>                :            : struct CV_EXPORTS Matx_MatMulOp {};
+<span class="lineNum">      71 </span>                :            : struct CV_EXPORTS Matx_TOp {};
+<span class="lineNum">      72 </span>                :            : //! @endcond
+<span class="lineNum">      73 </span>                :            : 
+<span class="lineNum">      74 </span>                :            : /** @brief Template class for small matrices whose type and size are known at compilation time
+<span class="lineNum">      75 </span>                :            : 
+<span class="lineNum">      76 </span>                :            : If you need a more flexible type, use Mat . The elements of the matrix M are accessible using the
+<span class="lineNum">      77 </span>                :            : M(i,j) notation. Most of the common matrix operations (see also @ref MatrixExpressions ) are
+<span class="lineNum">      78 </span>                :            : available. To do an operation on Matx that is not implemented, you can easily convert the matrix to
+<span class="lineNum">      79 </span>                :            : Mat and backwards:
+<span class="lineNum">      80 </span>                :            : @code
+<span class="lineNum">      81 </span>                :            :     Matx33f m(1, 2, 3,
+<span class="lineNum">      82 </span>                :            :               4, 5, 6,
+<span class="lineNum">      83 </span>                :            :               7, 8, 9);
+<span class="lineNum">      84 </span>                :            :     cout &lt;&lt; sum(Mat(m*m.t())) &lt;&lt; endl;
+<span class="lineNum">      85 </span>                :            :  @endcode
+<span class="lineNum">      86 </span>                :            :  */
+<span class="lineNum">      87 </span>                :            : template&lt;typename _Tp, int m, int n&gt; class Matx
+<span class="lineNum">      88 </span>                :            : {
+<span class="lineNum">      89 </span>                :            : public:
+<span class="lineNum">      90 </span>                :            :     enum { depth    = DataType&lt;_Tp&gt;::depth,
+<span class="lineNum">      91 </span>                :            :            rows     = m,
+<span class="lineNum">      92 </span>                :            :            cols     = n,
+<span class="lineNum">      93 </span>                :            :            channels = rows*cols,
+<span class="lineNum">      94 </span>                :            :            type     = CV_MAKETYPE(depth, channels),
+<span class="lineNum">      95 </span>                :            :            shortdim = (m &lt; n ? m : n)
+<span class="lineNum">      96 </span>                :            :          };
+<span class="lineNum">      97 </span>                :            : 
+<span class="lineNum">      98 </span>                :            :     typedef _Tp                           value_type;
+<span class="lineNum">      99 </span>                :            :     typedef Matx&lt;_Tp, m, n&gt;               mat_type;
+<span class="lineNum">     100 </span>                :            :     typedef Matx&lt;_Tp, shortdim, 1&gt; diag_type;
+<span class="lineNum">     101 </span>                :            : 
+<span class="lineNum">     102 </span>                :            :     //! default constructor
+<span class="lineNum">     103 </span>                :            :     Matx();
+<span class="lineNum">     104 </span>                :            : 
+<span class="lineNum">     105 </span>                :            :     Matx(_Tp v0); //!&lt; 1x1 matrix
+<span class="lineNum">     106 </span>                :            :     Matx(_Tp v0, _Tp v1); //!&lt; 1x2 or 2x1 matrix
+<span class="lineNum">     107 </span>                :            :     Matx(_Tp v0, _Tp v1, _Tp v2); //!&lt; 1x3 or 3x1 matrix
+<span class="lineNum">     108 </span>                :            :     Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3); //!&lt; 1x4, 2x2 or 4x1 matrix
+<span class="lineNum">     109 </span>                :            :     Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4); //!&lt; 1x5 or 5x1 matrix
+<span class="lineNum">     110 </span>                :            :     Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5); //!&lt; 1x6, 2x3, 3x2 or 6x1 matrix
+<span class="lineNum">     111 </span>                :            :     Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6); //!&lt; 1x7 or 7x1 matrix
+<span class="lineNum">     112 </span>                :            :     Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7); //!&lt; 1x8, 2x4, 4x2 or 8x1 matrix
+<span class="lineNum">     113 </span>                :            :     Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8); //!&lt; 1x9, 3x3 or 9x1 matrix
+<span class="lineNum">     114 </span>                :            :     Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8, _Tp v9); //!&lt; 1x10, 2x5 or 5x2 or 10x1 matrix
+<span class="lineNum">     115 </span>                :            :     Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3,
+<span class="lineNum">     116 </span>                :            :          _Tp v4, _Tp v5, _Tp v6, _Tp v7,
+<span class="lineNum">     117 </span>                :            :          _Tp v8, _Tp v9, _Tp v10, _Tp v11); //!&lt; 1x12, 2x6, 3x4, 4x3, 6x2 or 12x1 matrix
+<span class="lineNum">     118 </span>                :            :     Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3,
+<span class="lineNum">     119 </span>                :            :          _Tp v4, _Tp v5, _Tp v6, _Tp v7,
+<span class="lineNum">     120 </span>                :            :          _Tp v8, _Tp v9, _Tp v10, _Tp v11,
+<span class="lineNum">     121 </span>                :            :          _Tp v12, _Tp v13); //!&lt; 1x14, 2x7, 7x2 or 14x1 matrix
+<span class="lineNum">     122 </span>                :            :     Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3,
+<span class="lineNum">     123 </span>                :            :          _Tp v4, _Tp v5, _Tp v6, _Tp v7,
+<span class="lineNum">     124 </span>                :            :          _Tp v8, _Tp v9, _Tp v10, _Tp v11,
+<span class="lineNum">     125 </span>                :            :          _Tp v12, _Tp v13, _Tp v14, _Tp v15); //!&lt; 1x16, 4x4 or 16x1 matrix
+<span class="lineNum">     126 </span>                :            :     explicit Matx(const _Tp* vals); //!&lt; initialize from a plain array
+<span class="lineNum">     127 </span>                :            : 
+<span class="lineNum">     128 </span>                :            :     static Matx all(_Tp alpha);
+<span class="lineNum">     129 </span>                :            :     static Matx zeros();
+<span class="lineNum">     130 </span>                :            :     static Matx ones();
+<span class="lineNum">     131 </span>                :            :     static Matx eye();
+<span class="lineNum">     132 </span>                :            :     static Matx diag(const diag_type&amp; d);
+<span class="lineNum">     133 </span>                :            :     static Matx randu(_Tp a, _Tp b);
+<span class="lineNum">     134 </span>                :            :     static Matx randn(_Tp a, _Tp b);
+<span class="lineNum">     135 </span>                :            : 
+<span class="lineNum">     136 </span>                :            :     //! dot product computed with the default precision
+<span class="lineNum">     137 </span>                :            :     _Tp dot(const Matx&lt;_Tp, m, n&gt;&amp; v) const;
+<span class="lineNum">     138 </span>                :            : 
+<span class="lineNum">     139 </span>                :            :     //! dot product computed in double-precision arithmetics
+<span class="lineNum">     140 </span>                :            :     double ddot(const Matx&lt;_Tp, m, n&gt;&amp; v) const;
+<span class="lineNum">     141 </span>                :            : 
+<span class="lineNum">     142 </span>                :            :     //! conversion to another data type
+<span class="lineNum">     143 </span>                :            :     template&lt;typename T2&gt; operator Matx&lt;T2, m, n&gt;() const;
+<span class="lineNum">     144 </span>                :            : 
+<span class="lineNum">     145 </span>                :            :     //! change the matrix shape
+<span class="lineNum">     146 </span>                :            :     template&lt;int m1, int n1&gt; Matx&lt;_Tp, m1, n1&gt; reshape() const;
+<span class="lineNum">     147 </span>                :            : 
+<span class="lineNum">     148 </span>                :            :     //! extract part of the matrix
+<span class="lineNum">     149 </span>                :            :     template&lt;int m1, int n1&gt; Matx&lt;_Tp, m1, n1&gt; get_minor(int i, int j) const;
+<span class="lineNum">     150 </span>                :            : 
+<span class="lineNum">     151 </span>                :            :     //! extract the matrix row
+<span class="lineNum">     152 </span>                :            :     Matx&lt;_Tp, 1, n&gt; row(int i) const;
+<span class="lineNum">     153 </span>                :            : 
+<span class="lineNum">     154 </span>                :            :     //! extract the matrix column
+<span class="lineNum">     155 </span>                :            :     Matx&lt;_Tp, m, 1&gt; col(int i) const;
+<span class="lineNum">     156 </span>                :            : 
+<span class="lineNum">     157 </span>                :            :     //! extract the matrix diagonal
+<span class="lineNum">     158 </span>                :            :     diag_type diag() const;
+<span class="lineNum">     159 </span>                :            : 
+<span class="lineNum">     160 </span>                :            :     //! transpose the matrix
+<span class="lineNum">     161 </span>                :            :     Matx&lt;_Tp, n, m&gt; t() const;
+<span class="lineNum">     162 </span>                :            : 
+<span class="lineNum">     163 </span>                :            :     //! invert the matrix
+<span class="lineNum">     164 </span>                :            :     Matx&lt;_Tp, n, m&gt; inv(int method=DECOMP_LU, bool *p_is_ok = NULL) const;
+<span class="lineNum">     165 </span>                :            : 
+<span class="lineNum">     166 </span>                :            :     //! solve linear system
+<span class="lineNum">     167 </span>                :            :     template&lt;int l&gt; Matx&lt;_Tp, n, l&gt; solve(const Matx&lt;_Tp, m, l&gt;&amp; rhs, int flags=DECOMP_LU) const;
+<span class="lineNum">     168 </span>                :            :     Vec&lt;_Tp, n&gt; solve(const Vec&lt;_Tp, m&gt;&amp; rhs, int method) const;
+<span class="lineNum">     169 </span>                :            : 
+<span class="lineNum">     170 </span>                :            :     //! multiply two matrices element-wise
+<span class="lineNum">     171 </span>                :            :     Matx&lt;_Tp, m, n&gt; mul(const Matx&lt;_Tp, m, n&gt;&amp; a) const;
+<span class="lineNum">     172 </span>                :            : 
+<span class="lineNum">     173 </span>                :            :     //! divide two matrices element-wise
+<span class="lineNum">     174 </span>                :            :     Matx&lt;_Tp, m, n&gt; div(const Matx&lt;_Tp, m, n&gt;&amp; a) const;
+<span class="lineNum">     175 </span>                :            : 
+<span class="lineNum">     176 </span>                :            :     //! element access
+<span class="lineNum">     177 </span>                :            :     const _Tp&amp; operator ()(int i, int j) const;
+<span class="lineNum">     178 </span>                :            :     _Tp&amp; operator ()(int i, int j);
+<span class="lineNum">     179 </span>                :            : 
+<span class="lineNum">     180 </span>                :            :     //! 1D element access
+<span class="lineNum">     181 </span>                :            :     const _Tp&amp; operator ()(int i) const;
+<span class="lineNum">     182 </span>                :            :     _Tp&amp; operator ()(int i);
+<span class="lineNum">     183 </span>                :            : 
+<span class="lineNum">     184 </span>                :            :     Matx(const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b, Matx_AddOp);
+<span class="lineNum">     185 </span>                :            :     Matx(const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b, Matx_SubOp);
+<span class="lineNum">     186 </span>                :            :     template&lt;typename _T2&gt; Matx(const Matx&lt;_Tp, m, n&gt;&amp; a, _T2 alpha, Matx_ScaleOp);
+<span class="lineNum">     187 </span>                :            :     Matx(const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b, Matx_MulOp);
+<span class="lineNum">     188 </span>                :            :     Matx(const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b, Matx_DivOp);
+<span class="lineNum">     189 </span>                :            :     template&lt;int l&gt; Matx(const Matx&lt;_Tp, m, l&gt;&amp; a, const Matx&lt;_Tp, l, n&gt;&amp; b, Matx_MatMulOp);
+<span class="lineNum">     190 </span>                :            :     Matx(const Matx&lt;_Tp, n, m&gt;&amp; a, Matx_TOp);
+<span class="lineNum">     191 </span>                :            : 
+<span class="lineNum">     192 </span>                :            :     _Tp val[m*n]; //&lt; matrix elements
+<span class="lineNum">     193 </span>                :            : };
+<span class="lineNum">     194 </span>                :            : 
+<span class="lineNum">     195 </span>                :            : typedef Matx&lt;float, 1, 2&gt; Matx12f;
+<span class="lineNum">     196 </span>                :            : typedef Matx&lt;double, 1, 2&gt; Matx12d;
+<span class="lineNum">     197 </span>                :            : typedef Matx&lt;float, 1, 3&gt; Matx13f;
+<span class="lineNum">     198 </span>                :            : typedef Matx&lt;double, 1, 3&gt; Matx13d;
+<span class="lineNum">     199 </span>                :            : typedef Matx&lt;float, 1, 4&gt; Matx14f;
+<span class="lineNum">     200 </span>                :            : typedef Matx&lt;double, 1, 4&gt; Matx14d;
+<span class="lineNum">     201 </span>                :            : typedef Matx&lt;float, 1, 6&gt; Matx16f;
+<span class="lineNum">     202 </span>                :            : typedef Matx&lt;double, 1, 6&gt; Matx16d;
+<span class="lineNum">     203 </span>                :            : 
+<span class="lineNum">     204 </span>                :            : typedef Matx&lt;float, 2, 1&gt; Matx21f;
+<span class="lineNum">     205 </span>                :            : typedef Matx&lt;double, 2, 1&gt; Matx21d;
+<span class="lineNum">     206 </span>                :            : typedef Matx&lt;float, 3, 1&gt; Matx31f;
+<span class="lineNum">     207 </span>                :            : typedef Matx&lt;double, 3, 1&gt; Matx31d;
+<span class="lineNum">     208 </span>                :            : typedef Matx&lt;float, 4, 1&gt; Matx41f;
+<span class="lineNum">     209 </span>                :            : typedef Matx&lt;double, 4, 1&gt; Matx41d;
+<span class="lineNum">     210 </span>                :            : typedef Matx&lt;float, 6, 1&gt; Matx61f;
+<span class="lineNum">     211 </span>                :            : typedef Matx&lt;double, 6, 1&gt; Matx61d;
+<span class="lineNum">     212 </span>                :            : 
+<span class="lineNum">     213 </span>                :            : typedef Matx&lt;float, 2, 2&gt; Matx22f;
+<span class="lineNum">     214 </span>                :            : typedef Matx&lt;double, 2, 2&gt; Matx22d;
+<span class="lineNum">     215 </span>                :            : typedef Matx&lt;float, 2, 3&gt; Matx23f;
+<span class="lineNum">     216 </span>                :            : typedef Matx&lt;double, 2, 3&gt; Matx23d;
+<span class="lineNum">     217 </span>                :            : typedef Matx&lt;float, 3, 2&gt; Matx32f;
+<span class="lineNum">     218 </span>                :            : typedef Matx&lt;double, 3, 2&gt; Matx32d;
+<span class="lineNum">     219 </span>                :            : 
+<span class="lineNum">     220 </span>                :            : typedef Matx&lt;float, 3, 3&gt; Matx33f;
+<span class="lineNum">     221 </span>                :            : typedef Matx&lt;double, 3, 3&gt; Matx33d;
+<span class="lineNum">     222 </span>                :            : 
+<span class="lineNum">     223 </span>                :            : typedef Matx&lt;float, 3, 4&gt; Matx34f;
+<span class="lineNum">     224 </span>                :            : typedef Matx&lt;double, 3, 4&gt; Matx34d;
+<span class="lineNum">     225 </span>                :            : typedef Matx&lt;float, 4, 3&gt; Matx43f;
+<span class="lineNum">     226 </span>                :            : typedef Matx&lt;double, 4, 3&gt; Matx43d;
+<span class="lineNum">     227 </span>                :            : 
+<span class="lineNum">     228 </span>                :            : typedef Matx&lt;float, 4, 4&gt; Matx44f;
+<span class="lineNum">     229 </span>                :            : typedef Matx&lt;double, 4, 4&gt; Matx44d;
+<span class="lineNum">     230 </span>                :            : typedef Matx&lt;float, 6, 6&gt; Matx66f;
+<span class="lineNum">     231 </span>                :            : typedef Matx&lt;double, 6, 6&gt; Matx66d;
+<span class="lineNum">     232 </span>                :            : 
+<span class="lineNum">     233 </span>                :            : /*!
+<span class="lineNum">     234 </span>                :            :   traits
+<span class="lineNum">     235 </span>                :            : */
+<span class="lineNum">     236 </span>                :            : template&lt;typename _Tp, int m, int n&gt; class DataType&lt; Matx&lt;_Tp, m, n&gt; &gt;
+<span class="lineNum">     237 </span>                :            : {
+<span class="lineNum">     238 </span>                :            : public:
+<span class="lineNum">     239 </span>                :            :     typedef Matx&lt;_Tp, m, n&gt;                               value_type;
+<span class="lineNum">     240 </span>                :            :     typedef Matx&lt;typename DataType&lt;_Tp&gt;::work_type, m, n&gt; work_type;
+<span class="lineNum">     241 </span>                :            :     typedef _Tp                                           channel_type;
+<span class="lineNum">     242 </span>                :            :     typedef value_type                                    vec_type;
+<span class="lineNum">     243 </span>                :            : 
+<span class="lineNum">     244 </span>                :            :     enum { generic_type = 0,
+<span class="lineNum">     245 </span>                :            :            depth        = DataType&lt;channel_type&gt;::depth,
+<span class="lineNum">     246 </span>                :            :            channels     = m * n,
+<span class="lineNum">     247 </span>                :            :            fmt          = DataType&lt;channel_type&gt;::fmt + ((channels - 1) &lt;&lt; 8),
+<span class="lineNum">     248 </span>                :            :            type         = CV_MAKETYPE(depth, channels)
+<span class="lineNum">     249 </span>                :            :          };
+<span class="lineNum">     250 </span>                :            : };
+<span class="lineNum">     251 </span>                :            : 
+<span class="lineNum">     252 </span>                :            : /** @brief  Comma-separated Matrix Initializer
+<span class="lineNum">     253 </span>                :            : */
+<span class="lineNum">     254 </span>                :            : template&lt;typename _Tp, int m, int n&gt; class MatxCommaInitializer
+<span class="lineNum">     255 </span>                :            : {
+<span class="lineNum">     256 </span>                :            : public:
+<span class="lineNum">     257 </span>                :            :     MatxCommaInitializer(Matx&lt;_Tp, m, n&gt;* _mtx);
+<span class="lineNum">     258 </span>                :            :     template&lt;typename T2&gt; MatxCommaInitializer&lt;_Tp, m, n&gt;&amp; operator , (T2 val);
+<span class="lineNum">     259 </span>                :            :     Matx&lt;_Tp, m, n&gt; operator *() const;
+<span class="lineNum">     260 </span>                :            : 
+<span class="lineNum">     261 </span>                :            :     Matx&lt;_Tp, m, n&gt;* dst;
+<span class="lineNum">     262 </span>                :            :     int idx;
+<span class="lineNum">     263 </span>                :            : };
+<span class="lineNum">     264 </span>                :            : 
+<span class="lineNum">     265 </span>                :            : /*
+<span class="lineNum">     266 </span>                :            :  Utility methods
+<span class="lineNum">     267 </span>                :            : */
+<span class="lineNum">     268 </span>                :            : template&lt;typename _Tp, int m&gt; static double determinant(const Matx&lt;_Tp, m, m&gt;&amp; a);
+<span class="lineNum">     269 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static double trace(const Matx&lt;_Tp, m, n&gt;&amp; a);
+<span class="lineNum">     270 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static double norm(const Matx&lt;_Tp, m, n&gt;&amp; M);
+<span class="lineNum">     271 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static double norm(const Matx&lt;_Tp, m, n&gt;&amp; M, int normType);
+<span class="lineNum">     272 </span>                :            : 
+<span class="lineNum">     273 </span>                :            : 
+<span class="lineNum">     274 </span>                :            : 
+<span class="lineNum">     275 </span>                :            : /////////////////////// Vec (used as element of multi-channel images /////////////////////
+<span class="lineNum">     276 </span>                :            : 
+<span class="lineNum">     277 </span>                :            : /** @brief Template class for short numerical vectors, a partial case of Matx
+<span class="lineNum">     278 </span>                :            : 
+<span class="lineNum">     279 </span>                :            : This template class represents short numerical vectors (of 1, 2, 3, 4 ... elements) on which you
+<span class="lineNum">     280 </span>                :            : can perform basic arithmetical operations, access individual elements using [] operator etc. The
+<span class="lineNum">     281 </span>                :            : vectors are allocated on stack, as opposite to std::valarray, std::vector, cv::Mat etc., which
+<span class="lineNum">     282 </span>                :            : elements are dynamically allocated in the heap.
+<span class="lineNum">     283 </span>                :            : 
+<span class="lineNum">     284 </span>                :            : The template takes 2 parameters:
+<span class="lineNum">     285 </span>                :            : @tparam _Tp element type
+<span class="lineNum">     286 </span>                :            : @tparam cn the number of elements
+<span class="lineNum">     287 </span>                :            : 
+<span class="lineNum">     288 </span>                :            : In addition to the universal notation like Vec&lt;float, 3&gt;, you can use shorter aliases
+<span class="lineNum">     289 </span>                :            : for the most popular specialized variants of Vec, e.g. Vec3f ~ Vec&lt;float, 3&gt;.
+<span class="lineNum">     290 </span>                :            : 
+<span class="lineNum">     291 </span>                :            : It is possible to convert Vec\&lt;T,2\&gt; to/from Point_, Vec\&lt;T,3\&gt; to/from Point3_ , and Vec\&lt;T,4\&gt;
+<span class="lineNum">     292 </span>                :            : to CvScalar or Scalar_. Use operator[] to access the elements of Vec.
+<span class="lineNum">     293 </span>                :            : 
+<span class="lineNum">     294 </span>                :            : All the expected vector operations are also implemented:
+<span class="lineNum">     295 </span>                :            : -   v1 = v2 + v3
+<span class="lineNum">     296 </span>                :            : -   v1 = v2 - v3
+<span class="lineNum">     297 </span>                :            : -   v1 = v2 \* scale
+<span class="lineNum">     298 </span>                :            : -   v1 = scale \* v2
+<span class="lineNum">     299 </span>                :            : -   v1 = -v2
+<span class="lineNum">     300 </span>                :            : -   v1 += v2 and other augmenting operations
+<span class="lineNum">     301 </span>                :            : -   v1 == v2, v1 != v2
+<span class="lineNum">     302 </span>                :            : -   norm(v1) (euclidean norm)
+<span class="lineNum">     303 </span>                :            : The Vec class is commonly used to describe pixel types of multi-channel arrays. See Mat for details.
+<span class="lineNum">     304 </span>                :            : */
+<span class="lineNum">     305 </span>                :            : template&lt;typename _Tp, int cn&gt; class Vec : public Matx&lt;_Tp, cn, 1&gt;
+<span class="lineNum">     306 </span>                :            : {
+<span class="lineNum">     307 </span>                :            : public:
+<span class="lineNum">     308 </span>                :            :     typedef _Tp value_type;
+<span class="lineNum">     309 </span>                :            :     enum { depth    = Matx&lt;_Tp, cn, 1&gt;::depth,
+<span class="lineNum">     310 </span>                :            :            channels = cn,
+<span class="lineNum">     311 </span>                :            :            type     = CV_MAKETYPE(depth, channels)
+<span class="lineNum">     312 </span>                :            :          };
+<span class="lineNum">     313 </span>                :            : 
+<span class="lineNum">     314 </span>                :            :     //! default constructor
+<span class="lineNum">     315 </span>                :            :     Vec();
+<span class="lineNum">     316 </span>                :            : 
+<span class="lineNum">     317 </span>                :            :     Vec(_Tp v0); //!&lt; 1-element vector constructor
+<span class="lineNum">     318 </span>                :            :     Vec(_Tp v0, _Tp v1); //!&lt; 2-element vector constructor
+<span class="lineNum">     319 </span>                :            :     Vec(_Tp v0, _Tp v1, _Tp v2); //!&lt; 3-element vector constructor
+<span class="lineNum">     320 </span>                :            :     Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3); //!&lt; 4-element vector constructor
+<span class="lineNum">     321 </span>                :            :     Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4); //!&lt; 5-element vector constructor
+<span class="lineNum">     322 </span>                :            :     Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5); //!&lt; 6-element vector constructor
+<span class="lineNum">     323 </span>                :            :     Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6); //!&lt; 7-element vector constructor
+<span class="lineNum">     324 </span>                :            :     Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7); //!&lt; 8-element vector constructor
+<span class="lineNum">     325 </span>                :            :     Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8); //!&lt; 9-element vector constructor
+<span class="lineNum">     326 </span>                :            :     Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8, _Tp v9); //!&lt; 10-element vector constructor
+<span class="lineNum">     327 </span>                :            :     Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8, _Tp v9, _Tp v10, _Tp v11, _Tp v12, _Tp v13); //!&lt; 14-element vector constructor
+<span class="lineNum">     328 </span>                :            :     explicit Vec(const _Tp* values);
+<span class="lineNum">     329 </span>                :            : 
+<span class="lineNum">     330 </span>                :            :     Vec(const Vec&lt;_Tp, cn&gt;&amp; v);
+<span class="lineNum">     331 </span>                :            : 
+<span class="lineNum">     332 </span>                :            :     static Vec all(_Tp alpha);
+<span class="lineNum">     333 </span>                :            : 
+<span class="lineNum">     334 </span>                :            :     //! per-element multiplication
+<span class="lineNum">     335 </span>                :            :     Vec mul(const Vec&lt;_Tp, cn&gt;&amp; v) const;
+<span class="lineNum">     336 </span>                :            : 
+<span class="lineNum">     337 </span>                :            :     //! conjugation (makes sense for complex numbers and quaternions)
+<span class="lineNum">     338 </span>                :            :     Vec conj() const;
+<span class="lineNum">     339 </span>                :            : 
+<span class="lineNum">     340 </span>                :            :     /*!
+<span class="lineNum">     341 </span>                :            :       cross product of the two 3D vectors.
+<span class="lineNum">     342 </span>                :            : 
+<span class="lineNum">     343 </span>                :            :       For other dimensionalities the exception is raised
+<span class="lineNum">     344 </span>                :            :     */
+<span class="lineNum">     345 </span>                :            :     Vec cross(const Vec&amp; v) const;
+<span class="lineNum">     346 </span>                :            :     //! conversion to another data type
+<span class="lineNum">     347 </span>                :            :     template&lt;typename T2&gt; operator Vec&lt;T2, cn&gt;() const;
+<span class="lineNum">     348 </span>                :            : 
+<span class="lineNum">     349 </span>                :            :     /*! element access */
+<span class="lineNum">     350 </span>                :            :     const _Tp&amp; operator [](int i) const;
+<span class="lineNum">     351 </span>                :            :     _Tp&amp; operator[](int i);
+<span class="lineNum">     352 </span>                :            :     const _Tp&amp; operator ()(int i) const;
+<span class="lineNum">     353 </span>                :            :     _Tp&amp; operator ()(int i);
+<span class="lineNum">     354 </span>                :            : 
+<span class="lineNum">     355 </span>                :            :     Vec(const Matx&lt;_Tp, cn, 1&gt;&amp; a, const Matx&lt;_Tp, cn, 1&gt;&amp; b, Matx_AddOp);
+<span class="lineNum">     356 </span>                :            :     Vec(const Matx&lt;_Tp, cn, 1&gt;&amp; a, const Matx&lt;_Tp, cn, 1&gt;&amp; b, Matx_SubOp);
+<span class="lineNum">     357 </span>                :            :     template&lt;typename _T2&gt; Vec(const Matx&lt;_Tp, cn, 1&gt;&amp; a, _T2 alpha, Matx_ScaleOp);
+<span class="lineNum">     358 </span>                :            : };
+<span class="lineNum">     359 </span>                :            : 
+<span class="lineNum">     360 </span>                :            : /** @name Shorter aliases for the most popular specializations of Vec&lt;T,n&gt;
+<span class="lineNum">     361 </span>                :            :   @{
+<span class="lineNum">     362 </span>                :            : */
+<span class="lineNum">     363 </span>                :            : typedef Vec&lt;uchar, 2&gt; Vec2b;
+<span class="lineNum">     364 </span>                :            : typedef Vec&lt;uchar, 3&gt; Vec3b;
+<span class="lineNum">     365 </span>                :            : typedef Vec&lt;uchar, 4&gt; Vec4b;
+<span class="lineNum">     366 </span>                :            : 
+<span class="lineNum">     367 </span>                :            : typedef Vec&lt;short, 2&gt; Vec2s;
+<span class="lineNum">     368 </span>                :            : typedef Vec&lt;short, 3&gt; Vec3s;
+<span class="lineNum">     369 </span>                :            : typedef Vec&lt;short, 4&gt; Vec4s;
+<span class="lineNum">     370 </span>                :            : 
+<span class="lineNum">     371 </span>                :            : typedef Vec&lt;ushort, 2&gt; Vec2w;
+<span class="lineNum">     372 </span>                :            : typedef Vec&lt;ushort, 3&gt; Vec3w;
+<span class="lineNum">     373 </span>                :            : typedef Vec&lt;ushort, 4&gt; Vec4w;
+<span class="lineNum">     374 </span>                :            : 
+<span class="lineNum">     375 </span>                :            : typedef Vec&lt;int, 2&gt; Vec2i;
+<span class="lineNum">     376 </span>                :            : typedef Vec&lt;int, 3&gt; Vec3i;
+<span class="lineNum">     377 </span>                :            : typedef Vec&lt;int, 4&gt; Vec4i;
+<span class="lineNum">     378 </span>                :            : typedef Vec&lt;int, 6&gt; Vec6i;
+<span class="lineNum">     379 </span>                :            : typedef Vec&lt;int, 8&gt; Vec8i;
+<span class="lineNum">     380 </span>                :            : 
+<span class="lineNum">     381 </span>                :            : typedef Vec&lt;float, 2&gt; Vec2f;
+<span class="lineNum">     382 </span>                :            : typedef Vec&lt;float, 3&gt; Vec3f;
+<span class="lineNum">     383 </span>                :            : typedef Vec&lt;float, 4&gt; Vec4f;
+<span class="lineNum">     384 </span>                :            : typedef Vec&lt;float, 6&gt; Vec6f;
+<span class="lineNum">     385 </span>                :            : 
+<span class="lineNum">     386 </span>                :            : typedef Vec&lt;double, 2&gt; Vec2d;
+<span class="lineNum">     387 </span>                :            : typedef Vec&lt;double, 3&gt; Vec3d;
+<span class="lineNum">     388 </span>                :            : typedef Vec&lt;double, 4&gt; Vec4d;
+<span class="lineNum">     389 </span>                :            : typedef Vec&lt;double, 6&gt; Vec6d;
+<span class="lineNum">     390 </span>                :            : /** @} */
+<span class="lineNum">     391 </span>                :            : 
+<span class="lineNum">     392 </span>                :            : /*!
+<span class="lineNum">     393 </span>                :            :   traits
+<span class="lineNum">     394 </span>                :            : */
+<span class="lineNum">     395 </span>                :            : template&lt;typename _Tp, int cn&gt; class DataType&lt; Vec&lt;_Tp, cn&gt; &gt;
+<span class="lineNum">     396 </span>                :            : {
+<span class="lineNum">     397 </span>                :            : public:
+<span class="lineNum">     398 </span>                :            :     typedef Vec&lt;_Tp, cn&gt;                               value_type;
+<span class="lineNum">     399 </span>                :            :     typedef Vec&lt;typename DataType&lt;_Tp&gt;::work_type, cn&gt; work_type;
+<span class="lineNum">     400 </span>                :            :     typedef _Tp                                        channel_type;
+<span class="lineNum">     401 </span>                :            :     typedef value_type                                 vec_type;
+<span class="lineNum">     402 </span>                :            : 
+<span class="lineNum">     403 </span>                :            :     enum { generic_type = 0,
+<span class="lineNum">     404 </span>                :            :            depth        = DataType&lt;channel_type&gt;::depth,
+<span class="lineNum">     405 </span>                :            :            channels     = cn,
+<span class="lineNum">     406 </span>                :            :            fmt          = DataType&lt;channel_type&gt;::fmt + ((channels - 1) &lt;&lt; 8),
+<span class="lineNum">     407 </span>                :            :            type         = CV_MAKETYPE(depth, channels)
+<span class="lineNum">     408 </span>                :            :          };
+<span class="lineNum">     409 </span>                :            : };
+<span class="lineNum">     410 </span>                :            : 
+<span class="lineNum">     411 </span>                :            : /** @brief  Comma-separated Vec Initializer
+<span class="lineNum">     412 </span>                :            : */
+<span class="lineNum">     413 </span>                :            : template&lt;typename _Tp, int m&gt; class VecCommaInitializer : public MatxCommaInitializer&lt;_Tp, m, 1&gt;
+<span class="lineNum">     414 </span>                :            : {
+<span class="lineNum">     415 </span>                :            : public:
+<span class="lineNum">     416 </span>                :            :     VecCommaInitializer(Vec&lt;_Tp, m&gt;* _vec);
+<span class="lineNum">     417 </span>                :            :     template&lt;typename T2&gt; VecCommaInitializer&lt;_Tp, m&gt;&amp; operator , (T2 val);
+<span class="lineNum">     418 </span>                :            :     Vec&lt;_Tp, m&gt; operator *() const;
+<span class="lineNum">     419 </span>                :            : };
+<span class="lineNum">     420 </span>                :            : 
+<span class="lineNum">     421 </span>                :            : template&lt;typename _Tp, int cn&gt; static Vec&lt;_Tp, cn&gt; normalize(const Vec&lt;_Tp, cn&gt;&amp; v);
+<span class="lineNum">     422 </span>                :            : 
+<span class="lineNum">     423 </span>                :            : //! @} core_basic
+<span class="lineNum">     424 </span>                :            : 
+<span class="lineNum">     425 </span>                :            : //! @cond IGNORED
+<span class="lineNum">     426 </span>                :            : 
+<span class="lineNum">     427 </span>                :            : ///////////////////////////////////// helper classes /////////////////////////////////////
+<span class="lineNum">     428 </span>                :            : namespace internal
+<span class="lineNum">     429 </span>                :            : {
+<span class="lineNum">     430 </span>                :            : 
+<span class="lineNum">     431 </span>                :            : template&lt;typename _Tp, int m&gt; struct Matx_DetOp
+<span class="lineNum">     432 </span>                :            : {
+<span class="lineNum">     433 </span>                :            :     double operator ()(const Matx&lt;_Tp, m, m&gt;&amp; a) const
+<span class="lineNum">     434 </span>                :            :     {
+<span class="lineNum">     435 </span>                :            :         Matx&lt;_Tp, m, m&gt; temp = a;
+<span class="lineNum">     436 </span>                :            :         double p = LU(temp.val, m*sizeof(_Tp), m, 0, 0, 0);
+<span class="lineNum">     437 </span>                :            :         if( p == 0 )
+<span class="lineNum">     438 </span>                :            :             return p;
+<span class="lineNum">     439 </span>                :            :         for( int i = 0; i &lt; m; i++ )
+<span class="lineNum">     440 </span>                :            :             p *= temp(i, i);
+<span class="lineNum">     441 </span>                :            :         return 1./p;
+<span class="lineNum">     442 </span>                :            :     }
+<span class="lineNum">     443 </span>                :            : };
+<span class="lineNum">     444 </span>                :            : 
+<span class="lineNum">     445 </span>                :            : template&lt;typename _Tp&gt; struct Matx_DetOp&lt;_Tp, 1&gt;
+<span class="lineNum">     446 </span>                :            : {
+<span class="lineNum">     447 </span>                :            :     double operator ()(const Matx&lt;_Tp, 1, 1&gt;&amp; a) const
+<span class="lineNum">     448 </span>                :            :     {
+<span class="lineNum">     449 </span>                :            :         return a(0,0);
+<span class="lineNum">     450 </span>                :            :     }
+<span class="lineNum">     451 </span>                :            : };
+<span class="lineNum">     452 </span>                :            : 
+<span class="lineNum">     453 </span>                :            : template&lt;typename _Tp&gt; struct Matx_DetOp&lt;_Tp, 2&gt;
+<span class="lineNum">     454 </span>                :            : {
+<span class="lineNum">     455 </span>                :            :     double operator ()(const Matx&lt;_Tp, 2, 2&gt;&amp; a) const
+<span class="lineNum">     456 </span>                :            :     {
+<span class="lineNum">     457 </span>                :            :         return a(0,0)*a(1,1) - a(0,1)*a(1,0);
+<span class="lineNum">     458 </span>                :            :     }
+<span class="lineNum">     459 </span>                :            : };
+<span class="lineNum">     460 </span>                :            : 
+<span class="lineNum">     461 </span>                :            : template&lt;typename _Tp&gt; struct Matx_DetOp&lt;_Tp, 3&gt;
+<span class="lineNum">     462 </span>                :            : {
+<span class="lineNum">     463 </span>                :            :     double operator ()(const Matx&lt;_Tp, 3, 3&gt;&amp; a) const
+<span class="lineNum">     464 </span>                :            :     {
+<span class="lineNum">     465 </span>                :            :         return a(0,0)*(a(1,1)*a(2,2) - a(2,1)*a(1,2)) -
+<span class="lineNum">     466 </span>                :            :             a(0,1)*(a(1,0)*a(2,2) - a(2,0)*a(1,2)) +
+<span class="lineNum">     467 </span>                :            :             a(0,2)*(a(1,0)*a(2,1) - a(2,0)*a(1,1));
+<span class="lineNum">     468 </span>                :            :     }
+<span class="lineNum">     469 </span>                :            : };
+<span class="lineNum">     470 </span>                :            : 
+<span class="lineNum">     471 </span>                :            : template&lt;typename _Tp&gt; Vec&lt;_Tp, 2&gt; inline conjugate(const Vec&lt;_Tp, 2&gt;&amp; v)
+<span class="lineNum">     472 </span>                :            : {
+<span class="lineNum">     473 </span>                :            :     return Vec&lt;_Tp, 2&gt;(v[0], -v[1]);
+<span class="lineNum">     474 </span>                :            : }
+<span class="lineNum">     475 </span>                :            : 
+<span class="lineNum">     476 </span>                :            : template&lt;typename _Tp&gt; Vec&lt;_Tp, 4&gt; inline conjugate(const Vec&lt;_Tp, 4&gt;&amp; v)
+<span class="lineNum">     477 </span>                :            : {
+<span class="lineNum">     478 </span>                :            :     return Vec&lt;_Tp, 4&gt;(v[0], -v[1], -v[2], -v[3]);
+<span class="lineNum">     479 </span>                :            : }
+<span class="lineNum">     480 </span>                :            : 
+<span class="lineNum">     481 </span>                :            : } // internal
+<span class="lineNum">     482 </span>                :            : 
+<span class="lineNum">     483 </span>                :            : 
+<span class="lineNum">     484 </span>                :            : 
+<span class="lineNum">     485 </span>                :            : ////////////////////////////////// Matx Implementation ///////////////////////////////////
+<a name="486"><span class="lineNum">     486 </span>                :            : </a>
+<span class="lineNum">     487 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     488 </span>                :<span class="lineCov">       2705 : Matx&lt;_Tp, m, n&gt;::Matx()</span>
+<span class="lineNum">     489 </span>                :            : {
+<span class="lineNum">     490 </span>        [<span class="branchCov" title="Branch 0 was taken 10820 times"> + </span><span class="branchCov" title="Branch 1 was taken 2705 times"> + </span>]:<span class="lineCov">      13525 :     for(int i = 0; i &lt; channels; i++) val[i] = _Tp(0);</span>
+<span class="lineNum">     491 </span>                :<span class="lineCov">       2705 : }</span>
+<span class="lineNum">     492 </span>                :            : 
+<span class="lineNum">     493 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     494 </span>                :            : Matx&lt;_Tp, m, n&gt;::Matx(_Tp v0)
+<span class="lineNum">     495 </span>                :            : {
+<span class="lineNum">     496 </span>                :            :     val[0] = v0;
+<span class="lineNum">     497 </span>                :            :     for(int i = 1; i &lt; channels; i++) val[i] = _Tp(0);
+<span class="lineNum">     498 </span>                :            : }
+<span class="lineNum">     499 </span>                :            : 
+<span class="lineNum">     500 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     501 </span>                :            : Matx&lt;_Tp, m, n&gt;::Matx(_Tp v0, _Tp v1)
+<span class="lineNum">     502 </span>                :            : {
+<span class="lineNum">     503 </span>                :            :     CV_StaticAssert(channels &gt;= 2, &quot;Matx should have at least 2 elements.&quot;);
+<span class="lineNum">     504 </span>                :            :     val[0] = v0; val[1] = v1;
+<span class="lineNum">     505 </span>                :            :     for(int i = 2; i &lt; channels; i++) val[i] = _Tp(0);
+<span class="lineNum">     506 </span>                :            : }
+<a name="507"><span class="lineNum">     507 </span>                :            : </a>
+<span class="lineNum">     508 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     509 </span>                :<span class="lineCov">          1 : Matx&lt;_Tp, m, n&gt;::Matx(_Tp v0, _Tp v1, _Tp v2)</span>
+<span class="lineNum">     510 </span>                :            : {
+<span class="lineNum">     511 </span>                :<span class="lineCov">          1 :     CV_StaticAssert(channels &gt;= 3, &quot;Matx should have at least 3 elements.&quot;);</span>
+<span class="lineNum">     512 </span>                :<span class="lineCov">          1 :     val[0] = v0; val[1] = v1; val[2] = v2;</span>
+<span class="lineNum">     513 </span>        [<span class="branchNoCov" title="Branch 0 was not taken"> - </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          1 :     for(int i = 3; i &lt; channels; i++) val[i] = _Tp(0);</span>
+<span class="lineNum">     514 </span>                :<span class="lineCov">          1 : }</span>
+<span class="lineNum">     515 </span>                :            : 
+<span class="lineNum">     516 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     517 </span>                :            : Matx&lt;_Tp, m, n&gt;::Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
+<span class="lineNum">     518 </span>                :            : {
+<span class="lineNum">     519 </span>                :            :     CV_StaticAssert(channels &gt;= 4, &quot;Matx should have at least 4 elements.&quot;);
+<span class="lineNum">     520 </span>                :            :     val[0] = v0; val[1] = v1; val[2] = v2; val[3] = v3;
+<span class="lineNum">     521 </span>                :            :     for(int i = 4; i &lt; channels; i++) val[i] = _Tp(0);
+<span class="lineNum">     522 </span>                :            : }
+<span class="lineNum">     523 </span>                :            : 
+<span class="lineNum">     524 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     525 </span>                :            : Matx&lt;_Tp, m, n&gt;::Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4)
+<span class="lineNum">     526 </span>                :            : {
+<span class="lineNum">     527 </span>                :            :     CV_StaticAssert(channels &gt;= 5, &quot;Matx should have at least 5 elements.&quot;);
+<span class="lineNum">     528 </span>                :            :     val[0] = v0; val[1] = v1; val[2] = v2; val[3] = v3; val[4] = v4;
+<span class="lineNum">     529 </span>                :            :     for(int i = 5; i &lt; channels; i++) val[i] = _Tp(0);
+<span class="lineNum">     530 </span>                :            : }
+<span class="lineNum">     531 </span>                :            : 
+<span class="lineNum">     532 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     533 </span>                :            : Matx&lt;_Tp, m, n&gt;::Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5)
+<span class="lineNum">     534 </span>                :            : {
+<span class="lineNum">     535 </span>                :            :     CV_StaticAssert(channels &gt;= 6, &quot;Matx should have at least 6 elements.&quot;);
+<span class="lineNum">     536 </span>                :            :     val[0] = v0; val[1] = v1; val[2] = v2; val[3] = v3;
+<span class="lineNum">     537 </span>                :            :     val[4] = v4; val[5] = v5;
+<span class="lineNum">     538 </span>                :            :     for(int i = 6; i &lt; channels; i++) val[i] = _Tp(0);
+<span class="lineNum">     539 </span>                :            : }
+<span class="lineNum">     540 </span>                :            : 
+<span class="lineNum">     541 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     542 </span>                :            : Matx&lt;_Tp, m, n&gt;::Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6)
+<span class="lineNum">     543 </span>                :            : {
+<span class="lineNum">     544 </span>                :            :     CV_StaticAssert(channels &gt;= 7, &quot;Matx should have at least 7 elements.&quot;);
+<span class="lineNum">     545 </span>                :            :     val[0] = v0; val[1] = v1; val[2] = v2; val[3] = v3;
+<span class="lineNum">     546 </span>                :            :     val[4] = v4; val[5] = v5; val[6] = v6;
+<span class="lineNum">     547 </span>                :            :     for(int i = 7; i &lt; channels; i++) val[i] = _Tp(0);
+<span class="lineNum">     548 </span>                :            : }
+<span class="lineNum">     549 </span>                :            : 
+<span class="lineNum">     550 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     551 </span>                :            : Matx&lt;_Tp, m, n&gt;::Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7)
+<span class="lineNum">     552 </span>                :            : {
+<span class="lineNum">     553 </span>                :            :     CV_StaticAssert(channels &gt;= 8, &quot;Matx should have at least 8 elements.&quot;);
+<span class="lineNum">     554 </span>                :            :     val[0] = v0; val[1] = v1; val[2] = v2; val[3] = v3;
+<span class="lineNum">     555 </span>                :            :     val[4] = v4; val[5] = v5; val[6] = v6; val[7] = v7;
+<span class="lineNum">     556 </span>                :            :     for(int i = 8; i &lt; channels; i++) val[i] = _Tp(0);
+<span class="lineNum">     557 </span>                :            : }
+<span class="lineNum">     558 </span>                :            : 
+<span class="lineNum">     559 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     560 </span>                :            : Matx&lt;_Tp, m, n&gt;::Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8)
+<span class="lineNum">     561 </span>                :            : {
+<span class="lineNum">     562 </span>                :            :     CV_StaticAssert(channels &gt;= 9, &quot;Matx should have at least 9 elements.&quot;);
+<span class="lineNum">     563 </span>                :            :     val[0] = v0; val[1] = v1; val[2] = v2; val[3] = v3;
+<span class="lineNum">     564 </span>                :            :     val[4] = v4; val[5] = v5; val[6] = v6; val[7] = v7;
+<span class="lineNum">     565 </span>                :            :     val[8] = v8;
+<span class="lineNum">     566 </span>                :            :     for(int i = 9; i &lt; channels; i++) val[i] = _Tp(0);
+<span class="lineNum">     567 </span>                :            : }
+<span class="lineNum">     568 </span>                :            : 
+<span class="lineNum">     569 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     570 </span>                :            : Matx&lt;_Tp, m, n&gt;::Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8, _Tp v9)
+<span class="lineNum">     571 </span>                :            : {
+<span class="lineNum">     572 </span>                :            :     CV_StaticAssert(channels &gt;= 10, &quot;Matx should have at least 10 elements.&quot;);
+<span class="lineNum">     573 </span>                :            :     val[0] = v0; val[1] = v1; val[2] = v2; val[3] = v3;
+<span class="lineNum">     574 </span>                :            :     val[4] = v4; val[5] = v5; val[6] = v6; val[7] = v7;
+<span class="lineNum">     575 </span>                :            :     val[8] = v8; val[9] = v9;
+<span class="lineNum">     576 </span>                :            :     for(int i = 10; i &lt; channels; i++) val[i] = _Tp(0);
+<span class="lineNum">     577 </span>                :            : }
+<span class="lineNum">     578 </span>                :            : 
+<span class="lineNum">     579 </span>                :            : 
+<span class="lineNum">     580 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     581 </span>                :            : Matx&lt;_Tp,m,n&gt;::Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8, _Tp v9, _Tp v10, _Tp v11)
+<span class="lineNum">     582 </span>                :            : {
+<span class="lineNum">     583 </span>                :            :     CV_StaticAssert(channels &gt;= 12, &quot;Matx should have at least 12 elements.&quot;);
+<span class="lineNum">     584 </span>                :            :     val[0] = v0; val[1] = v1; val[2] = v2; val[3] = v3;
+<span class="lineNum">     585 </span>                :            :     val[4] = v4; val[5] = v5; val[6] = v6; val[7] = v7;
+<span class="lineNum">     586 </span>                :            :     val[8] = v8; val[9] = v9; val[10] = v10; val[11] = v11;
+<span class="lineNum">     587 </span>                :            :     for(int i = 12; i &lt; channels; i++) val[i] = _Tp(0);
+<span class="lineNum">     588 </span>                :            : }
+<span class="lineNum">     589 </span>                :            : 
+<span class="lineNum">     590 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     591 </span>                :            : Matx&lt;_Tp,m,n&gt;::Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8, _Tp v9, _Tp v10, _Tp v11, _Tp v12, _Tp v13)
+<span class="lineNum">     592 </span>                :            : {
+<span class="lineNum">     593 </span>                :            :     CV_StaticAssert(channels == 14, &quot;Matx should have at least 14 elements.&quot;);
+<span class="lineNum">     594 </span>                :            :     val[0] = v0; val[1] = v1; val[2] = v2; val[3] = v3;
+<span class="lineNum">     595 </span>                :            :     val[4] = v4; val[5] = v5; val[6] = v6; val[7] = v7;
+<span class="lineNum">     596 </span>                :            :     val[8] = v8; val[9] = v9; val[10] = v10; val[11] = v11;
+<span class="lineNum">     597 </span>                :            :     val[12] = v12; val[13] = v13;
+<span class="lineNum">     598 </span>                :            : }
+<span class="lineNum">     599 </span>                :            : 
+<span class="lineNum">     600 </span>                :            : 
+<span class="lineNum">     601 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     602 </span>                :            : Matx&lt;_Tp,m,n&gt;::Matx(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8, _Tp v9, _Tp v10, _Tp v11, _Tp v12, _Tp v13, _Tp v14, _Tp v15)
+<span class="lineNum">     603 </span>                :            : {
+<span class="lineNum">     604 </span>                :            :     CV_StaticAssert(channels &gt;= 16, &quot;Matx should have at least 16 elements.&quot;);
+<span class="lineNum">     605 </span>                :            :     val[0] = v0; val[1] = v1; val[2] = v2; val[3] = v3;
+<span class="lineNum">     606 </span>                :            :     val[4] = v4; val[5] = v5; val[6] = v6; val[7] = v7;
+<span class="lineNum">     607 </span>                :            :     val[8] = v8; val[9] = v9; val[10] = v10; val[11] = v11;
+<span class="lineNum">     608 </span>                :            :     val[12] = v12; val[13] = v13; val[14] = v14; val[15] = v15;
+<span class="lineNum">     609 </span>                :            :     for(int i = 16; i &lt; channels; i++) val[i] = _Tp(0);
+<span class="lineNum">     610 </span>                :            : }
+<span class="lineNum">     611 </span>                :            : 
+<span class="lineNum">     612 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     613 </span>                :            : Matx&lt;_Tp, m, n&gt;::Matx(const _Tp* values)
+<span class="lineNum">     614 </span>                :            : {
+<span class="lineNum">     615 </span>                :            :     for( int i = 0; i &lt; channels; i++ ) val[i] = values[i];
+<span class="lineNum">     616 </span>                :            : }
+<span class="lineNum">     617 </span>                :            : 
+<span class="lineNum">     618 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     619 </span>                :            : Matx&lt;_Tp, m, n&gt; Matx&lt;_Tp, m, n&gt;::all(_Tp alpha)
+<span class="lineNum">     620 </span>                :            : {
+<span class="lineNum">     621 </span>                :            :     Matx&lt;_Tp, m, n&gt; M;
+<span class="lineNum">     622 </span>                :            :     for( int i = 0; i &lt; m*n; i++ ) M.val[i] = alpha;
+<span class="lineNum">     623 </span>                :            :     return M;
+<span class="lineNum">     624 </span>                :            : }
+<span class="lineNum">     625 </span>                :            : 
+<span class="lineNum">     626 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     627 </span>                :            : Matx&lt;_Tp,m,n&gt; Matx&lt;_Tp,m,n&gt;::zeros()
+<span class="lineNum">     628 </span>                :            : {
+<span class="lineNum">     629 </span>                :            :     return all(0);
+<span class="lineNum">     630 </span>                :            : }
+<span class="lineNum">     631 </span>                :            : 
+<span class="lineNum">     632 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     633 </span>                :            : Matx&lt;_Tp,m,n&gt; Matx&lt;_Tp,m,n&gt;::ones()
+<span class="lineNum">     634 </span>                :            : {
+<span class="lineNum">     635 </span>                :            :     return all(1);
+<span class="lineNum">     636 </span>                :            : }
+<span class="lineNum">     637 </span>                :            : 
+<span class="lineNum">     638 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     639 </span>                :            : Matx&lt;_Tp,m,n&gt; Matx&lt;_Tp,m,n&gt;::eye()
+<span class="lineNum">     640 </span>                :            : {
+<span class="lineNum">     641 </span>                :            :     Matx&lt;_Tp,m,n&gt; M;
+<span class="lineNum">     642 </span>                :            :     for(int i = 0; i &lt; shortdim; i++)
+<span class="lineNum">     643 </span>                :            :         M(i,i) = 1;
+<span class="lineNum">     644 </span>                :            :     return M;
+<span class="lineNum">     645 </span>                :            : }
+<span class="lineNum">     646 </span>                :            : 
+<span class="lineNum">     647 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     648 </span>                :            : _Tp Matx&lt;_Tp, m, n&gt;::dot(const Matx&lt;_Tp, m, n&gt;&amp; M) const
+<span class="lineNum">     649 </span>                :            : {
+<span class="lineNum">     650 </span>                :            :     _Tp s = 0;
+<span class="lineNum">     651 </span>                :            :     for( int i = 0; i &lt; channels; i++ ) s += val[i]*M.val[i];
+<span class="lineNum">     652 </span>                :            :     return s;
+<span class="lineNum">     653 </span>                :            : }
+<span class="lineNum">     654 </span>                :            : 
+<span class="lineNum">     655 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     656 </span>                :            : double Matx&lt;_Tp, m, n&gt;::ddot(const Matx&lt;_Tp, m, n&gt;&amp; M) const
+<span class="lineNum">     657 </span>                :            : {
+<span class="lineNum">     658 </span>                :            :     double s = 0;
+<span class="lineNum">     659 </span>                :            :     for( int i = 0; i &lt; channels; i++ ) s += (double)val[i]*M.val[i];
+<span class="lineNum">     660 </span>                :            :     return s;
+<span class="lineNum">     661 </span>                :            : }
+<span class="lineNum">     662 </span>                :            : 
+<span class="lineNum">     663 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     664 </span>                :            : Matx&lt;_Tp,m,n&gt; Matx&lt;_Tp,m,n&gt;::diag(const typename Matx&lt;_Tp,m,n&gt;::diag_type&amp; d)
+<span class="lineNum">     665 </span>                :            : {
+<span class="lineNum">     666 </span>                :            :     Matx&lt;_Tp,m,n&gt; M;
+<span class="lineNum">     667 </span>                :            :     for(int i = 0; i &lt; shortdim; i++)
+<span class="lineNum">     668 </span>                :            :         M(i,i) = d(i, 0);
+<span class="lineNum">     669 </span>                :            :     return M;
+<span class="lineNum">     670 </span>                :            : }
+<span class="lineNum">     671 </span>                :            : 
+<span class="lineNum">     672 </span>                :            : template&lt;typename _Tp, int m, int n&gt; template&lt;typename T2&gt;
+<span class="lineNum">     673 </span>                :            : inline Matx&lt;_Tp, m, n&gt;::operator Matx&lt;T2, m, n&gt;() const
+<span class="lineNum">     674 </span>                :            : {
+<span class="lineNum">     675 </span>                :            :     Matx&lt;T2, m, n&gt; M;
+<span class="lineNum">     676 </span>                :            :     for( int i = 0; i &lt; m*n; i++ ) M.val[i] = saturate_cast&lt;T2&gt;(val[i]);
+<span class="lineNum">     677 </span>                :            :     return M;
+<span class="lineNum">     678 </span>                :            : }
+<span class="lineNum">     679 </span>                :            : 
+<span class="lineNum">     680 </span>                :            : template&lt;typename _Tp, int m, int n&gt; template&lt;int m1, int n1&gt; inline
+<span class="lineNum">     681 </span>                :            : Matx&lt;_Tp, m1, n1&gt; Matx&lt;_Tp, m, n&gt;::reshape() const
+<span class="lineNum">     682 </span>                :            : {
+<span class="lineNum">     683 </span>                :            :     CV_StaticAssert(m1*n1 == m*n, &quot;Input and destnarion matrices must have the same number of elements&quot;);
+<span class="lineNum">     684 </span>                :            :     return (const Matx&lt;_Tp, m1, n1&gt;&amp;)*this;
+<span class="lineNum">     685 </span>                :            : }
+<span class="lineNum">     686 </span>                :            : 
+<span class="lineNum">     687 </span>                :            : template&lt;typename _Tp, int m, int n&gt;
+<span class="lineNum">     688 </span>                :            : template&lt;int m1, int n1&gt; inline
+<span class="lineNum">     689 </span>                :            : Matx&lt;_Tp, m1, n1&gt; Matx&lt;_Tp, m, n&gt;::get_minor(int i, int j) const
+<span class="lineNum">     690 </span>                :            : {
+<span class="lineNum">     691 </span>                :            :     CV_DbgAssert(0 &lt;= i &amp;&amp; i+m1 &lt;= m &amp;&amp; 0 &lt;= j &amp;&amp; j+n1 &lt;= n);
+<span class="lineNum">     692 </span>                :            :     Matx&lt;_Tp, m1, n1&gt; s;
+<span class="lineNum">     693 </span>                :            :     for( int di = 0; di &lt; m1; di++ )
+<span class="lineNum">     694 </span>                :            :         for( int dj = 0; dj &lt; n1; dj++ )
+<span class="lineNum">     695 </span>                :            :             s(di, dj) = (*this)(i+di, j+dj);
+<span class="lineNum">     696 </span>                :            :     return s;
+<span class="lineNum">     697 </span>                :            : }
+<span class="lineNum">     698 </span>                :            : 
+<span class="lineNum">     699 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     700 </span>                :            : Matx&lt;_Tp, 1, n&gt; Matx&lt;_Tp, m, n&gt;::row(int i) const
+<span class="lineNum">     701 </span>                :            : {
+<span class="lineNum">     702 </span>                :            :     CV_DbgAssert((unsigned)i &lt; (unsigned)m);
+<span class="lineNum">     703 </span>                :            :     return Matx&lt;_Tp, 1, n&gt;(&amp;val[i*n]);
+<span class="lineNum">     704 </span>                :            : }
+<span class="lineNum">     705 </span>                :            : 
+<span class="lineNum">     706 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     707 </span>                :            : Matx&lt;_Tp, m, 1&gt; Matx&lt;_Tp, m, n&gt;::col(int j) const
+<span class="lineNum">     708 </span>                :            : {
+<span class="lineNum">     709 </span>                :            :     CV_DbgAssert((unsigned)j &lt; (unsigned)n);
+<span class="lineNum">     710 </span>                :            :     Matx&lt;_Tp, m, 1&gt; v;
+<span class="lineNum">     711 </span>                :            :     for( int i = 0; i &lt; m; i++ )
+<span class="lineNum">     712 </span>                :            :         v.val[i] = val[i*n + j];
+<span class="lineNum">     713 </span>                :            :     return v;
+<span class="lineNum">     714 </span>                :            : }
+<span class="lineNum">     715 </span>                :            : 
+<span class="lineNum">     716 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     717 </span>                :            : typename Matx&lt;_Tp, m, n&gt;::diag_type Matx&lt;_Tp, m, n&gt;::diag() const
+<span class="lineNum">     718 </span>                :            : {
+<span class="lineNum">     719 </span>                :            :     diag_type d;
+<span class="lineNum">     720 </span>                :            :     for( int i = 0; i &lt; shortdim; i++ )
+<span class="lineNum">     721 </span>                :            :         d.val[i] = val[i*n + i];
+<span class="lineNum">     722 </span>                :            :     return d;
+<span class="lineNum">     723 </span>                :            : }
+<a name="724"><span class="lineNum">     724 </span>                :            : </a>
+<span class="lineNum">     725 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     726 </span>                :<span class="lineCov">          3 : const _Tp&amp; Matx&lt;_Tp, m, n&gt;::operator()(int i, int j) const</span>
+<span class="lineNum">     727 </span>                :            : {
+<span class="lineNum">     728 </span>                :            :     CV_DbgAssert( (unsigned)i &lt; (unsigned)m &amp;&amp; (unsigned)j &lt; (unsigned)n );
+<span class="lineNum">     729 </span>                :<span class="lineCov">          3 :     return this-&gt;val[i*n + j];</span>
+<span class="lineNum">     730 </span>                :            : }
+<span class="lineNum">     731 </span>                :            : 
+<span class="lineNum">     732 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     733 </span>                :            : _Tp&amp; Matx&lt;_Tp, m, n&gt;::operator ()(int i, int j)
+<span class="lineNum">     734 </span>                :            : {
+<span class="lineNum">     735 </span>                :            :     CV_DbgAssert( (unsigned)i &lt; (unsigned)m &amp;&amp; (unsigned)j &lt; (unsigned)n );
+<span class="lineNum">     736 </span>                :            :     return val[i*n + j];
+<span class="lineNum">     737 </span>                :            : }
+<span class="lineNum">     738 </span>                :            : 
+<span class="lineNum">     739 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     740 </span>                :            : const _Tp&amp; Matx&lt;_Tp, m, n&gt;::operator ()(int i) const
+<span class="lineNum">     741 </span>                :            : {
+<span class="lineNum">     742 </span>                :            :     CV_StaticAssert(m == 1 || n == 1, &quot;Single index indexation requires matrix to be a column or a row&quot;);
+<span class="lineNum">     743 </span>                :            :     CV_DbgAssert( (unsigned)i &lt; (unsigned)(m+n-1) );
+<span class="lineNum">     744 </span>                :            :     return val[i];
+<span class="lineNum">     745 </span>                :            : }
+<span class="lineNum">     746 </span>                :            : 
+<span class="lineNum">     747 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     748 </span>                :            : _Tp&amp; Matx&lt;_Tp, m, n&gt;::operator ()(int i)
+<span class="lineNum">     749 </span>                :            : {
+<span class="lineNum">     750 </span>                :            :     CV_StaticAssert(m == 1 || n == 1, &quot;Single index indexation requires matrix to be a column or a row&quot;);
+<span class="lineNum">     751 </span>                :            :     CV_DbgAssert( (unsigned)i &lt; (unsigned)(m+n-1) );
+<span class="lineNum">     752 </span>                :            :     return val[i];
+<span class="lineNum">     753 </span>                :            : }
+<span class="lineNum">     754 </span>                :            : 
+<span class="lineNum">     755 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     756 </span>                :            : Matx&lt;_Tp,m,n&gt;::Matx(const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b, Matx_AddOp)
+<span class="lineNum">     757 </span>                :            : {
+<span class="lineNum">     758 </span>                :            :     for( int i = 0; i &lt; channels; i++ )
+<span class="lineNum">     759 </span>                :            :         val[i] = saturate_cast&lt;_Tp&gt;(a.val[i] + b.val[i]);
+<span class="lineNum">     760 </span>                :            : }
+<span class="lineNum">     761 </span>                :            : 
+<span class="lineNum">     762 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     763 </span>                :            : Matx&lt;_Tp,m,n&gt;::Matx(const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b, Matx_SubOp)
+<span class="lineNum">     764 </span>                :            : {
+<span class="lineNum">     765 </span>                :            :     for( int i = 0; i &lt; channels; i++ )
+<span class="lineNum">     766 </span>                :            :         val[i] = saturate_cast&lt;_Tp&gt;(a.val[i] - b.val[i]);
+<span class="lineNum">     767 </span>                :            : }
+<span class="lineNum">     768 </span>                :            : 
+<span class="lineNum">     769 </span>                :            : template&lt;typename _Tp, int m, int n&gt; template&lt;typename _T2&gt; inline
+<span class="lineNum">     770 </span>                :            : Matx&lt;_Tp,m,n&gt;::Matx(const Matx&lt;_Tp, m, n&gt;&amp; a, _T2 alpha, Matx_ScaleOp)
+<span class="lineNum">     771 </span>                :            : {
+<span class="lineNum">     772 </span>                :            :     for( int i = 0; i &lt; channels; i++ )
+<span class="lineNum">     773 </span>                :            :         val[i] = saturate_cast&lt;_Tp&gt;(a.val[i] * alpha);
+<span class="lineNum">     774 </span>                :            : }
+<span class="lineNum">     775 </span>                :            : 
+<span class="lineNum">     776 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     777 </span>                :            : Matx&lt;_Tp,m,n&gt;::Matx(const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b, Matx_MulOp)
+<span class="lineNum">     778 </span>                :            : {
+<span class="lineNum">     779 </span>                :            :     for( int i = 0; i &lt; channels; i++ )
+<span class="lineNum">     780 </span>                :            :         val[i] = saturate_cast&lt;_Tp&gt;(a.val[i] * b.val[i]);
+<span class="lineNum">     781 </span>                :            : }
+<span class="lineNum">     782 </span>                :            : 
+<span class="lineNum">     783 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     784 </span>                :            : Matx&lt;_Tp,m,n&gt;::Matx(const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b, Matx_DivOp)
+<span class="lineNum">     785 </span>                :            : {
+<span class="lineNum">     786 </span>                :            :     for( int i = 0; i &lt; channels; i++ )
+<span class="lineNum">     787 </span>                :            :         val[i] = saturate_cast&lt;_Tp&gt;(a.val[i] / b.val[i]);
+<span class="lineNum">     788 </span>                :            : }
+<span class="lineNum">     789 </span>                :            : 
+<span class="lineNum">     790 </span>                :            : template&lt;typename _Tp, int m, int n&gt; template&lt;int l&gt; inline
+<span class="lineNum">     791 </span>                :            : Matx&lt;_Tp,m,n&gt;::Matx(const Matx&lt;_Tp, m, l&gt;&amp; a, const Matx&lt;_Tp, l, n&gt;&amp; b, Matx_MatMulOp)
+<span class="lineNum">     792 </span>                :            : {
+<span class="lineNum">     793 </span>                :            :     for( int i = 0; i &lt; m; i++ )
+<span class="lineNum">     794 </span>                :            :         for( int j = 0; j &lt; n; j++ )
+<span class="lineNum">     795 </span>                :            :         {
+<span class="lineNum">     796 </span>                :            :             _Tp s = 0;
+<span class="lineNum">     797 </span>                :            :             for( int k = 0; k &lt; l; k++ )
+<span class="lineNum">     798 </span>                :            :                 s += a(i, k) * b(k, j);
+<span class="lineNum">     799 </span>                :            :             val[i*n + j] = s;
+<span class="lineNum">     800 </span>                :            :         }
+<span class="lineNum">     801 </span>                :            : }
+<a name="802"><span class="lineNum">     802 </span>                :            : </a>
+<span class="lineNum">     803 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     804 </span>                :<span class="lineCov">          1 : Matx&lt;_Tp,m,n&gt;::Matx(const Matx&lt;_Tp, n, m&gt;&amp; a, Matx_TOp)</span>
+<span class="lineNum">     805 </span>                :            : {
+<span class="lineNum">     806 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          4 :     for( int i = 0; i &lt; m; i++ )</span>
+<span class="lineNum">     807 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchCov" title="Branch 1 was taken 3 times"> + </span>]:<span class="lineCov">          6 :         for( int j = 0; j &lt; n; j++ )</span>
+<span class="lineNum">     808 </span>                :<span class="lineCov">          3 :             val[i*n + j] = a(j, i);</span>
+<span class="lineNum">     809 </span>                :<span class="lineCov">          1 : }</span>
+<span class="lineNum">     810 </span>                :            : 
+<span class="lineNum">     811 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     812 </span>                :            : Matx&lt;_Tp, m, n&gt; Matx&lt;_Tp, m, n&gt;::mul(const Matx&lt;_Tp, m, n&gt;&amp; a) const
+<span class="lineNum">     813 </span>                :            : {
+<span class="lineNum">     814 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(*this, a, Matx_MulOp());
+<span class="lineNum">     815 </span>                :            : }
+<span class="lineNum">     816 </span>                :            : 
+<span class="lineNum">     817 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     818 </span>                :            : Matx&lt;_Tp, m, n&gt; Matx&lt;_Tp, m, n&gt;::div(const Matx&lt;_Tp, m, n&gt;&amp; a) const
+<span class="lineNum">     819 </span>                :            : {
+<span class="lineNum">     820 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(*this, a, Matx_DivOp());
+<span class="lineNum">     821 </span>                :            : }
+<a name="822"><span class="lineNum">     822 </span>                :            : </a>
+<span class="lineNum">     823 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     824 </span>                :<span class="lineCov">          1 : Matx&lt;_Tp, n, m&gt; Matx&lt;_Tp, m, n&gt;::t() const</span>
+<span class="lineNum">     825 </span>                :            : {
+<span class="lineNum">     826 </span>        [<span class="branchCov" title="Branch 1 was taken 1 time"> + </span><span class="branchNoCov" title="Branch 2 was not taken"> - </span>]:<span class="lineCov">          1 :     return Matx&lt;_Tp, n, m&gt;(*this, Matx_TOp());</span>
+<span class="lineNum">     827 </span>                :            : }
+<span class="lineNum">     828 </span>                :            : 
+<span class="lineNum">     829 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     830 </span>                :            : Vec&lt;_Tp, n&gt; Matx&lt;_Tp, m, n&gt;::solve(const Vec&lt;_Tp, m&gt;&amp; rhs, int method) const
+<span class="lineNum">     831 </span>                :            : {
+<span class="lineNum">     832 </span>                :            :     Matx&lt;_Tp, n, 1&gt; x = solve((const Matx&lt;_Tp, m, 1&gt;&amp;)(rhs), method);
+<span class="lineNum">     833 </span>                :            :     return (Vec&lt;_Tp, n&gt;&amp;)(x);
+<span class="lineNum">     834 </span>                :            : }
+<span class="lineNum">     835 </span>                :            : 
+<span class="lineNum">     836 </span>                :            : template&lt;typename _Tp, int m&gt; static inline
+<span class="lineNum">     837 </span>                :            : double determinant(const Matx&lt;_Tp, m, m&gt;&amp; a)
+<span class="lineNum">     838 </span>                :            : {
+<span class="lineNum">     839 </span>                :            :     return cv::internal::Matx_DetOp&lt;_Tp, m&gt;()(a);
+<span class="lineNum">     840 </span>                :            : }
+<span class="lineNum">     841 </span>                :            : 
+<span class="lineNum">     842 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">     843 </span>                :            : double trace(const Matx&lt;_Tp, m, n&gt;&amp; a)
+<span class="lineNum">     844 </span>                :            : {
+<span class="lineNum">     845 </span>                :            :     _Tp s = 0;
+<span class="lineNum">     846 </span>                :            :     for( int i = 0; i &lt; std::min(m, n); i++ )
+<span class="lineNum">     847 </span>                :            :         s += a(i,i);
+<span class="lineNum">     848 </span>                :            :     return s;
+<span class="lineNum">     849 </span>                :            : }
+<span class="lineNum">     850 </span>                :            : 
+<span class="lineNum">     851 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">     852 </span>                :            : double norm(const Matx&lt;_Tp, m, n&gt;&amp; M)
+<span class="lineNum">     853 </span>                :            : {
+<span class="lineNum">     854 </span>                :            :     return std::sqrt(normL2Sqr&lt;_Tp, double&gt;(M.val, m*n));
+<span class="lineNum">     855 </span>                :            : }
+<span class="lineNum">     856 </span>                :            : 
+<span class="lineNum">     857 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">     858 </span>                :            : double norm(const Matx&lt;_Tp, m, n&gt;&amp; M, int normType)
+<span class="lineNum">     859 </span>                :            : {
+<span class="lineNum">     860 </span>                :            :     switch(normType) {
+<span class="lineNum">     861 </span>                :            :     case NORM_INF:
+<span class="lineNum">     862 </span>                :            :         return (double)normInf&lt;_Tp, typename DataType&lt;_Tp&gt;::work_type&gt;(M.val, m*n);
+<span class="lineNum">     863 </span>                :            :     case NORM_L1:
+<span class="lineNum">     864 </span>                :            :         return (double)normL1&lt;_Tp, typename DataType&lt;_Tp&gt;::work_type&gt;(M.val, m*n);
+<span class="lineNum">     865 </span>                :            :     case NORM_L2SQR:
+<span class="lineNum">     866 </span>                :            :         return (double)normL2Sqr&lt;_Tp, typename DataType&lt;_Tp&gt;::work_type&gt;(M.val, m*n);
+<span class="lineNum">     867 </span>                :            :     default:
+<span class="lineNum">     868 </span>                :            :     case NORM_L2:
+<span class="lineNum">     869 </span>                :            :         return std::sqrt((double)normL2Sqr&lt;_Tp, typename DataType&lt;_Tp&gt;::work_type&gt;(M.val, m*n));
+<span class="lineNum">     870 </span>                :            :     }
+<span class="lineNum">     871 </span>                :            : }
+<span class="lineNum">     872 </span>                :            : 
+<span class="lineNum">     873 </span>                :            : 
+<span class="lineNum">     874 </span>                :            : 
+<span class="lineNum">     875 </span>                :            : //////////////////////////////// matx comma initializer //////////////////////////////////
+<span class="lineNum">     876 </span>                :            : 
+<span class="lineNum">     877 </span>                :            : template&lt;typename _Tp, typename _T2, int m, int n&gt; static inline
+<span class="lineNum">     878 </span>                :            : MatxCommaInitializer&lt;_Tp, m, n&gt; operator &lt;&lt; (const Matx&lt;_Tp, m, n&gt;&amp; mtx, _T2 val)
+<span class="lineNum">     879 </span>                :            : {
+<span class="lineNum">     880 </span>                :            :     MatxCommaInitializer&lt;_Tp, m, n&gt; commaInitializer((Matx&lt;_Tp, m, n&gt;*)&amp;mtx);
+<span class="lineNum">     881 </span>                :            :     return (commaInitializer, val);
+<span class="lineNum">     882 </span>                :            : }
+<span class="lineNum">     883 </span>                :            : 
+<span class="lineNum">     884 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     885 </span>                :            : MatxCommaInitializer&lt;_Tp, m, n&gt;::MatxCommaInitializer(Matx&lt;_Tp, m, n&gt;* _mtx)
+<span class="lineNum">     886 </span>                :            :     : dst(_mtx), idx(0)
+<span class="lineNum">     887 </span>                :            : {}
+<span class="lineNum">     888 </span>                :            : 
+<span class="lineNum">     889 </span>                :            : template&lt;typename _Tp, int m, int n&gt; template&lt;typename _T2&gt; inline
+<span class="lineNum">     890 </span>                :            : MatxCommaInitializer&lt;_Tp, m, n&gt;&amp; MatxCommaInitializer&lt;_Tp, m, n&gt;::operator , (_T2 value)
+<span class="lineNum">     891 </span>                :            : {
+<span class="lineNum">     892 </span>                :            :     CV_DbgAssert( idx &lt; m*n );
+<span class="lineNum">     893 </span>                :            :     dst-&gt;val[idx++] = saturate_cast&lt;_Tp&gt;(value);
+<span class="lineNum">     894 </span>                :            :     return *this;
+<span class="lineNum">     895 </span>                :            : }
+<span class="lineNum">     896 </span>                :            : 
+<span class="lineNum">     897 </span>                :            : template&lt;typename _Tp, int m, int n&gt; inline
+<span class="lineNum">     898 </span>                :            : Matx&lt;_Tp, m, n&gt; MatxCommaInitializer&lt;_Tp, m, n&gt;::operator *() const
+<span class="lineNum">     899 </span>                :            : {
+<span class="lineNum">     900 </span>                :            :     CV_DbgAssert( idx == n*m );
+<span class="lineNum">     901 </span>                :            :     return *dst;
+<span class="lineNum">     902 </span>                :            : }
+<span class="lineNum">     903 </span>                :            : 
+<span class="lineNum">     904 </span>                :            : 
+<span class="lineNum">     905 </span>                :            : 
+<span class="lineNum">     906 </span>                :            : /////////////////////////////////// Vec Implementation ///////////////////////////////////
+<a name="907"><span class="lineNum">     907 </span>                :            : </a>
+<span class="lineNum">     908 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     909 </span>                :<span class="lineCov">       5410 : Vec&lt;_Tp, cn&gt;::Vec() {}</span>
+<span class="lineNum">     910 </span>                :            : 
+<span class="lineNum">     911 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     912 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(_Tp v0)
+<span class="lineNum">     913 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(v0) {}
+<span class="lineNum">     914 </span>                :            : 
+<span class="lineNum">     915 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     916 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(_Tp v0, _Tp v1)
+<span class="lineNum">     917 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(v0, v1) {}
+<span class="lineNum">     918 </span>                :            : 
+<span class="lineNum">     919 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     920 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(_Tp v0, _Tp v1, _Tp v2)
+<span class="lineNum">     921 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(v0, v1, v2) {}
+<span class="lineNum">     922 </span>                :            : 
+<span class="lineNum">     923 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     924 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3)
+<span class="lineNum">     925 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(v0, v1, v2, v3) {}
+<span class="lineNum">     926 </span>                :            : 
+<span class="lineNum">     927 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     928 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4)
+<span class="lineNum">     929 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(v0, v1, v2, v3, v4) {}
+<span class="lineNum">     930 </span>                :            : 
+<span class="lineNum">     931 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     932 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5)
+<span class="lineNum">     933 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(v0, v1, v2, v3, v4, v5) {}
+<span class="lineNum">     934 </span>                :            : 
+<span class="lineNum">     935 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     936 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6)
+<span class="lineNum">     937 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(v0, v1, v2, v3, v4, v5, v6) {}
+<span class="lineNum">     938 </span>                :            : 
+<span class="lineNum">     939 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     940 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7)
+<span class="lineNum">     941 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(v0, v1, v2, v3, v4, v5, v6, v7) {}
+<span class="lineNum">     942 </span>                :            : 
+<span class="lineNum">     943 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     944 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8)
+<span class="lineNum">     945 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(v0, v1, v2, v3, v4, v5, v6, v7, v8) {}
+<span class="lineNum">     946 </span>                :            : 
+<span class="lineNum">     947 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     948 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8, _Tp v9)
+<span class="lineNum">     949 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9) {}
+<span class="lineNum">     950 </span>                :            : 
+<span class="lineNum">     951 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     952 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(_Tp v0, _Tp v1, _Tp v2, _Tp v3, _Tp v4, _Tp v5, _Tp v6, _Tp v7, _Tp v8, _Tp v9, _Tp v10, _Tp v11, _Tp v12, _Tp v13)
+<span class="lineNum">     953 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13) {}
+<span class="lineNum">     954 </span>                :            : 
+<span class="lineNum">     955 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     956 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(const _Tp* values)
+<span class="lineNum">     957 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(values) {}
+<span class="lineNum">     958 </span>                :            : 
+<span class="lineNum">     959 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     960 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(const Vec&lt;_Tp, cn&gt;&amp; m)
+<span class="lineNum">     961 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(m.val) {}
+<span class="lineNum">     962 </span>                :            : 
+<span class="lineNum">     963 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     964 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(const Matx&lt;_Tp, cn, 1&gt;&amp; a, const Matx&lt;_Tp, cn, 1&gt;&amp; b, Matx_AddOp op)
+<span class="lineNum">     965 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(a, b, op) {}
+<span class="lineNum">     966 </span>                :            : 
+<span class="lineNum">     967 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     968 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(const Matx&lt;_Tp, cn, 1&gt;&amp; a, const Matx&lt;_Tp, cn, 1&gt;&amp; b, Matx_SubOp op)
+<span class="lineNum">     969 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(a, b, op) {}
+<span class="lineNum">     970 </span>                :            : 
+<span class="lineNum">     971 </span>                :            : template&lt;typename _Tp, int cn&gt; template&lt;typename _T2&gt; inline
+<span class="lineNum">     972 </span>                :            : Vec&lt;_Tp, cn&gt;::Vec(const Matx&lt;_Tp, cn, 1&gt;&amp; a, _T2 alpha, Matx_ScaleOp op)
+<span class="lineNum">     973 </span>                :            :     : Matx&lt;_Tp, cn, 1&gt;(a, alpha, op) {}
+<span class="lineNum">     974 </span>                :            : 
+<span class="lineNum">     975 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     976 </span>                :            : Vec&lt;_Tp, cn&gt; Vec&lt;_Tp, cn&gt;::all(_Tp alpha)
+<span class="lineNum">     977 </span>                :            : {
+<span class="lineNum">     978 </span>                :            :     Vec v;
+<span class="lineNum">     979 </span>                :            :     for( int i = 0; i &lt; cn; i++ ) v.val[i] = alpha;
+<span class="lineNum">     980 </span>                :            :     return v;
+<span class="lineNum">     981 </span>                :            : }
+<span class="lineNum">     982 </span>                :            : 
+<span class="lineNum">     983 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">     984 </span>                :            : Vec&lt;_Tp, cn&gt; Vec&lt;_Tp, cn&gt;::mul(const Vec&lt;_Tp, cn&gt;&amp; v) const
+<span class="lineNum">     985 </span>                :            : {
+<span class="lineNum">     986 </span>                :            :     Vec&lt;_Tp, cn&gt; w;
+<span class="lineNum">     987 </span>                :            :     for( int i = 0; i &lt; cn; i++ ) w.val[i] = saturate_cast&lt;_Tp&gt;(this-&gt;val[i]*v.val[i]);
+<span class="lineNum">     988 </span>                :            :     return w;
+<span class="lineNum">     989 </span>                :            : }
+<span class="lineNum">     990 </span>                :            : 
+<span class="lineNum">     991 </span>                :            : template&lt;&gt; inline
+<span class="lineNum">     992 </span>                :            : Vec&lt;float, 2&gt; Vec&lt;float, 2&gt;::conj() const
+<span class="lineNum">     993 </span>                :            : {
+<span class="lineNum">     994 </span>                :            :     return cv::internal::conjugate(*this);
+<span class="lineNum">     995 </span>                :            : }
+<span class="lineNum">     996 </span>                :            : 
+<span class="lineNum">     997 </span>                :            : template&lt;&gt; inline
+<span class="lineNum">     998 </span>                :            : Vec&lt;double, 2&gt; Vec&lt;double, 2&gt;::conj() const
+<span class="lineNum">     999 </span>                :            : {
+<span class="lineNum">    1000 </span>                :            :     return cv::internal::conjugate(*this);
+<span class="lineNum">    1001 </span>                :            : }
+<span class="lineNum">    1002 </span>                :            : 
+<span class="lineNum">    1003 </span>                :            : template&lt;&gt; inline
+<span class="lineNum">    1004 </span>                :            : Vec&lt;float, 4&gt; Vec&lt;float, 4&gt;::conj() const
+<span class="lineNum">    1005 </span>                :            : {
+<span class="lineNum">    1006 </span>                :            :     return cv::internal::conjugate(*this);
+<span class="lineNum">    1007 </span>                :            : }
+<span class="lineNum">    1008 </span>                :            : 
+<span class="lineNum">    1009 </span>                :            : template&lt;&gt; inline
+<span class="lineNum">    1010 </span>                :            : Vec&lt;double, 4&gt; Vec&lt;double, 4&gt;::conj() const
+<span class="lineNum">    1011 </span>                :            : {
+<span class="lineNum">    1012 </span>                :            :     return cv::internal::conjugate(*this);
+<span class="lineNum">    1013 </span>                :            : }
+<span class="lineNum">    1014 </span>                :            : 
+<span class="lineNum">    1015 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">    1016 </span>                :            : Vec&lt;_Tp, cn&gt; Vec&lt;_Tp, cn&gt;::cross(const Vec&lt;_Tp, cn&gt;&amp;) const
+<span class="lineNum">    1017 </span>                :            : {
+<span class="lineNum">    1018 </span>                :            :     CV_StaticAssert(cn == 3, &quot;for arbitrary-size vector there is no cross-product defined&quot;);
+<span class="lineNum">    1019 </span>                :            :     return Vec&lt;_Tp, cn&gt;();
+<span class="lineNum">    1020 </span>                :            : }
+<span class="lineNum">    1021 </span>                :            : 
+<span class="lineNum">    1022 </span>                :            : template&lt;&gt; inline
+<span class="lineNum">    1023 </span>                :            : Vec&lt;float, 3&gt; Vec&lt;float, 3&gt;::cross(const Vec&lt;float, 3&gt;&amp; v) const
+<span class="lineNum">    1024 </span>                :            : {
+<span class="lineNum">    1025 </span>                :            :     return Vec&lt;float,3&gt;(val[1]*v.val[2] - val[2]*v.val[1],
+<span class="lineNum">    1026 </span>                :            :                      val[2]*v.val[0] - val[0]*v.val[2],
+<span class="lineNum">    1027 </span>                :            :                      val[0]*v.val[1] - val[1]*v.val[0]);
+<span class="lineNum">    1028 </span>                :            : }
+<span class="lineNum">    1029 </span>                :            : 
+<span class="lineNum">    1030 </span>                :            : template&lt;&gt; inline
+<span class="lineNum">    1031 </span>                :            : Vec&lt;double, 3&gt; Vec&lt;double, 3&gt;::cross(const Vec&lt;double, 3&gt;&amp; v) const
+<span class="lineNum">    1032 </span>                :            : {
+<span class="lineNum">    1033 </span>                :            :     return Vec&lt;double,3&gt;(val[1]*v.val[2] - val[2]*v.val[1],
+<span class="lineNum">    1034 </span>                :            :                      val[2]*v.val[0] - val[0]*v.val[2],
+<span class="lineNum">    1035 </span>                :            :                      val[0]*v.val[1] - val[1]*v.val[0]);
+<span class="lineNum">    1036 </span>                :            : }
+<span class="lineNum">    1037 </span>                :            : 
+<span class="lineNum">    1038 </span>                :            : template&lt;typename _Tp, int cn&gt; template&lt;typename T2&gt; inline
+<span class="lineNum">    1039 </span>                :            : Vec&lt;_Tp, cn&gt;::operator Vec&lt;T2, cn&gt;() const
+<span class="lineNum">    1040 </span>                :            : {
+<span class="lineNum">    1041 </span>                :            :     Vec&lt;T2, cn&gt; v;
+<span class="lineNum">    1042 </span>                :            :     for( int i = 0; i &lt; cn; i++ ) v.val[i] = saturate_cast&lt;T2&gt;(this-&gt;val[i]);
+<span class="lineNum">    1043 </span>                :            :     return v;
+<span class="lineNum">    1044 </span>                :            : }
+<span class="lineNum">    1045 </span>                :            : 
+<span class="lineNum">    1046 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">    1047 </span>                :            : const _Tp&amp; Vec&lt;_Tp, cn&gt;::operator [](int i) const
+<span class="lineNum">    1048 </span>                :            : {
+<span class="lineNum">    1049 </span>                :            :     CV_DbgAssert( (unsigned)i &lt; (unsigned)cn );
+<span class="lineNum">    1050 </span>                :            :     return this-&gt;val[i];
+<span class="lineNum">    1051 </span>                :            : }
+<span class="lineNum">    1052 </span>                :            : 
+<span class="lineNum">    1053 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">    1054 </span>                :            : _Tp&amp; Vec&lt;_Tp, cn&gt;::operator [](int i)
+<span class="lineNum">    1055 </span>                :            : {
+<span class="lineNum">    1056 </span>                :            :     CV_DbgAssert( (unsigned)i &lt; (unsigned)cn );
+<span class="lineNum">    1057 </span>                :            :     return this-&gt;val[i];
+<span class="lineNum">    1058 </span>                :            : }
+<span class="lineNum">    1059 </span>                :            : 
+<span class="lineNum">    1060 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">    1061 </span>                :            : const _Tp&amp; Vec&lt;_Tp, cn&gt;::operator ()(int i) const
+<span class="lineNum">    1062 </span>                :            : {
+<span class="lineNum">    1063 </span>                :            :     CV_DbgAssert( (unsigned)i &lt; (unsigned)cn );
+<span class="lineNum">    1064 </span>                :            :     return this-&gt;val[i];
+<span class="lineNum">    1065 </span>                :            : }
+<span class="lineNum">    1066 </span>                :            : 
+<span class="lineNum">    1067 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">    1068 </span>                :            : _Tp&amp; Vec&lt;_Tp, cn&gt;::operator ()(int i)
+<span class="lineNum">    1069 </span>                :            : {
+<span class="lineNum">    1070 </span>                :            :     CV_DbgAssert( (unsigned)i &lt; (unsigned)cn );
+<span class="lineNum">    1071 </span>                :            :     return this-&gt;val[i];
+<span class="lineNum">    1072 </span>                :            : }
+<span class="lineNum">    1073 </span>                :            : 
+<span class="lineNum">    1074 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">    1075 </span>                :            : Vec&lt;_Tp, cn&gt; normalize(const Vec&lt;_Tp, cn&gt;&amp; v)
+<span class="lineNum">    1076 </span>                :            : {
+<span class="lineNum">    1077 </span>                :            :     double nv = norm(v);
+<span class="lineNum">    1078 </span>                :            :     return v * (nv ? 1./nv : 0.);
+<span class="lineNum">    1079 </span>                :            : }
+<span class="lineNum">    1080 </span>                :            : 
+<span class="lineNum">    1081 </span>                :            : 
+<span class="lineNum">    1082 </span>                :            : 
+<span class="lineNum">    1083 </span>                :            : //////////////////////////////// matx comma initializer //////////////////////////////////
+<span class="lineNum">    1084 </span>                :            : 
+<span class="lineNum">    1085 </span>                :            : 
+<span class="lineNum">    1086 </span>                :            : template&lt;typename _Tp, typename _T2, int cn&gt; static inline
+<span class="lineNum">    1087 </span>                :            : VecCommaInitializer&lt;_Tp, cn&gt; operator &lt;&lt; (const Vec&lt;_Tp, cn&gt;&amp; vec, _T2 val)
+<span class="lineNum">    1088 </span>                :            : {
+<span class="lineNum">    1089 </span>                :            :     VecCommaInitializer&lt;_Tp, cn&gt; commaInitializer((Vec&lt;_Tp, cn&gt;*)&amp;vec);
+<span class="lineNum">    1090 </span>                :            :     return (commaInitializer, val);
+<span class="lineNum">    1091 </span>                :            : }
+<span class="lineNum">    1092 </span>                :            : 
+<span class="lineNum">    1093 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">    1094 </span>                :            : VecCommaInitializer&lt;_Tp, cn&gt;::VecCommaInitializer(Vec&lt;_Tp, cn&gt;* _vec)
+<span class="lineNum">    1095 </span>                :            :     : MatxCommaInitializer&lt;_Tp, cn, 1&gt;(_vec)
+<span class="lineNum">    1096 </span>                :            : {}
+<span class="lineNum">    1097 </span>                :            : 
+<span class="lineNum">    1098 </span>                :            : template&lt;typename _Tp, int cn&gt; template&lt;typename _T2&gt; inline
+<span class="lineNum">    1099 </span>                :            : VecCommaInitializer&lt;_Tp, cn&gt;&amp; VecCommaInitializer&lt;_Tp, cn&gt;::operator , (_T2 value)
+<span class="lineNum">    1100 </span>                :            : {
+<span class="lineNum">    1101 </span>                :            :     CV_DbgAssert( this-&gt;idx &lt; cn );
+<span class="lineNum">    1102 </span>                :            :     this-&gt;dst-&gt;val[this-&gt;idx++] = saturate_cast&lt;_Tp&gt;(value);
+<span class="lineNum">    1103 </span>                :            :     return *this;
+<span class="lineNum">    1104 </span>                :            : }
+<span class="lineNum">    1105 </span>                :            : 
+<span class="lineNum">    1106 </span>                :            : template&lt;typename _Tp, int cn&gt; inline
+<span class="lineNum">    1107 </span>                :            : Vec&lt;_Tp, cn&gt; VecCommaInitializer&lt;_Tp, cn&gt;::operator *() const
+<span class="lineNum">    1108 </span>                :            : {
+<span class="lineNum">    1109 </span>                :            :     CV_DbgAssert( this-&gt;idx == cn );
+<span class="lineNum">    1110 </span>                :            :     return *this-&gt;dst;
+<span class="lineNum">    1111 </span>                :            : }
+<span class="lineNum">    1112 </span>                :            : 
+<span class="lineNum">    1113 </span>                :            : //! @endcond
+<span class="lineNum">    1114 </span>                :            : 
+<span class="lineNum">    1115 </span>                :            : ///////////////////////////// Matx out-of-class operators ////////////////////////////////
+<span class="lineNum">    1116 </span>                :            : 
+<span class="lineNum">    1117 </span>                :            : //! @relates cv::Matx
+<span class="lineNum">    1118 </span>                :            : //! @{
+<span class="lineNum">    1119 </span>                :            : 
+<span class="lineNum">    1120 </span>                :            : template&lt;typename _Tp1, typename _Tp2, int m, int n&gt; static inline
+<span class="lineNum">    1121 </span>                :            : Matx&lt;_Tp1, m, n&gt;&amp; operator += (Matx&lt;_Tp1, m, n&gt;&amp; a, const Matx&lt;_Tp2, m, n&gt;&amp; b)
+<span class="lineNum">    1122 </span>                :            : {
+<span class="lineNum">    1123 </span>                :            :     for( int i = 0; i &lt; m*n; i++ )
+<span class="lineNum">    1124 </span>                :            :         a.val[i] = saturate_cast&lt;_Tp1&gt;(a.val[i] + b.val[i]);
+<span class="lineNum">    1125 </span>                :            :     return a;
+<span class="lineNum">    1126 </span>                :            : }
+<span class="lineNum">    1127 </span>                :            : 
+<span class="lineNum">    1128 </span>                :            : template&lt;typename _Tp1, typename _Tp2, int m, int n&gt; static inline
+<span class="lineNum">    1129 </span>                :            : Matx&lt;_Tp1, m, n&gt;&amp; operator -= (Matx&lt;_Tp1, m, n&gt;&amp; a, const Matx&lt;_Tp2, m, n&gt;&amp; b)
+<span class="lineNum">    1130 </span>                :            : {
+<span class="lineNum">    1131 </span>                :            :     for( int i = 0; i &lt; m*n; i++ )
+<span class="lineNum">    1132 </span>                :            :         a.val[i] = saturate_cast&lt;_Tp1&gt;(a.val[i] - b.val[i]);
+<span class="lineNum">    1133 </span>                :            :     return a;
+<span class="lineNum">    1134 </span>                :            : }
+<span class="lineNum">    1135 </span>                :            : 
+<span class="lineNum">    1136 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1137 </span>                :            : Matx&lt;_Tp, m, n&gt; operator + (const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b)
+<span class="lineNum">    1138 </span>                :            : {
+<span class="lineNum">    1139 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(a, b, Matx_AddOp());
+<span class="lineNum">    1140 </span>                :            : }
+<span class="lineNum">    1141 </span>                :            : 
+<span class="lineNum">    1142 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1143 </span>                :            : Matx&lt;_Tp, m, n&gt; operator - (const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b)
+<span class="lineNum">    1144 </span>                :            : {
+<span class="lineNum">    1145 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(a, b, Matx_SubOp());
+<span class="lineNum">    1146 </span>                :            : }
+<span class="lineNum">    1147 </span>                :            : 
+<span class="lineNum">    1148 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1149 </span>                :            : Matx&lt;_Tp, m, n&gt;&amp; operator *= (Matx&lt;_Tp, m, n&gt;&amp; a, int alpha)
+<span class="lineNum">    1150 </span>                :            : {
+<span class="lineNum">    1151 </span>                :            :     for( int i = 0; i &lt; m*n; i++ )
+<span class="lineNum">    1152 </span>                :            :         a.val[i] = saturate_cast&lt;_Tp&gt;(a.val[i] * alpha);
+<span class="lineNum">    1153 </span>                :            :     return a;
+<span class="lineNum">    1154 </span>                :            : }
+<span class="lineNum">    1155 </span>                :            : 
+<span class="lineNum">    1156 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1157 </span>                :            : Matx&lt;_Tp, m, n&gt;&amp; operator *= (Matx&lt;_Tp, m, n&gt;&amp; a, float alpha)
+<span class="lineNum">    1158 </span>                :            : {
+<span class="lineNum">    1159 </span>                :            :     for( int i = 0; i &lt; m*n; i++ )
+<span class="lineNum">    1160 </span>                :            :         a.val[i] = saturate_cast&lt;_Tp&gt;(a.val[i] * alpha);
+<span class="lineNum">    1161 </span>                :            :     return a;
+<span class="lineNum">    1162 </span>                :            : }
+<span class="lineNum">    1163 </span>                :            : 
+<span class="lineNum">    1164 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1165 </span>                :            : Matx&lt;_Tp, m, n&gt;&amp; operator *= (Matx&lt;_Tp, m, n&gt;&amp; a, double alpha)
+<span class="lineNum">    1166 </span>                :            : {
+<span class="lineNum">    1167 </span>                :            :     for( int i = 0; i &lt; m*n; i++ )
+<span class="lineNum">    1168 </span>                :            :         a.val[i] = saturate_cast&lt;_Tp&gt;(a.val[i] * alpha);
+<span class="lineNum">    1169 </span>                :            :     return a;
+<span class="lineNum">    1170 </span>                :            : }
+<span class="lineNum">    1171 </span>                :            : 
+<span class="lineNum">    1172 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1173 </span>                :            : Matx&lt;_Tp, m, n&gt; operator * (const Matx&lt;_Tp, m, n&gt;&amp; a, int alpha)
+<span class="lineNum">    1174 </span>                :            : {
+<span class="lineNum">    1175 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1176 </span>                :            : }
+<span class="lineNum">    1177 </span>                :            : 
+<span class="lineNum">    1178 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1179 </span>                :            : Matx&lt;_Tp, m, n&gt; operator * (const Matx&lt;_Tp, m, n&gt;&amp; a, float alpha)
+<span class="lineNum">    1180 </span>                :            : {
+<span class="lineNum">    1181 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1182 </span>                :            : }
+<span class="lineNum">    1183 </span>                :            : 
+<span class="lineNum">    1184 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1185 </span>                :            : Matx&lt;_Tp, m, n&gt; operator * (const Matx&lt;_Tp, m, n&gt;&amp; a, double alpha)
+<span class="lineNum">    1186 </span>                :            : {
+<span class="lineNum">    1187 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1188 </span>                :            : }
+<span class="lineNum">    1189 </span>                :            : 
+<span class="lineNum">    1190 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1191 </span>                :            : Matx&lt;_Tp, m, n&gt; operator * (int alpha, const Matx&lt;_Tp, m, n&gt;&amp; a)
+<span class="lineNum">    1192 </span>                :            : {
+<span class="lineNum">    1193 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1194 </span>                :            : }
+<span class="lineNum">    1195 </span>                :            : 
+<span class="lineNum">    1196 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1197 </span>                :            : Matx&lt;_Tp, m, n&gt; operator * (float alpha, const Matx&lt;_Tp, m, n&gt;&amp; a)
+<span class="lineNum">    1198 </span>                :            : {
+<span class="lineNum">    1199 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1200 </span>                :            : }
+<span class="lineNum">    1201 </span>                :            : 
+<span class="lineNum">    1202 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1203 </span>                :            : Matx&lt;_Tp, m, n&gt; operator * (double alpha, const Matx&lt;_Tp, m, n&gt;&amp; a)
+<span class="lineNum">    1204 </span>                :            : {
+<span class="lineNum">    1205 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1206 </span>                :            : }
+<span class="lineNum">    1207 </span>                :            : 
+<span class="lineNum">    1208 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1209 </span>                :            : Matx&lt;_Tp, m, n&gt; operator - (const Matx&lt;_Tp, m, n&gt;&amp; a)
+<span class="lineNum">    1210 </span>                :            : {
+<span class="lineNum">    1211 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(a, -1, Matx_ScaleOp());
+<span class="lineNum">    1212 </span>                :            : }
+<span class="lineNum">    1213 </span>                :            : 
+<span class="lineNum">    1214 </span>                :            : template&lt;typename _Tp, int m, int n, int l&gt; static inline
+<span class="lineNum">    1215 </span>                :            : Matx&lt;_Tp, m, n&gt; operator * (const Matx&lt;_Tp, m, l&gt;&amp; a, const Matx&lt;_Tp, l, n&gt;&amp; b)
+<span class="lineNum">    1216 </span>                :            : {
+<span class="lineNum">    1217 </span>                :            :     return Matx&lt;_Tp, m, n&gt;(a, b, Matx_MatMulOp());
+<span class="lineNum">    1218 </span>                :            : }
+<span class="lineNum">    1219 </span>                :            : 
+<span class="lineNum">    1220 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1221 </span>                :            : Vec&lt;_Tp, m&gt; operator * (const Matx&lt;_Tp, m, n&gt;&amp; a, const Vec&lt;_Tp, n&gt;&amp; b)
+<span class="lineNum">    1222 </span>                :            : {
+<span class="lineNum">    1223 </span>                :            :     Matx&lt;_Tp, m, 1&gt; c(a, b, Matx_MatMulOp());
+<span class="lineNum">    1224 </span>                :            :     return (const Vec&lt;_Tp, m&gt;&amp;)(c);
+<span class="lineNum">    1225 </span>                :            : }
+<span class="lineNum">    1226 </span>                :            : 
+<span class="lineNum">    1227 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1228 </span>                :            : bool operator == (const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b)
+<span class="lineNum">    1229 </span>                :            : {
+<span class="lineNum">    1230 </span>                :            :     for( int i = 0; i &lt; m*n; i++ )
+<span class="lineNum">    1231 </span>                :            :         if( a.val[i] != b.val[i] ) return false;
+<span class="lineNum">    1232 </span>                :            :     return true;
+<span class="lineNum">    1233 </span>                :            : }
+<span class="lineNum">    1234 </span>                :            : 
+<span class="lineNum">    1235 </span>                :            : template&lt;typename _Tp, int m, int n&gt; static inline
+<span class="lineNum">    1236 </span>                :            : bool operator != (const Matx&lt;_Tp, m, n&gt;&amp; a, const Matx&lt;_Tp, m, n&gt;&amp; b)
+<span class="lineNum">    1237 </span>                :            : {
+<span class="lineNum">    1238 </span>                :            :     return !(a == b);
+<span class="lineNum">    1239 </span>                :            : }
+<span class="lineNum">    1240 </span>                :            : 
+<span class="lineNum">    1241 </span>                :            : //! @}
+<span class="lineNum">    1242 </span>                :            : 
+<span class="lineNum">    1243 </span>                :            : ////////////////////////////// Vec out-of-class operators ////////////////////////////////
+<span class="lineNum">    1244 </span>                :            : 
+<span class="lineNum">    1245 </span>                :            : //! @relates cv::Vec
+<span class="lineNum">    1246 </span>                :            : //! @{
+<span class="lineNum">    1247 </span>                :            : 
+<span class="lineNum">    1248 </span>                :            : template&lt;typename _Tp1, typename _Tp2, int cn&gt; static inline
+<span class="lineNum">    1249 </span>                :            : Vec&lt;_Tp1, cn&gt;&amp; operator += (Vec&lt;_Tp1, cn&gt;&amp; a, const Vec&lt;_Tp2, cn&gt;&amp; b)
+<span class="lineNum">    1250 </span>                :            : {
+<span class="lineNum">    1251 </span>                :            :     for( int i = 0; i &lt; cn; i++ )
+<span class="lineNum">    1252 </span>                :            :         a.val[i] = saturate_cast&lt;_Tp1&gt;(a.val[i] + b.val[i]);
+<span class="lineNum">    1253 </span>                :            :     return a;
+<span class="lineNum">    1254 </span>                :            : }
+<span class="lineNum">    1255 </span>                :            : 
+<span class="lineNum">    1256 </span>                :            : template&lt;typename _Tp1, typename _Tp2, int cn&gt; static inline
+<span class="lineNum">    1257 </span>                :            : Vec&lt;_Tp1, cn&gt;&amp; operator -= (Vec&lt;_Tp1, cn&gt;&amp; a, const Vec&lt;_Tp2, cn&gt;&amp; b)
+<span class="lineNum">    1258 </span>                :            : {
+<span class="lineNum">    1259 </span>                :            :     for( int i = 0; i &lt; cn; i++ )
+<span class="lineNum">    1260 </span>                :            :         a.val[i] = saturate_cast&lt;_Tp1&gt;(a.val[i] - b.val[i]);
+<span class="lineNum">    1261 </span>                :            :     return a;
+<span class="lineNum">    1262 </span>                :            : }
+<span class="lineNum">    1263 </span>                :            : 
+<span class="lineNum">    1264 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1265 </span>                :            : Vec&lt;_Tp, cn&gt; operator + (const Vec&lt;_Tp, cn&gt;&amp; a, const Vec&lt;_Tp, cn&gt;&amp; b)
+<span class="lineNum">    1266 </span>                :            : {
+<span class="lineNum">    1267 </span>                :            :     return Vec&lt;_Tp, cn&gt;(a, b, Matx_AddOp());
+<span class="lineNum">    1268 </span>                :            : }
+<span class="lineNum">    1269 </span>                :            : 
+<span class="lineNum">    1270 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1271 </span>                :            : Vec&lt;_Tp, cn&gt; operator - (const Vec&lt;_Tp, cn&gt;&amp; a, const Vec&lt;_Tp, cn&gt;&amp; b)
+<span class="lineNum">    1272 </span>                :            : {
+<span class="lineNum">    1273 </span>                :            :     return Vec&lt;_Tp, cn&gt;(a, b, Matx_SubOp());
+<span class="lineNum">    1274 </span>                :            : }
+<span class="lineNum">    1275 </span>                :            : 
+<span class="lineNum">    1276 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1277 </span>                :            : Vec&lt;_Tp, cn&gt;&amp; operator *= (Vec&lt;_Tp, cn&gt;&amp; a, int alpha)
+<span class="lineNum">    1278 </span>                :            : {
+<span class="lineNum">    1279 </span>                :            :     for( int i = 0; i &lt; cn; i++ )
+<span class="lineNum">    1280 </span>                :            :         a[i] = saturate_cast&lt;_Tp&gt;(a[i]*alpha);
+<span class="lineNum">    1281 </span>                :            :     return a;
+<span class="lineNum">    1282 </span>                :            : }
+<span class="lineNum">    1283 </span>                :            : 
+<span class="lineNum">    1284 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1285 </span>                :            : Vec&lt;_Tp, cn&gt;&amp; operator *= (Vec&lt;_Tp, cn&gt;&amp; a, float alpha)
+<span class="lineNum">    1286 </span>                :            : {
+<span class="lineNum">    1287 </span>                :            :     for( int i = 0; i &lt; cn; i++ )
+<span class="lineNum">    1288 </span>                :            :         a[i] = saturate_cast&lt;_Tp&gt;(a[i]*alpha);
+<span class="lineNum">    1289 </span>                :            :     return a;
+<span class="lineNum">    1290 </span>                :            : }
+<span class="lineNum">    1291 </span>                :            : 
+<span class="lineNum">    1292 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1293 </span>                :            : Vec&lt;_Tp, cn&gt;&amp; operator *= (Vec&lt;_Tp, cn&gt;&amp; a, double alpha)
+<span class="lineNum">    1294 </span>                :            : {
+<span class="lineNum">    1295 </span>                :            :     for( int i = 0; i &lt; cn; i++ )
+<span class="lineNum">    1296 </span>                :            :         a[i] = saturate_cast&lt;_Tp&gt;(a[i]*alpha);
+<span class="lineNum">    1297 </span>                :            :     return a;
+<span class="lineNum">    1298 </span>                :            : }
+<span class="lineNum">    1299 </span>                :            : 
+<span class="lineNum">    1300 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1301 </span>                :            : Vec&lt;_Tp, cn&gt;&amp; operator /= (Vec&lt;_Tp, cn&gt;&amp; a, int alpha)
+<span class="lineNum">    1302 </span>                :            : {
+<span class="lineNum">    1303 </span>                :            :     double ialpha = 1./alpha;
+<span class="lineNum">    1304 </span>                :            :     for( int i = 0; i &lt; cn; i++ )
+<span class="lineNum">    1305 </span>                :            :         a[i] = saturate_cast&lt;_Tp&gt;(a[i]*ialpha);
+<span class="lineNum">    1306 </span>                :            :     return a;
+<span class="lineNum">    1307 </span>                :            : }
+<span class="lineNum">    1308 </span>                :            : 
+<span class="lineNum">    1309 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1310 </span>                :            : Vec&lt;_Tp, cn&gt;&amp; operator /= (Vec&lt;_Tp, cn&gt;&amp; a, float alpha)
+<span class="lineNum">    1311 </span>                :            : {
+<span class="lineNum">    1312 </span>                :            :     float ialpha = 1.f/alpha;
+<span class="lineNum">    1313 </span>                :            :     for( int i = 0; i &lt; cn; i++ )
+<span class="lineNum">    1314 </span>                :            :         a[i] = saturate_cast&lt;_Tp&gt;(a[i]*ialpha);
+<span class="lineNum">    1315 </span>                :            :     return a;
+<span class="lineNum">    1316 </span>                :            : }
+<span class="lineNum">    1317 </span>                :            : 
+<span class="lineNum">    1318 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1319 </span>                :            : Vec&lt;_Tp, cn&gt;&amp; operator /= (Vec&lt;_Tp, cn&gt;&amp; a, double alpha)
+<span class="lineNum">    1320 </span>                :            : {
+<span class="lineNum">    1321 </span>                :            :     double ialpha = 1./alpha;
+<span class="lineNum">    1322 </span>                :            :     for( int i = 0; i &lt; cn; i++ )
+<span class="lineNum">    1323 </span>                :            :         a[i] = saturate_cast&lt;_Tp&gt;(a[i]*ialpha);
+<span class="lineNum">    1324 </span>                :            :     return a;
+<span class="lineNum">    1325 </span>                :            : }
+<span class="lineNum">    1326 </span>                :            : 
+<span class="lineNum">    1327 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1328 </span>                :            : Vec&lt;_Tp, cn&gt; operator * (const Vec&lt;_Tp, cn&gt;&amp; a, int alpha)
+<span class="lineNum">    1329 </span>                :            : {
+<span class="lineNum">    1330 </span>                :            :     return Vec&lt;_Tp, cn&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1331 </span>                :            : }
+<span class="lineNum">    1332 </span>                :            : 
+<span class="lineNum">    1333 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1334 </span>                :            : Vec&lt;_Tp, cn&gt; operator * (int alpha, const Vec&lt;_Tp, cn&gt;&amp; a)
+<span class="lineNum">    1335 </span>                :            : {
+<span class="lineNum">    1336 </span>                :            :     return Vec&lt;_Tp, cn&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1337 </span>                :            : }
+<span class="lineNum">    1338 </span>                :            : 
+<span class="lineNum">    1339 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1340 </span>                :            : Vec&lt;_Tp, cn&gt; operator * (const Vec&lt;_Tp, cn&gt;&amp; a, float alpha)
+<span class="lineNum">    1341 </span>                :            : {
+<span class="lineNum">    1342 </span>                :            :     return Vec&lt;_Tp, cn&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1343 </span>                :            : }
+<span class="lineNum">    1344 </span>                :            : 
+<span class="lineNum">    1345 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1346 </span>                :            : Vec&lt;_Tp, cn&gt; operator * (float alpha, const Vec&lt;_Tp, cn&gt;&amp; a)
+<span class="lineNum">    1347 </span>                :            : {
+<span class="lineNum">    1348 </span>                :            :     return Vec&lt;_Tp, cn&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1349 </span>                :            : }
+<span class="lineNum">    1350 </span>                :            : 
+<span class="lineNum">    1351 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1352 </span>                :            : Vec&lt;_Tp, cn&gt; operator * (const Vec&lt;_Tp, cn&gt;&amp; a, double alpha)
+<span class="lineNum">    1353 </span>                :            : {
+<span class="lineNum">    1354 </span>                :            :     return Vec&lt;_Tp, cn&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1355 </span>                :            : }
+<span class="lineNum">    1356 </span>                :            : 
+<span class="lineNum">    1357 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1358 </span>                :            : Vec&lt;_Tp, cn&gt; operator * (double alpha, const Vec&lt;_Tp, cn&gt;&amp; a)
+<span class="lineNum">    1359 </span>                :            : {
+<span class="lineNum">    1360 </span>                :            :     return Vec&lt;_Tp, cn&gt;(a, alpha, Matx_ScaleOp());
+<span class="lineNum">    1361 </span>                :            : }
+<span class="lineNum">    1362 </span>                :            : 
+<span class="lineNum">    1363 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1364 </span>                :            : Vec&lt;_Tp, cn&gt; operator / (const Vec&lt;_Tp, cn&gt;&amp; a, int alpha)
+<span class="lineNum">    1365 </span>                :            : {
+<span class="lineNum">    1366 </span>                :            :     return Vec&lt;_Tp, cn&gt;(a, 1./alpha, Matx_ScaleOp());
+<span class="lineNum">    1367 </span>                :            : }
+<span class="lineNum">    1368 </span>                :            : 
+<span class="lineNum">    1369 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1370 </span>                :            : Vec&lt;_Tp, cn&gt; operator / (const Vec&lt;_Tp, cn&gt;&amp; a, float alpha)
+<span class="lineNum">    1371 </span>                :            : {
+<span class="lineNum">    1372 </span>                :            :     return Vec&lt;_Tp, cn&gt;(a, 1.f/alpha, Matx_ScaleOp());
+<span class="lineNum">    1373 </span>                :            : }
+<span class="lineNum">    1374 </span>                :            : 
+<span class="lineNum">    1375 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1376 </span>                :            : Vec&lt;_Tp, cn&gt; operator / (const Vec&lt;_Tp, cn&gt;&amp; a, double alpha)
+<span class="lineNum">    1377 </span>                :            : {
+<span class="lineNum">    1378 </span>                :            :     return Vec&lt;_Tp, cn&gt;(a, 1./alpha, Matx_ScaleOp());
+<span class="lineNum">    1379 </span>                :            : }
+<span class="lineNum">    1380 </span>                :            : 
+<span class="lineNum">    1381 </span>                :            : template&lt;typename _Tp, int cn&gt; static inline
+<span class="lineNum">    1382 </span>                :            : Vec&lt;_Tp, cn&gt; operator - (const Vec&lt;_Tp, cn&gt;&amp; a)
+<span class="lineNum">    1383 </span>                :            : {
+<span class="lineNum">    1384 </span>                :            :     Vec&lt;_Tp,cn&gt; t;
+<span class="lineNum">    1385 </span>                :            :     for( int i = 0; i &lt; cn; i++ ) t.val[i] = saturate_cast&lt;_Tp&gt;(-a.val[i]);
+<span class="lineNum">    1386 </span>                :            :     return t;
+<span class="lineNum">    1387 </span>                :            : }
+<span class="lineNum">    1388 </span>                :            : 
+<span class="lineNum">    1389 </span>                :            : template&lt;typename _Tp&gt; inline Vec&lt;_Tp, 4&gt; operator * (const Vec&lt;_Tp, 4&gt;&amp; v1, const Vec&lt;_Tp, 4&gt;&amp; v2)
+<span class="lineNum">    1390 </span>                :            : {
+<span class="lineNum">    1391 </span>                :            :     return Vec&lt;_Tp, 4&gt;(saturate_cast&lt;_Tp&gt;(v1[0]*v2[0] - v1[1]*v2[1] - v1[2]*v2[2] - v1[3]*v2[3]),
+<span class="lineNum">    1392 </span>                :            :                        saturate_cast&lt;_Tp&gt;(v1[0]*v2[1] + v1[1]*v2[0] + v1[2]*v2[3] - v1[3]*v2[2]),
+<span class="lineNum">    1393 </span>                :            :                        saturate_cast&lt;_Tp&gt;(v1[0]*v2[2] - v1[1]*v2[3] + v1[2]*v2[0] + v1[3]*v2[1]),
+<span class="lineNum">    1394 </span>                :            :                        saturate_cast&lt;_Tp&gt;(v1[0]*v2[3] + v1[1]*v2[2] - v1[2]*v2[1] + v1[3]*v2[0]));
+<span class="lineNum">    1395 </span>                :            : }
+<span class="lineNum">    1396 </span>                :            : 
+<span class="lineNum">    1397 </span>                :            : template&lt;typename _Tp&gt; inline Vec&lt;_Tp, 4&gt;&amp; operator *= (Vec&lt;_Tp, 4&gt;&amp; v1, const Vec&lt;_Tp, 4&gt;&amp; v2)
+<span class="lineNum">    1398 </span>                :            : {
+<span class="lineNum">    1399 </span>                :            :     v1 = v1 * v2;
+<span class="lineNum">    1400 </span>                :            :     return v1;
+<span class="lineNum">    1401 </span>                :            : }
+<span class="lineNum">    1402 </span>                :            : 
+<span class="lineNum">    1403 </span>                :            : //! @}
+<span class="lineNum">    1404 </span>                :            : 
+<span class="lineNum">    1405 </span>                :            : } // cv
+<span class="lineNum">    1406 </span>                :            : 
+<span class="lineNum">    1407 </span>                :            : #endif // __OPENCV_CORE_MATX_HPP__
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.10</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

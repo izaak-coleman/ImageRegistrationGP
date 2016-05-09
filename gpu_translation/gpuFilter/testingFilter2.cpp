@@ -24,8 +24,7 @@ int main (int argc, char* argv[])
     // Read original image
 
     src_host = imread(argv[1], IMREAD_UNCHANGED); // read in img
-//src.upload(src_host);
-/*
+		//src.upload(src_host);
     cuda::GpuMat dest;
     Mat temp_dest = Mat::zeros(src.rows, src.cols, CV_32FC3); // size of dst
     dest.upload(temp_dest);
@@ -43,7 +42,7 @@ int main (int argc, char* argv[])
 
     imshow(argv[1], src);
     imshow("After filter", dest);
-    waitKey();*/
+    waitKey();
     return 0;
 }
 
