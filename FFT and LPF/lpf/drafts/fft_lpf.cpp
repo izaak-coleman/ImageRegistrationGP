@@ -1,4 +1,5 @@
 // Jukka Soikkeli, 6 March 2016
+// Samuel Martinet, 30 March 2016
 
 //#include <opencv2/core/core.hpp>      // Basic OpenCV structures
 #include "opencv2/opencv.hpp"
@@ -19,6 +20,98 @@
 
 using namespace std;
 using namespace cv;
+
+////////////////////////////////////////////////////////////////////////////////
+/* LPF on the CPU*/
+void lpf(Mat &dft, const float R){
+
+	Mat temp = Mat(dft.rows, dft.cols, CV_32F);
+	Point centre = Point(dft.rows/2, dft.cols/2);
+
+  float sqDistance;
+	for(int i = 0; i < dft.rows; i++)
+	{
+		for(int j = 0; j < dft.cols; j++)
+		{
+		     sqDistance = (float) pow((i - centre.x), 2.0) + pow((double) (j - centre.y), 2.0);
+		     if (sqDistance < pow(R, 2.0)){
+      		        temp.at<float>(i,j) = dft.at<float>(i,j);
+		     } else {
+                  temp.at<float>(i,j) = 0;
+         }
+	  }
+	}
+  Mat planes[] = {temp, temp};
+	merge(planes, 2, dft);
+}
+
+/* The following is taken verbatim from :
+http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/
+
+// return a floating point spectrum magnitude image scaled for user viewing
+// complexImg- input dft (2 channel floating point, Real + Imaginary fourier image)
+// rearrange - perform rearrangement of DFT quadrants if true
+// return value - pointer to output spectrum magnitude image scaled for user viewing
+*/
+Mat create_spectrum_magnitude_display(Mat& complexImg, bool rearrange){
+    Mat planes[2];
+
+    // compute magnitude spectrum (N.B. for display)
+    // compute log(1 + sqrt(Re(DFT(img))**2 + Im(DFT(img))**2))
+
+    split(complexImg, planes);
+    magnitude(planes[0], planes[1], planes[0]);
+
+    Mat mag = (planes[0]).clone();
+    mag += Scalar::all(1);
+    log(mag, mag);
+
+    if (rearrange)
+    {
+        // re-arrange the quaderants
+        shiftDFT(mag);
+    }
+
+    normalize(mag, mag, 0, 1, CV_MINMAX);
+
+    return mag;
+}
+
+/* The following is taken verbatim from :
+http://breckon.eu/toby/teaching/dip/opencv/lecture_demos/
+// Rearrange the quadrants of a Fourier image so that the origin is at
+// the image center
+*/
+void shiftDFT(Mat& fImage )
+{
+  Mat tmp, q0, q1, q2, q3;
+
+	// first crop the image, if it has an odd number of rows or columns
+
+	fImage = fImage(Rect(0, 0, fImage.cols & -2, fImage.rows & -2));
+
+	int cx = fImage.cols/2;
+	int cy = fImage.rows/2;
+
+	// rearrange the quadrants of Fourier image
+	// so that the origin is at the image center
+
+	q0 = fImage(Rect(0, 0, cx, cy));
+	q1 = fImage(Rect(cx, 0, cx, cy));
+	q2 = fImage(Rect(0, cy, cx, cy));
+	q3 = fImage(Rect(cx, cy, cx, cy));
+
+	q0.copyTo(tmp);
+	q3.copyTo(q0);
+	tmp.copyTo(q3);
+
+	q1.copyTo(tmp);
+	q2.copyTo(q1);
+	tmp.copyTo(q2);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
 
@@ -50,9 +143,41 @@ int main(int argc, char *argv[]) {
     // Applying forward DFT (in place)
     dft(complexI, complexI);
 
+    // LPF
+		Mat lpf;
+		lpFilter = complexI.clone();
+    lpf(lpFilter,500);
+		shiftDFT(complexI);
+    mulSpectrums(complexI, filter, complexI, 0);
+		shiftDFT(complexI);
+		mag = create_spectrum_magnitude_display(complexI, true);
 
-    // LPF GOES HERE
 
+		Mat out, outimg; //make matrices
+
+// COPY MODE ON
+const string spectrumMagName = "Magnitude Image (log transformed)"; // window name
+const string lowPassName = "Butterworth Low Pass Filtered (grayscale)"; // window name
+const string filterName = "Filter Image"; // window nam
+Mat filterOutput, imgOutput;
+// do inverse DFT on filtered image
+idft(complexI, complexI);
+
+// split into planes and extract plane 0 as output image
+split(complexI, planes);
+normalize(planes[0], imgOutput, 0, 1, CV_MINMAX);
+
+// do the same with the filter image
+split(lpFilter, planes);
+normalize(planes[0], filterOutput, 0, 1, CV_MINMAX);
+
+// display image in window
+imshow(spectrumMagName, mag);
+imshow(lowPassName, imgOutput);
+imshow(filterName, filterOutput);
+// COPY MODE OFF
+
+/*
 
     // Inverse DFT
     Mat out, outimg; //make matrices
@@ -60,6 +185,9 @@ int main(int argc, char *argv[]) {
     out.convertTo(outimg, CV_8U);
     imshow("Output", outimg);
     imwrite( "out.jpg", outimg );
+
+		// LPF display
+*/
   }
 
 
@@ -125,27 +253,3 @@ int main(int argc, char *argv[]) {
 
 //GPU based:
 //http://answers.opencv.org/question/11485/opencv-gpudft-distorted-image-after-inverse-transform/
-
-
-/* LPF on the CPU*/
-void LPF(Mat &dft, const float R)
-{
-	Mat temp = Mat(dft.rows, dft.cols, CV_32F);
-	Point centre = Point(dft.rows / 2, dft.cols / 2);
-
-        float sqDistance;
-	for(int i = 0; i < dft.rows; i++)
-	{
-		for(int j = 0; j < dft.cols; j++)
-		{
-		     sqDistance = (float) pow((i - centre.x), 2.0) + pow((double) (j - centre.y), 2.0);
-		     if (sqDistance < pow(R, 2.0)){
-      		        temp.at<float>(i,j) = dft.at<float>(i,j);
-		     } else {
-                        temp.at<float>(i,j) = 0;
-                     }
-		}
-	}
-        Mat planes[] = {temp, temp};
-	merge(planes, 2, dft);
-}
