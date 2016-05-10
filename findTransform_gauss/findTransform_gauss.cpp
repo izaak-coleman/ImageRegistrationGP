@@ -6,20 +6,18 @@
 // warp matrix needed to transform the input image to the same coordinates
 // as the template image, and also applies the transform to the input image
 
-#include <fstream>
 #include <cmath>
 #include <ctime>
 #include "opencv2/opencv.hpp"
+#include "saveWarp.h"
  
-void saveWarp(std::string fileName, const cv::Mat& warp);
-
 int main( int argc, char** argv )
 {
   // Check correct number of command line arguments
   if( argc != 4)
     {
-      std::cout << " Usage: findTransform <TemplateImage> <InputImage> 
-                     <OutputWarp.cpp>" << std::endl;
+      std::cout << "Usage: findTransform <TemplateImage> <InputImage> "
+	        << "<OutputWarp.cpp>" << std::endl;
       return -1;
     }
 
@@ -52,7 +50,7 @@ int main( int argc, char** argv )
   cv::Mat warped_image = cv::Mat(template_image.rows, template_image.cols, 
 				   CV_32FC1);
 
-  int gauss_level = 4; // start point for number of gauss reductions
+  int gauss_level = 3; // start point for number of gauss reductions
   double cc = 0; // correlation coefficient
 
   std::clock_t begin = clock(); // FOR TESTING PURPOSES
@@ -133,16 +131,3 @@ int main( int argc, char** argv )
   return 0;
 }
 
-/* function to save the final values in the warp matrix to fileName */
-void saveWarp(std::string fileName, const cv::Mat& warp)
-{
-  // it saves the raw matrix elements in a file
-  CV_Assert(warp.type()==CV_32FC1);
-
-  const float* matPtr = warp.ptr<float>(0);
-
-  std::ofstream outfile(fileName.c_str());
-  //save the warp's elements
-  outfile << matPtr[0] << " " << matPtr[1] << " " << matPtr[2] << std::endl;
-  outfile << matPtr[3] << " " << matPtr[4] << " " << matPtr[5] << std::endl;
-}
