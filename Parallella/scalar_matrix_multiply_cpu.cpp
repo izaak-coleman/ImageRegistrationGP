@@ -16,18 +16,18 @@ using namespace std;
 int main(){
 
     Mat img, result;
-		double funcTime;
-    img = imread("lenna.jpg", CV_8U);							// load data	
-		Scalar multiplier = 1.5;
+    double funcTime;
+    img = imread("lenna.jpg", CV_8U);              // load data  
+    Scalar multiplier = 1.5;
     std::clock_t function;
 
 
-    function = std::clock();											// CLOCK START
+    function = std::clock();                      // CLOCK START
     multiply(img, multiplier, result);
-		funcTime = (std::clock() - function)/(double)CLOCKS_PER_SEC; // CLOCK END
+    funcTime = (std::clock() - function)/(double)CLOCKS_PER_SEC; // CLOCK END
 
     std::cout << "function time taken = " << funcTime << std::endl;
-    imwrite("1.5xlena.jpg", result);			// save result
+    imwrite("1.5xlena.jpg", result);      // save result
 
     return 0;
 }
