@@ -46,6 +46,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <sys/time.h>
+#include <time.h>
 
 #include <IL/il.h>
 #define ILU_ENABLED
@@ -64,7 +65,7 @@
 
 /////////////////////////////
 // FOR USING DRAM instead of local mem
-#define _USE_DRAM_
+//#define _USE_DRAM_
 /////////////////////////////
 
 typedef unsigned int e_coreid_t;
@@ -262,6 +263,8 @@ int main(int argc, char *argv[])
 #ifdef _USE_DRAM_
 	// Copy operand matrices to Epiphany system
 	//addr = DRAM_BASE + offsetof(shared_buf_t, A[0]);
+        time_t upload_overhead; //ADDED
+	upload_overhead = clock(); //ADDED
 	gettimeofday(&timer[1], NULL);
 	addr = offsetof(shared_buf_t, A[0]);
 	sz = sizeof(Mailbox.A);
@@ -279,11 +282,13 @@ int main(int argc, char *argv[])
 	//e_write(addr, (void *) Mailbox.B, sz);
 	e_write(pDRAM,0,0,addr, (void *) Mailbox.B, sz); //added "pDRAM,0,0"
 	gettimeofday(&timer[2], NULL);
+        printf( "upload time taken = %f sec\n", (clock() - upload_overhead)/(double)CLOCKS_PER_SEC); //ADDED
 #else
 	// Copy operand matrices to Epiphany cores' memory
 	 printf(       "Writing image to Epiphany\n");
 	fprintf(fo, "%% Writing image to Epiphany\n");
-        
+        time_t upload_overhead; //ADDED        
+	upload_overhead = clock(); //ADDED
 	gettimeofday(&timer[1], NULL);
 	sz = sizeof(Mailbox.A) / _Ncores;
 	for (row=0; row<(int) platform.rows; row++)
@@ -298,6 +303,7 @@ int main(int argc, char *argv[])
 			e_write(pEpiphany, row, col, addr, (void *) &Mailbox.A[cnum * _Score * _Sedge], sz);
 		}
 	gettimeofday(&timer[2], NULL);
+        printf( "upload time taken = %f sec\n", (clock() - upload_overhead)/(double)CLOCKS_PER_SEC); //ADDED
 	printf("\n");
 #endif
 
@@ -307,9 +313,12 @@ int main(int argc, char *argv[])
 	fprintf(fo, "%% GO!\n");
 	fflush(stdout);
 	fflush(fo);
+        time_t function; //ADDED
+	function = clock(); //ADDED
 	gettimeofday(&timer[3], NULL);
         calc_go(pDRAM);  //checks the DRAM for ready and go, runs the core programs, and waits for all cores to finish
 	gettimeofday(&timer[4], NULL); //timing the whole Epiphany calculation using sys/time
+        printf( "Function time taken = %f sec\n", (clock() - function)/(double)CLOCKS_PER_SEC); //ADDED
 	 printf(       "Done!\n\n");
 	fprintf(fo, "%% Done!\n\n");
 	fflush(stdout);
@@ -350,6 +359,8 @@ int main(int argc, char *argv[])
 #ifdef _USE_DRAM_
 	//addr = DRAM_BASE + offsetof(shared_buf_t, B[0]);
 	gettimeofday(&timer[5], NULL);
+        time_t download_overhead; //ADDED
+        download_overhead = clock(); //ADDED
 	addr = offsetof(shared_buf_t, B[0]);
 	sz = sizeof(Mailbox.B);
 	 printf(       "Reading B[%ldB] from address %08x...\n", sz, addr);
@@ -371,9 +382,13 @@ int main(int argc, char *argv[])
 	//e_read(addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), remndr);
 	e_read(pDRAM,0,0,addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), remndr); // added "pDRAM,0,0,"
 	gettimeofday(&timer[6], NULL);
+        printf( "Download overhead time taken = %f sec\n", (clock() - download_overhead)/(double)CLOCKS_PER_SEC); //ADDED
+
 #else
 	// Read result matrix from Epiphany cores' memory
 	gettimeofday(&timer[5], NULL);
+        time_t download_overhead; //ADDED
+        download_overhead = clock(); //ADDED
 	sz = sizeof(Mailbox.A) / _Ncores;
 	for (row=0; row<(int) platform.rows; row++)
 		for (col=0; col<(int) platform.cols; col++)
@@ -387,6 +402,7 @@ int main(int argc, char *argv[])
 			e_read(pEpiphany, row, col, addr, (void *) &Mailbox.B[cnum * _Score * _Sedge], sz);
 		}
 	gettimeofday(&timer[6], NULL);
+        printf( "Download overhead time taken = %f sec\n", (clock() - download_overhead)/(double)CLOCKS_PER_SEC); //ADDED
 #endif
 	printf("\n");
 	 printf(       "Memory overhead (out)  - (%5.3f msec)\n", (timer[6].tv_usec - timer[5].tv_usec)/1000.0);
