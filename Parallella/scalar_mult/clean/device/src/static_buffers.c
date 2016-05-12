@@ -1,9 +1,9 @@
 /*
   static_buffers.c
-
+  An edited version of original by Adapteva.
   Copyright (c) 2016 Jukka Soikkeli <jes15@ic.ac.uk>
   
-  Based on original by Adapteva:
+  Edited version of original by Adapteva:
   Copyright (C) 2012 Adapteva, Inc.
   Contributed by Yainv Sapir <yaniv@adapteva.com>
 
@@ -35,7 +35,6 @@
 volatile float  AA[_Score][_Sedge] ALIGN(8) SECTION(".data_bank1");       // local operand array (ping)
 volatile float  BB[_Score][_Sedge] ALIGN(8) SECTION(".data_bank2");       // local operand array (pong)
 
-//REMOVED COMPLEX VERSIONS:
 core_t           me                ALIGN(8) SECTION("core_data_section"); // core data structure
 shared_buf_ptr_t Mailbox           ALIGN(8) SECTION("core_data_section"); // Mailbox pointers
 volatile e_dma_desc_t tcb          ALIGN(8) SECTION("core_data_section"); // TCB structure for DMA

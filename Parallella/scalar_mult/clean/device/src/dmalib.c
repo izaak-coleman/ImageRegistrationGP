@@ -2,7 +2,7 @@
   dmalib.c
 
   Copyright (c) 2016 Jukka Soikkeli <jes15@ic.ac.uk>
-
+  [Edited version of original by Adapteva]
   Copyright (C) 2012 Adapteva, Inc.
   Contributed by Yainv Sapir <yaniv@adapteva.com>
 
@@ -23,10 +23,9 @@
 
 
 #include "dmalib.h"
-#include "calclib.h"
 #include "epiphany.h"
 
-/*
+
 extern volatile e_dma_desc_t tcb;
 
 
@@ -118,5 +117,4 @@ int dmacpyi(void *src, void *dst)
 
 	return 0;
 }
-*/
 

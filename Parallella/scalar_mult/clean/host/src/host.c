@@ -63,7 +63,8 @@
 
 typedef unsigned int e_coreid_t;
 #include <e-hal.h>
-#include "calclib.h"
+#include <math.h>
+#include <stdlib.h>
 #include "epiphany.h"
 #include "dram_buffers.h"
 
@@ -85,15 +86,11 @@ void get_args(int argc, char *argv[]);
 #define eMHz 600e6
 #define RdBlkSz 1024
 
-int  main(int argc, char *argv[]);
 void matrix_init(int seed);
 int  calc_go(e_mem_t *pDRAM); //function to signal calculations to start
 void init_coreID(e_epiphany_t *pEpiphany, unsigned int *coreID, int rows, int cols, unsigned int base_core);
 
-//cfloat Bref[_Smtx];
-//cfloat Bdiff[_Smtx];
-
-unsigned int DRAM_BASE  = 0x8f000000;
+unsigned int DRAM_BASE  = 0x8f000000;  //DRAM base address
 unsigned int BankA_addr = 0x2000;  //address of memory bank A
 unsigned int coreID[_Ncores];      //core ID array
 
@@ -101,7 +98,7 @@ typedef struct timeval timeval_t;
 e_platform_t platform;
 
 //////////////////////////
-	float mult = 1.5; //multiplier
+	float mult = 1.5; //multiplier for the scalar-matrix multiplication
 //////////////////////////
 
 int main(int argc, char *argv[])
@@ -111,21 +108,18 @@ int main(int argc, char *argv[])
 	unsigned int msize;
 	int          row, col, cnum;
 
-
-	//DevIL library related...
+	//DevIL library related declarations
 	ILuint  ImgId;
 	ILubyte *imdata;
 	ILuint  imsize, imBpp;
 
-
 	unsigned int addr;
 	size_t sz;
-	timeval_t timer[8];
-	uint32_t time_d[TIMERS];
+	timeval_t timer[2];
 	FILE *fo;
 	int  result;
 	//////////////////////////////////////////
-	gettimeofday(&timer[0], NULL);
+	gettimeofday(&timer[0], NULL); //Full program timer start
 	//////////////////////////////////////////
 	pEpiphany = &Epiphany;
 	pDRAM     = &DRAM;
@@ -234,7 +228,6 @@ int main(int argc, char *argv[])
 	// Extract image data into the A matrix.
 	for (unsigned int i=0; i<imsize; i++)
 	{
-	  //Mailbox.A[i] = (float) imdata[i*imBpp] + 0.0 * I; //REMOVE, imaginary version
 	  Mailbox.A[i] = (float) imdata[i*imBpp];
 	}
 
@@ -246,30 +239,27 @@ int main(int argc, char *argv[])
 
 #ifdef _USE_DRAM_
 	// Copy operand matrices to Epiphany system
-        time_t upload_overhead; //ADDED
-	upload_overhead = clock(); //ADDED
-	gettimeofday(&timer[1], NULL);
+        time_t upload_overhead;
+	upload_overhead = clock();
 	addr = offsetof(shared_buf_t, A[0]);
 	sz = sizeof(Mailbox.A);
-	printf(        "DRAM in use\n"); //REMOVE
+	printf(        "DRAM in use\n");
 	 printf(       "Writing A[%ldB] to address %08x...\n", sz, addr);
 	fprintf(fo, "%% Writing A[%ldB] to address %08x...\n", sz, addr);
-	e_write(pDRAM,0,0,addr, (void *) Mailbox.A, sz); //added "pDRAM,0,0"
+	e_write(pDRAM,0,0,addr, (void *) Mailbox.A, sz);
 
 	addr = offsetof(shared_buf_t, B[0]);
 	sz = sizeof(Mailbox.B);
 	 printf(       "Writing B[%ldB] to address %08x...\n", sz, addr);
 	fprintf(fo, "%% Writing B[%ldB] to address %08x...\n", sz, addr);
-	e_write(pDRAM,0,0,addr, (void *) Mailbox.B, sz); //added "pDRAM,0,0"
-	gettimeofday(&timer[2], NULL);
-        printf( "\nUpload time taken = %f sec\n", (clock() - upload_overhead)/(double)CLOCKS_PER_SEC); //ADDED
+	e_write(pDRAM,0,0,addr, (void *) Mailbox.B, sz);
+	printf( "\nUpload overhead time:  %5.3f msec\n", 1000*(clock() - upload_overhead)/(double)CLOCKS_PER_SEC);
 #else
 	// Copy operand matrices to Epiphany cores' memory
 	 printf(       "Writing image to Epiphany\n");
 	fprintf(fo, "%% Writing image to Epiphany\n");
-        time_t upload_overhead; //ADDED        
-	upload_overhead = clock(); //ADDED
-	gettimeofday(&timer[1], NULL);
+        time_t upload_overhead;
+	upload_overhead = clock();
 	sz = sizeof(Mailbox.A) / _Ncores;
 	for (row=0; row<(int) platform.rows; row++)
 		for (col=0; col<(int) platform.cols; col++)
@@ -281,64 +271,33 @@ int main(int argc, char *argv[])
 			fprintf(fo, "%% Writing A[%uB] to address %08x...\n", sz, (coreID[cnum] << 20) | addr); fflush(fo);
 			e_write(pEpiphany, row, col, addr, (void *) &Mailbox.A[cnum * _Score * _Sedge], sz);
 		}
-	gettimeofday(&timer[2], NULL);
-        printf( "\nUpload time taken = %f sec\n", (clock() - upload_overhead)/(double)CLOCKS_PER_SEC); //ADDED
+	printf( "\nUpload overhead time:  %5.3f msec\n", 1000*(clock() - upload_overhead)/(double)CLOCKS_PER_SEC);
 	printf("\n");
 #endif
 
 
 	// Call the Epiphany calc() function
-	 printf(       "GO!\n");
+	printf(       "Starting computation on Epiphany.\n");
 	fprintf(fo, "%% GO!\n");
 	fflush(stdout);
 	fflush(fo);
-        time_t function; //ADDED
-	function = clock(); //ADDED
-	gettimeofday(&timer[3], NULL);
+        time_t function;
+	function = clock();
         calc_go(pDRAM);  //checks the DRAM for ready and go, runs the core programs, and waits for all cores to finish
-	gettimeofday(&timer[4], NULL); //timing the whole Epiphany calculation using sys/time
-        printf( "Function time taken = %f sec\n", (clock() - function)/(double)CLOCKS_PER_SEC); //ADDED
-	 printf(       "Done!\n\n");
+	printf( "Done!\nComputation time on Epiphany:  %5.3f msec\n", 1000*(clock() - function)/(double)CLOCKS_PER_SEC);
 	fprintf(fo, "%% Done!\n\n");
 	fflush(stdout);
 	fflush(fo);
 
-
-	//TIMERS on Epiphany
-
-	// *** "Original type" of timers - seem incorrect and give weird results
-	/*
-	// Read time counters
-	fprintf(fo, "%% Reading time count...\n");
-	addr = 0x7128+0x4*2 + offsetof(core_t, time_p[0]);
-	sz = TIMERS * sizeof(uint32_t);
-	e_read(pEpiphany, 0, 0, addr, (void *) (&time_p[0]), sz);
-
-
-	//time_d[7] = time_p[1] - time_p[2]; // calc()
-	//time_d[9] = time_p[0] - time_p[9]; // Total cycles
-
-	//printf(       "Finished calculation in %u cycles (%5.3f msec @ %3.0f MHz)\n\n", time_d[9], (time_d[9] * 1000.0 / eMHz), (eMHz / 1e6));
-	//fprintf(fo, "%% Finished calculation in %u cycles (%5.3f msec @ %3.0f MHz)\n\n", time_d[9], (time_d[9] * 1000.0 / eMHz), (eMHz / 1e6));
-	//printf(       "Calculations     - %7u cycles (%5.3f msec)\n", time_d[7], (time_d[7] * 1000.0 / eMHz));
-	*/
-	// ***
-
-	// Timers using sys/time.h [sensible results, robust]
-	 printf(       "Memory overhead (in)  - (%5.3f msec)\n", (timer[2].tv_usec - timer[1].tv_usec)/1000.0);
-	 printf(       "Processing time on Epiphany     - (%5.3f msec)\n", (timer[4].tv_usec - timer[3].tv_usec)/1000.0);
-	 printf(       "\n");
-
-	 printf(       "Reading processed image back to host\n");
+	 printf(       "\nReading processed image back to host\n");
 	fprintf(fo, "%% Reading processed image back to host\n");
 
 
 
 	// Read result matrix
 #ifdef _USE_DRAM_
-	gettimeofday(&timer[5], NULL);
-        time_t download_overhead; //ADDED
-        download_overhead = clock(); //ADDED
+        time_t download_overhead;
+        download_overhead = clock();
 	addr = offsetof(shared_buf_t, B[0]);
 	sz = sizeof(Mailbox.B);
 	 printf(       "Reading B[%ldB] from address %08x...\n", sz, addr);
@@ -355,14 +314,12 @@ int main(int argc, char *argv[])
 	printf(".");
 	fflush(stdout);
 	e_read(pDRAM,0,0,addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), remndr);
-	gettimeofday(&timer[6], NULL);
-        printf( "\nDownload overhead time taken = %f sec\n", (clock() - download_overhead)/(double)CLOCKS_PER_SEC); //ADDED
+	printf( "\nDownload overhead time:  %5.3f msec\n", 1000*(clock() - download_overhead)/(double)CLOCKS_PER_SEC);
 
 #else
 	// Read result matrix from Epiphany cores' memory
-	gettimeofday(&timer[5], NULL);
-        time_t download_overhead; //ADDED
-        download_overhead = clock(); //ADDED
+        time_t download_overhead;
+        download_overhead = clock();
 	sz = sizeof(Mailbox.A) / _Ncores;
 	for (row=0; row<(int) platform.rows; row++)
 		for (col=0; col<(int) platform.cols; col++)
@@ -374,18 +331,15 @@ int main(int argc, char *argv[])
 			fprintf(fo, "%% Reading A[%uB] from address %08x...\n", sz, (coreID[cnum] << 20) | addr); fflush(fo);
 			e_read(pEpiphany, row, col, addr, (void *) &Mailbox.B[cnum * _Score * _Sedge], sz);
 		}
-	gettimeofday(&timer[6], NULL);
-        printf( "\nDownload overhead time taken = %f sec\n", (clock() - download_overhead)/(double)CLOCKS_PER_SEC); //ADDED
+	printf( "\nDownload overhead time:  %5.3f msec\n", 1000*(clock() - download_overhead)/(double)CLOCKS_PER_SEC);
 #endif
 	printf("\n");
-	 printf(       "Memory overhead (out)  - (%5.3f msec)\n", (timer[6].tv_usec - timer[5].tv_usec)/1000.0);
-
 
 	// Convert processed image matrix B into the image file date.
 	for (unsigned int i=0; i<imsize; i++)
 	{
 		for (unsigned int j=0; j<imBpp; j++)
-			imdata[i*imBpp+j] = cabs(Mailbox.B[i]);
+		  imdata[i*imBpp+j] = fabs(Mailbox.B[i]);
 	}
 
 	// Save processed image to the output file.
@@ -397,11 +351,10 @@ int main(int argc, char *argv[])
 		exit(7);
 	}
 
-	// We're done with the image, so let's delete it.
+	// Delete the image, as it is not needed anymore
 	ilDeleteImages(1, &ImgId);
 
-
-	// Close connection to device
+	// Close connection to Epiphany
 	if (e_close(pEpiphany))
 	{
 		fprintf(fo, "\nERROR: Can't close connection to Epiphany device!\n\n");
@@ -417,17 +370,11 @@ int main(int argc, char *argv[])
 	fclose(fo);
 
 	///////////////////////////////////////
-	gettimeofday(&timer[7], NULL);
-	printf(       "Full program time     - (%5.3f msec)\n", (timer[7].tv_usec - timer[0].tv_usec)/1000.0 );
+	gettimeofday(&timer[1], NULL);
+	printf(       "Full program time:  %5.3f msec\n", (timer[1].tv_usec - timer[0].tv_usec)/1000.0 );
 	///////////////////////////////////////
-	
-	//Returning success if test runs expected number of clock cycles
-	if(time_d[9]>50000){
-	  return EXIT_SUCCESS;
-	}
-	else{
-	  return EXIT_FAILURE;
-	}
+
+	return 1;
 }
 	
 // Call (invoke) the calc() function
@@ -453,7 +400,7 @@ int calc_go(e_mem_t *pDRAM)
 		e_read(pDRAM, 0, 0, addr, (void *) (&Mailbox.core.go), sz);
 
 	printf("Signal cores to start again.\n");	
-	// Signal cores to start crunching   //same as above, but does a WRITE instead or read
+	// Signal cores to start crunching
 	Mailbox.core.go = 1;
 	addr = offsetof(shared_buf_t, core.go);
 	sz = sizeof(int64_t);
@@ -461,9 +408,9 @@ int calc_go(e_mem_t *pDRAM)
 	
 
 	// Wait until cores finished calculation
-	addr = offsetof(shared_buf_t, core.go); //REPETITION?
-	sz = sizeof(int64_t);  //REPETITION?
-	Mailbox.core.go = 1;  //REPETITION?
+	addr = offsetof(shared_buf_t, core.go);
+	sz = sizeof(int64_t);
+	Mailbox.core.go = 1;
 	while (Mailbox.core.go != 0)
 		e_read(pDRAM, 0, 0, addr, (void *) (&Mailbox.core.go), sz);
 
@@ -519,7 +466,7 @@ void usage(int n)
 }
 
 
-// Process command line args
+// Process command line arguments
 void get_args(int argc, char *argv[])
 {
 	int n;
@@ -572,7 +519,6 @@ void get_args(int argc, char *argv[])
 			strcat(ar.ofname, ".out");
 		}
 	}
-
 
 	return;
 }

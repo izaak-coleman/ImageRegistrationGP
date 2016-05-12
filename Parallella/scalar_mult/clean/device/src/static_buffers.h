@@ -1,6 +1,9 @@
 /*
   static_buffers.h
+  An Edited version of original by Adapteva
 
+  Copyright (C) 2016 Jukka Soikkeli (jes15@ic.ac.uk)
+  Edited version of original by Adapteva:
   Copyright (C) 2012 Adapteva, Inc.
   Contributed by Yainv Sapir <yaniv@adapteva.com>
 

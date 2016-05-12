@@ -1,6 +1,6 @@
 /*
   calc_internal.ldf
-  [Was called fft2d_internal.ldf]
+  [Renamed: Was called fft2d_internal.ldf]
 
   Copyright (C) 2012 Adapteva, Inc.
   Contributed by Yaniv Sapir <yaniv@adapteva.com>

@@ -2,7 +2,6 @@
   epiphany_main.c
 
   Copyright (C) 2016 Jukka Soikkeli and Chris Smallwood
-
   [Based on fft2d_main.c by Adapteva]
   Copyright (C) 2012 Adapteva, Inc.
   Contributed by Yainv Sapir <yaniv@adapteva.com>
@@ -30,7 +29,6 @@
 
 
 #include <e-lib.h>
-//#include "calclib.h" //REMOVE
 #include "epiphany.h"
 #include "dmalib.h"
 #include "dram_buffers.h"
@@ -40,7 +38,7 @@ void init();
 void calc();
 
 ///////////////////////////////
-//#define _USE_DRAM_
+//#define _USE_DRAM_  //enable this if want to use DRAM
 
 //#define _USE_DMA_E_
 ///////////////////////////////
@@ -93,22 +91,11 @@ int main(int argc, char *argv[])
 #	endif // _USE_DMA_E_
 #endif // _USE_DRAM_
 
-		// ======= OUR CALCULATIONS ========== //
+		// ======= CALCULATIONS ========== //
 
-		me.time_p[1] = e_ctimer_get(E_CTIMER_0); //CHECK!!
+		me.time_p[1] = e_ctimer_get(E_CTIMER_0);
 		calc();  // function for calculations
-		me.time_p[2] = e_ctimer_get(E_CTIMER_0); //CHECK!!
-
-
-		/*
-		//LOOP, to test DRAM vs eCore memory speed
-		me.time_p[1] = e_ctimer_get(E_CTIMER_0); //CHECK!!
-		for(int count=0; count<10; count++) {
-		  calc();  // function for calculations
-		}
-		me.time_p[2] = e_ctimer_get(E_CTIMER_0); //CHECK!!
-		*/
-
+		me.time_p[2] = e_ctimer_get(E_CTIMER_0);
 
 		// Save _Score rows to DRAM.
 #ifdef _USE_DRAM_
@@ -145,7 +132,7 @@ int main(int argc, char *argv[])
 
 
 
-
+// Function for calculations - scalar-matrix multiplication
 void calc() {
 
   int row=0;
@@ -153,7 +140,6 @@ void calc() {
     
 	for(row=0;row<_Score;row++) { 
 	  volatile float * restrict xX = (me.bank[_BankA][_PING] + row *_Sedge);
-	  //volatile cfloat * restrict xX = (me.bank[_BankA][_PING] + row *_Sedge);  //REMOVE
 
 	  for(int col=0;col<_Sedge;col++) { //change the name _Sedge to something else
 	    float mult = Mailbox.pCore->mult;
@@ -174,6 +160,7 @@ void calc() {
 
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
+// Initialization function
 void init()
 {
 	int row, col, cnum;
@@ -194,41 +181,16 @@ void init()
 	// Initialize pointers to the operand matrices ping-pong arrays
 	me.bank[_BankA][_PING] = (float *) &(AA[0][0]);
 	me.bank[_BankA][_PONG] = (float *) &(BB[0][0]);
-	//me.bank[_BankA][_PING] = (cfloat *) &(AA[0][0]);  //REMOVE
-	//me.bank[_BankA][_PONG] = (cfloat *) &(BB[0][0]); //REMOVE
-	//	me.bank[_BankW][_PING] = (cfloat *) &(Wn[0]); //REMOVE
 
 	// Use the e_neighbor_id() API to generate the pointer addresses of the arrays
-	// in the horizontal and vertical target cores, where the submatrices data will
-	// be swapped.
-	// JS: NOT ALL is necessary - but required to synch cores CHECK, REMOVE?
-	/*
-	cnum = 0;
-	for (row=0; row<e_group_config.group_rows; row++)
-		for (col=0; col<e_group_config.group_cols; col++)
-		{
-			me.tgt_bk[cnum][_BankA][_PING] = e_get_global_address(row, col, (void *) me.bank[_BankA][_PONG]);
-			me.tgt_bk[cnum][_BankA][_PONG] = e_get_global_address(row, col, (void *) me.bank[_BankA][_PING]);
-			me.tgt_sync[cnum]              = e_get_global_address(row, col, (void *) (&me.sync[me.corenum]));
-			cnum++;
-		}
-	*/
+	// in the adjacent cores.
 	e_neighbor_id(E_NEXT_CORE, E_GROUP_WRAP, &row, &col);
+
+	// Set up a pointer to the next core, for synchronization (and signalling the next)
 	me.tgt_go_sync = e_get_global_address(row, col, (void *) (&me.go_sync));
-
-	// Generate Wn //NOT NEEDED, REMOVE AFTER TESTING!!!
-	//if(_lgSedge == 6) {
-	//generateWn(me.bank[_BankW][_PING], 7);  //TEMP HARDCODED - for testing _lgSedge=6 issues...
-	//}
-	//else {
-	//generateWn(me.bank[_BankW][_PING], _lgSedge);  //CHECK - what do we do with _lgSedge, or its equivalent?
-	//}
-
 
 	// Clear the inter-core sync signals
 	me.go_sync = 0;
-	for (cnum=0; cnum<_Ncores; cnum++)
-		me.sync[cnum] = 0;
 
 	// Init the host-accelerator sync signals
 	Mailbox.pCore->go = 0;

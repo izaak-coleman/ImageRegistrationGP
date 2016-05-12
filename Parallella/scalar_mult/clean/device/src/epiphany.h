@@ -2,7 +2,6 @@
   epiphany.h
 
   Copyright (C) 2016 Jukka Soikkeli <jes15@ic.ac.uk>
-
   [Based on fft2d.h by Adapteva]
   Copyright (C) 2012 Adapteva, Inc.
   Contributed by Yainv Sapir <yaniv@adapteva.com>
@@ -27,23 +26,21 @@
 #define __EPIPHANY_H__
 
 #include <stdint.h>
-//#include "calclib.h" //REMOVE, NOT REQUIRED?
 #ifndef __HOST__
 #include <e_coreid.h>
 #endif // __HOST__
 
-#define _Nchips 1                  // # of chips in operand matrix side //NOT NEEDED?
 #define _Nside  4                  // # of cores in chip side
 #define _Ncores (_Nside * _Nside)  // Num of cores = 16
 #ifndef _lgSedge
-#define _lgSedge 7                  // Log2 of size of image edge //WAS 7!, use 6 for 64x64 image, 8 for 256x256
+#define _lgSedge 7                  // Log2 of size of image edge //Original 7!, use 6 for 64x64 image
 #endif
 #define _Sedge   (1<<_lgSedge)      // Size of image edge //i.e. 2^_lgSedge
 #define _Score  (_Sedge / _Ncores)  // Num of 1D vectors per-core
 #define _Schip  (_Score * _Ncores)  // Num of 1D vectors per-chip
 #define _Smtx   (_Schip * _Sedge)   // Num of elements in 2D array
 
-#define _Nbanks 2                  // Num of SRAM banks on core //CHECK - why only 2?
+#define _Nbanks 2                  // Num of SRAM banks on core
 
 #define _BankA  0
 #define _BankW  1
@@ -80,8 +77,6 @@ typedef struct {
 
         float volatile *bank[_Nbanks][2];            // Ping Pong Bank local space pointer
   	float volatile *tgt_bk[_Ncores][_Nbanks][2]; // Target Bank for matrix rotate in global space
-  //cfloat volatile *bank[_Nbanks][2];            // Ping Pong Bank local space pointer REMOVE complex
-  //	cfloat volatile *tgt_bk[_Ncores][_Nbanks][2]; // Target Bank for matrix rotate in global space REMOVE COMPLEX
 
 	uint32_t time_p[TIMERS]; // Timers
 } core_t;
@@ -99,8 +94,6 @@ typedef struct {
 typedef struct {
 	volatile float A[_Smtx]; // Global A matrix
 	volatile float B[_Smtx]; // Global B matrix
-  //volatile cfloat A[_Smtx]; // Global A matrix REMOVE, COMPLEX VER
-  //volatile cfloat B[_Smtx]; // Global B matrix REMOVE, COMPLEX VER
 	volatile mbox_t core;
 } shared_buf_t;
 
@@ -109,8 +102,6 @@ typedef struct {
 	void            *pBase; // ptr to base of shared buffers
 	volatile float *pA;    // ptr to global A matrix
 	volatile float *pB;    // ptr to global B matrix
-  //volatile cfloat *pA;    // ptr to global A matrix, REMOVE, COMPLEX VER
-  //volatile cfloat *pB;    // ptr to global B matrix, REMOVE, COMPLEX VER
 	mbox_t          *pCore; // ptr to cores mailbox
 } shared_buf_ptr_t;
 
