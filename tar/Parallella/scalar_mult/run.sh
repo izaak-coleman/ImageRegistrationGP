@@ -16,7 +16,7 @@ else
 fi
 
 if [[ "$2" == "" ]]; then
-	Img=../../lenna.jpg
+	Img=../../panda.jpg
 else
 	Img="../../"$2
 fi
