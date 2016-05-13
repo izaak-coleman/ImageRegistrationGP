@@ -30,14 +30,14 @@ int main( int argc, char** argv )
   // Check args 
   if (argc != 4) {
       std::cout << " Usage: findTransform <TemplateImage> " << 
-			"<InputImage> <Warp_matrix>" << std::endl;
+      "<InputImage> <Warp_matrix>" << std::endl;
       return -1;
   }
   
   // Save file names provided on command line.
   const char* templateImageName = argv[1];
   const char* deformedImageName = argv[2];
-	const char* outputWarpMatrix = argv[3];
+  const char* outputWarpMatrix = argv[3];
 
   // Load template image and input image into CV matrices
   cv::Mat template_image, deformed_image;
@@ -54,29 +54,29 @@ int main( int argc, char** argv )
   int number_of_iterations = 1000;
   double termination_eps = 1e-6;
   cv::TermCriteria criteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS,
-			number_of_iterations, termination_eps);
+      number_of_iterations, termination_eps);
 
  
   // Run find_transformECC to find the warp matrix
-	double totalTime = 0, withoutTransfer = 0, transferTime = 0;
-	Mat inputMask;
-	std::clock_t eccTimer;
-	eccTimer = std::clock();
+  double totalTime = 0, withoutTransfer = 0, transferTime = 0;
+  Mat inputMask;
+  std::clock_t eccTimer;
+  eccTimer = std::clock();
   double cc = gpu_findTransformECC (
-					 template_image,
-					 deformed_image,
-					 warp_matrix,
-					 warp_mode,
-					 criteria,
-					 inputMask,
-					 transferTime);
-	totalTime = (std::clock() - eccTimer)/(double)CLOCKS_PER_SEC;
-	withoutTransfer = totalTime - transferTime;
+           template_image,
+           deformed_image,
+           warp_matrix,
+           warp_mode,
+           criteria,
+           inputMask,
+           transferTime);
+  totalTime = (std::clock() - eccTimer)/(double)CLOCKS_PER_SEC;
+  withoutTransfer = totalTime - transferTime;
 
-	std::cout << std::endl << "Total time taken: "  << totalTime << std::endl;
-	std::cout << std::endl << "Transfer time taken: "  << transferTime << std::endl;
-	std::cout << std::endl << "Time without transfer: "  << withoutTransfer << std::endl;
-	std::cout << totalTime << ", " << transferTime << ", " << withoutTransfer << std::endl;
+  std::cout << std::endl << "Total time taken: "  << totalTime << std::endl;
+  std::cout << std::endl << "Transfer time taken: "  << transferTime << std::endl;
+  std::cout << std::endl << "Time without transfer: "  << withoutTransfer << std::endl;
+  std::cout << totalTime << ", " << transferTime << ", " << withoutTransfer << std::endl;
 
   // Reserve a matrix to store the warped image
   cv::Mat corrected_image = cv::Mat(template_image.rows, template_image.cols, CV_32FC1);
@@ -84,14 +84,14 @@ int main( int argc, char** argv )
   // Apply the warp matrix to the input image to produce a warped image 
   // (i.e. aligned to the template image)
   cv::warpAffine(deformed_image , corrected_image, 
-								warp_matrix, corrected_image.size(), 
-								cv::INTER_LINEAR + cv::WARP_INVERSE_MAP);
+                warp_matrix, corrected_image.size(), 
+                cv::INTER_LINEAR + cv::WARP_INVERSE_MAP);
  
   // Save values in the warp matrix to the filename provided on command-line
   saveWarp(outputWarpMatrix, warp_matrix);
 
   std::cout << "Enhanced correlation coefficient between the template " <<
-	"image the corrected image = " << cc << std::endl; 
+  "image the corrected image = " << cc << std::endl; 
 
   // Show final output
   cv::namedWindow( "Corrected Image", CV_WINDOW_AUTOSIZE );
@@ -102,8 +102,12 @@ int main( int argc, char** argv )
   cv::imshow( "Corrected Image", corrected_image);
   cv::waitKey(0);
 
-	std::string ofname = "corrected_image.jpg";
-	cv::imwrite(ofname, corrected_image);
+  std::string ofname = "corrected_image.jpg";
+  cv::imwrite(ofname, corrected_image);
+
+	std::cout << "Writing corrected image..." << std::endl;
+  std::string ofname = "corrected_image.jpg";
+  cv::imwrite(ofname, corrected_image);
 
   return 0;
 }

@@ -22,9 +22,9 @@ void saveWarp(std::string fileName, const cv::Mat& warp);
 void image_jacobian_affine_ECC(const cuda::GpuMat& gpu_src1, 
                                const cuda::GpuMat& gpu_src2,
                                const cuda::GpuMat& gpu_src3, 
-															 const cuda::GpuMat& gpu_src4,
+                               const cuda::GpuMat& gpu_src4,
                                Mat& dst,
-															 double &transferTime);
+                               double &transferTime);
 
 
 // Calculate the jacobian matrix as step for transformation estimation 
@@ -37,12 +37,12 @@ void update_warping_matrix_ECC (Mat& map_matrix, const Mat& update);
 
 // compute registration matrix
 double gpu_findTransformECC(InputArray templateImage,
-				 InputArray inputImage,
-				 InputOutputArray warpMatrix,
-				 int motionType,
-				 TermCriteria criteria,
-				 Mat inputMask,
-				 double &transferTime
-				 );
+         InputArray inputImage,
+         InputOutputArray warpMatrix,
+         int motionType,
+         TermCriteria criteria,
+         Mat inputMask,
+         double &transferTime
+         );
 
 #endif

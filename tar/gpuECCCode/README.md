@@ -7,11 +7,11 @@ OpenCV binaries included from non standard path: /vol/bitbucket/ic711/usr/local/
 Ensure path is included in Makefile before compilation
 
 Subdirectories:
-	* withoutTimers: Contains gpu ECC program without benchmarking timers
-	* gauss: 			   Contains gpu ECC program with gauss optimization 
-									 and timed functions
-	* nongauss: 		 Contains gpu ECC program without gauss opt. and timed
-									 functinos - equivalent to withoutTimers exe but timed
+  * withoutTimers: Contains gpu ECC program without benchmarking timers
+  * gauss:          Contains gpu ECC program with gauss optimization 
+                   and timed functions
+  * nongauss:      Contains gpu ECC program without gauss opt. and timed
+                   functinos - equivalent to withoutTimers exe but timed
 
 Makefiles all reference non standard path above for linking 
 Generated executable requires commandline inputs in order

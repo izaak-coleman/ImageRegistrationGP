@@ -57,7 +57,7 @@ int main( int argc, char** argv )
   int number_of_iterations = 1000;
   double termination_eps = 1e-6;
   cv::TermCriteria criteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS,
-			number_of_iterations, termination_eps);
+      number_of_iterations, termination_eps);
 
   Mat inputMask;
 
@@ -65,13 +65,13 @@ int main( int argc, char** argv )
   int gauss_level = 3; // start point for number of gauss reductions
   double cc = 0; // correlation coefficient
 
-	double totalTime = 0, withoutTransfer = 0, transferTime = 0;
+  double totalTime = 0, withoutTransfer = 0, transferTime = 0;
  
   // Run find_transformECC to find the warp matrix
-	std::clock_t function;
-	function = std::clock();
-	do{
-		gauss_level--;
+  std::clock_t function;
+  function = std::clock();
+  do{
+    gauss_level--;
     // Save copies of the template_image:
     tmp = template_image;
     gauss_template = tmp;
@@ -90,29 +90,29 @@ int main( int argc, char** argv )
       tmp = gauss_input;
     }
 
-  	cc = gpu_findTransformECC (
-					 gauss_template,
-					 gauss_input,
-					 warp_matrix,
-					 warp_mode,
-					 criteria,
-					 inputMask,
-					 transferTime);
+    cc = gpu_findTransformECC (
+           gauss_template,
+           gauss_input,
+           warp_matrix,
+           warp_mode,
+           criteria,
+           inputMask,
+           transferTime);
 
-	}while(cc<0.97 && gauss_level > 0);
-	totalTime = (std::clock() - function)/(double)CLOCKS_PER_SEC;
+  }while(cc<0.97 && gauss_level > 0);
+  totalTime = (std::clock() - function)/(double)CLOCKS_PER_SEC;
 
-	withoutTransfer = totalTime - transferTime;
+  withoutTransfer = totalTime - transferTime;
 
-	std::cout << std::endl << "Total time taken: "  << totalTime << std::endl;
-	std::cout << std::endl << "Transfer time taken: "  << transferTime << std::endl;
-	std::cout << std::endl << "Time without transfer: "  << withoutTransfer << std::endl;
-	std::cout << totalTime << ", " << transferTime << ", " << withoutTransfer << std::endl;
+  std::cout << std::endl << "Total time taken: "  << totalTime << std::endl;
+  std::cout << std::endl << "Transfer time taken: "  << transferTime << std::endl;
+  std::cout << std::endl << "Time without transfer: "  << withoutTransfer << std::endl;
+  std::cout << totalTime << ", " << transferTime << ", " << withoutTransfer << std::endl;
 
-	// adjust translation distances from gauss_reductoin
-	float* matPtr = warp_matrix.ptr<float>(0);
-	matPtr[2] = matPtr[2] * pow(2, gauss_level);
-	matPtr[5] = matPtr[5] * pow(2, gauss_level);
+  // adjust translation distances from gauss_reductoin
+  float* matPtr = warp_matrix.ptr<float>(0);
+  matPtr[2] = matPtr[2] * pow(2, gauss_level);
+  matPtr[5] = matPtr[5] * pow(2, gauss_level);
   // Reserve a matrix to store the warped image
   cv::Mat warped_image = cv::Mat(template_image.rows, template_image.cols, CV_32FC1);
 
@@ -133,6 +133,10 @@ int main( int argc, char** argv )
   cv::imshow( "Deformed Image", input_image );
   cv::imshow( "Corrected Image", warped_image);
   cv::waitKey(0);
+
+	std::cout << "Writing corrected image..." << std::endl;
+  std::string ofname = "corrected_image.jpg";
+  cv::imwrite(ofname, corrected_image);
 
   return 0;
 }

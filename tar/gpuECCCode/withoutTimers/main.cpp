@@ -29,7 +29,7 @@ int main( int argc, char** argv )
   // Check args 
   if (argc != 4) {
       std::cout << " Usage: findTransform <TemplateImage> " << 
-			"<InputImage> <Warp_matrix>" << std::endl;
+      "<InputImage> <Warp_matrix>" << std::endl;
       return -1;
   }
   
@@ -53,18 +53,18 @@ int main( int argc, char** argv )
   int number_of_iterations = 1000;
   double termination_eps = 1e-6;
   cv::TermCriteria criteria(cv::TermCriteria::COUNT+cv::TermCriteria::EPS,
-			number_of_iterations, termination_eps);
+      number_of_iterations, termination_eps);
 
  
   // Run find_transformECC to find the warp matrix
-	Mat inputMask;
+  Mat inputMask;
   double cc = gpu_findTransformECC (
-					 template_image,
-					 deformed_image,
-					 warp_matrix,
-					 warp_mode,
-					 criteria,
-					 inputMask);
+           template_image,
+           deformed_image,
+           warp_matrix,
+           warp_mode,
+           criteria,
+           inputMask);
 
 
   // Reserve a matrix to store the warped image
@@ -73,14 +73,14 @@ int main( int argc, char** argv )
   // Apply the warp matrix to the input image to produce a warped image 
   // (i.e. aligned to the template image)
   cv::warpAffine(deformed_image , corrected_image, 
-								warp_matrix, corrected_image.size(), 
-								cv::INTER_LINEAR + cv::WARP_INVERSE_MAP);
+                warp_matrix, corrected_image.size(), 
+                cv::INTER_LINEAR + cv::WARP_INVERSE_MAP);
  
   // Save values in the warp matrix to the filename provided on command-line
   saveWarp(outputWarpMatrix, warp_matrix);
 
   std::cout << "Enhanced correlation coefficient between the template " <<
-	"image the corrected image = " << cc << std::endl; 
+  "image the corrected image = " << cc << std::endl; 
 
   // Show final output
   cv::namedWindow( "Corrected Image", CV_WINDOW_AUTOSIZE );
@@ -90,9 +90,10 @@ int main( int argc, char** argv )
   cv::imshow( "Deformed Image", deformed_image  );
   cv::imshow( "Corrected Image", corrected_image);
   cv::waitKey(0);
-
-	std::string ofname = "corrected_image.jpg";
-	cv::imwrite(ofname, corrected_image);
+	
+	std::cout << "Writing corrected image..." << std::endl;
+  std::string ofname = "corrected_image.jpg";
+  cv::imwrite(ofname, corrected_image);
 
   return 0;
 }
