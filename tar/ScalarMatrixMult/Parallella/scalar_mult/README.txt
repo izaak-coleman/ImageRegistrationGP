@@ -14,6 +14,14 @@ work, so a Parallella board is required, with a version of eSDK
 Input:  an input image, and a multiplier by which the image pixel
         values should be multiplied.
 
+	NOTE: As standard the program runs with images of the size 
+	      128x128 pixels as standard. Size 64x64 can be used
+	      as well, and was run, but this has to be enabled by
+	      changing the value of _lgSedge to 6 on line 36 of
+	      "epiphany.h" in the device/src/ subfolder.
+	      Size 256x256 does not work, as it does not fit in the
+	      local memory of the eCores (at least as implemented).
+
 Result: an output image, which is the original after the intensity 
 	change due to the scalar multiplication. Saved in the main
 	folder with the name "original_name.out.jpg" [assuming the
@@ -65,7 +73,7 @@ code is only used for testing purposes.
 		  image, while > 1 yield a lighter image.
 		  Default value: 1.5
     - image:	  image name, in the form "name.jpg".
-      		  Default value: "lenna.jpg"
+      		  Default value: "panda.jpg"
 
 
 ## Authors
