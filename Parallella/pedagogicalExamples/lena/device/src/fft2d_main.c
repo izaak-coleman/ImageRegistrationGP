@@ -40,6 +40,7 @@ void corner_turn(int pingpong);
 void LPF(int lgNN);
 void init();
 
+//#define _USE_DRAM_
 
 ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
@@ -97,7 +98,7 @@ int main(int argc, char *argv[])
 		
 		// Calculate. During this time, the host polls the
 		// Core 0's mailbox, waiting for a falling
-		// edge indicating the end of the calculation.
+		// edge indicating the end of the calculation.   //WHAT is a falling edge?
 		me.time_p[1] = e_ctimer_get(E_CTIMER_0);
 		FFT2D(e_fft_fwd);
 

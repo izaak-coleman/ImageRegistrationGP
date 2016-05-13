@@ -1,4 +1,4 @@
-// Jukka Soikkeli, 6 March 2016
+// Jukka Soikkeli, 6 March 2016 
 
 //#include <opencv2/core/core.hpp>      // Basic OpenCV structures
 #include "opencv2/opencv.hpp"
@@ -19,9 +19,9 @@
 
 using namespace std;
 using namespace cv;
-
+ 
 int main(int argc, char *argv[]) {
-
+ 
   if(argc!=2) {
     cout << "Incorrect number of arguments - one argument required for cpu/gpu choice." << endl;
     cout << "Usage: ./fft_lpf cpu   OR   ./fft_lpf gpu" << endl;
@@ -29,13 +29,12 @@ int main(int argc, char *argv[]) {
   }
   std:: string argv1 = argv[1];
   if(argv1!="cpu" && argv1!="gpu") {
-    cout << "Incorrect command line argument (has to be 'cpu' or 'gpu')!" << endl;
+    cout << "Incorrect command line argument (has to be 'cpu' or 'gpu')!" << endl;    
     cout << "Usage: ./fft_lpf cpu   OR   ./fft_lpf gpu" << endl;
     return 1;
   }
 
-
-  //-------------- Preparation ------------------------------
+  //-------------- Preparation ------------------------------ 
   // Read image from file, making sure that the image is in grayscale
   Mat img = imread("lenna.jpg",CV_LOAD_IMAGE_GRAYSCALE);
 
@@ -49,11 +48,11 @@ int main(int argc, char *argv[]) {
   if(argv1=="cpu") {
     // Applying forward DFT (in place)
     dft(complexI, complexI);
-
+    
 
     // LPF GOES HERE
-
-
+    
+    
     // Inverse DFT
     Mat out, outimg; //make matrices
     dft(complexI,out, DFT_INVERSE | DFT_SCALE | DFT_REAL_OUTPUT); //getting inverse using dft function
@@ -93,7 +92,6 @@ int main(int argc, char *argv[]) {
     //double n,x;
     //minMaxIdx(gpuout, &n, &x);
     //gpuout.convertTo(outimg, CV_8U, 255.0/x);
-
     out.convertTo(outimg, CV_8U);
     // imshow("Output (GPU)", gpuoutimg);
     imshow("Output (GPU)", outimg);
@@ -106,13 +104,11 @@ int main(int argc, char *argv[]) {
        http://answers.opencv.org/question/11485/opencv-gpudft-distorted-image-after-inverse-transform/
        http://docs.opencv.org/2.4/modules/gpu/doc/image_processing.html#gpu-dft
     */
-
   }
 
 
   // Show the image
   imshow("Original Image", img);
-
   // Wait until user presses a key before exiting
   waitKey(0); // use while images shown, take out if only image saving is required
   return 0;
@@ -127,7 +123,8 @@ int main(int argc, char *argv[]) {
 //http://answers.opencv.org/question/11485/opencv-gpudft-distorted-image-after-inverse-transform/
 
 
-/* LPF on the CPU*/
+/*
+// LPF on the CPU
 void LPF(Mat &dft, const float R)
 {
 	Mat temp = Mat(dft.rows, dft.cols, CV_32F);
@@ -149,3 +146,4 @@ void LPF(Mat &dft, const float R)
         Mat planes[] = {temp, temp};
 	merge(planes, 2, dft);
 }
+*/
