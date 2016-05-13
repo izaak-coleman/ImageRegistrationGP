@@ -68,6 +68,8 @@ typedef unsigned int e_coreid_t;
 #define FALSE 0
 #define TRUE  1
 
+//#define _USE_DRAM_
+
 typedef struct {
 	int  run_target;
 	e_loader_diag_t verbose;
@@ -92,8 +94,8 @@ cfloat Bref[_Smtx];
 cfloat Bdiff[_Smtx];
 
 unsigned int DRAM_BASE  = 0x8f000000;
-unsigned int BankA_addr = 0x2000;
-unsigned int coreID[_Ncores];
+unsigned int BankA_addr = 0x2000;  //address of memory bank A ?
+unsigned int coreID[_Ncores];      //core ID array
 
 typedef struct timeval timeval_t;
 e_platform_t platform;
@@ -106,7 +108,7 @@ int main(int argc, char *argv[])
 	int          row, col, cnum;
 
 
-
+	//DevIL library related...
 	ILuint  ImgId;
 //	ILenum  Error;
 	ILubyte *imdata;
@@ -239,15 +241,16 @@ int main(int argc, char *argv[])
 	// Copy operand matrices to Epiphany system
 	addr = DRAM_BASE + offsetof(shared_buf_t, A[0]);
 	sz = sizeof(Mailbox.A);
+	 printf(       "HELLO DRAM\n");
 	 printf(       "Writing A[%ldB] to address %08x...\n", sz, addr);
 	fprintf(fo, "%% Writing A[%ldB] to address %08x...\n", sz, addr);
-	e_write(addr, (void *) Mailbox.A, sz);
+	e_write(pDRAM,0,0,addr, (void *) Mailbox.A, sz); //added "pDRAM,0,0"
 
 	addr = DRAM_BASE + offsetof(shared_buf_t, B[0]);
 	sz = sizeof(Mailbox.B);
 	 printf(       "Writing B[%ldB] to address %08x...\n", sz, addr);
 	fprintf(fo, "%% Writing B[%ldB] to address %08x...\n", sz, addr);
-	e_write(addr, (void *) Mailbox.B, sz);
+	e_write(pDRAM,0,0,addr, (void *) Mailbox.B, sz); //added "pDRAM,0,0"
 #else
 	// Copy operand matrices to Epiphany cores' memory
 	 printf(       "Writing image to Epiphany\n");
@@ -269,19 +272,20 @@ int main(int argc, char *argv[])
 #endif
 
 
-
 	// Call the Epiphany fft2d() function
 	 printf(       "GO!\n");
 	fprintf(fo, "%% GO!\n");
 	fflush(stdout);
 	fflush(fo);
 	gettimeofday(&timer[0], NULL);
-	fft2d_go(pDRAM);
+	fft2d_go(pDRAM);  //checks the DRAM for ready and go, runs the core programs, and waits for all cores to finish
 	gettimeofday(&timer[1], NULL);
 	 printf(       "Done!\n\n");
 	fprintf(fo, "%% Done!\n\n");
 	fflush(stdout);
 	fflush(fo);
+
+	//HERE
 
 	// Read time counters
 //	 printf(       "Reading time count...\n");
@@ -323,17 +327,18 @@ int main(int argc, char *argv[])
 	sz = sizeof(Mailbox.B);
 	 printf(       "Reading B[%ldB] from address %08x...\n", sz, addr);
 	fprintf(fo, "%% Reading B[%ldB] from address %08x...\n", sz, addr);
-	blknum = sz / RdBlkSz;
-	remndr = sz % RdBlkSz;
-	for (i=0; i<blknum; i++)
+	int blknum = sz / RdBlkSz; //added "int" type, maybe size_t would work as well
+	int remndr = sz % RdBlkSz; //added "int" type, maybe size_t would work as well
+	int j; //added "int" type j here, as later e_read did not have it declared
+	for (j=0; j<blknum; j++)
 	{
 		printf(".");
-		fflush(stdout);
-		e_read(addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), RdBlkSz);
+		fflush(stdout); //CHANGE i TO j HERE?
+		e_read(pDRAM,0,0,addr+j*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+j*RdBlkSz), RdBlkSz); // added "pDRAM,0,0,"
 	}
 	printf(".");
 	fflush(stdout);
-	e_read(addr+i*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+i*RdBlkSz), remndr);
+	e_read(pDRAM,0,0,addr+j*RdBlkSz, (void *) ((long unsigned)(Mailbox.B)+j*RdBlkSz), remndr); // added "pDRAM,0,0,"
 #else
 	// Read result matrix from Epiphany cores' memory
 	sz = sizeof(Mailbox.A) / _Ncores;
@@ -412,7 +417,7 @@ int fft2d_go(e_mem_t *pDRAM)
 	Mailbox.core.ready = 0;
 	while (Mailbox.core.ready == 0)
 		e_read(pDRAM, 0, 0, addr, (void *) &(Mailbox.core.ready), sizeof(Mailbox.core.ready));
-
+	//READS THE READY MESSAGE UNTIL READY? - busy waiting, but OK as the cores are only doing one thing
 
 	// Wait until cores finished previous calculation
 	addr = offsetof(shared_buf_t, core.go);
@@ -422,17 +427,17 @@ int fft2d_go(e_mem_t *pDRAM)
 		e_read(pDRAM, 0, 0, addr, (void *) (&Mailbox.core.go), sz);
 
 	
-	// Signal cores to start crunching
-	Mailbox.core.go = 1;
-	addr = offsetof(shared_buf_t, core.go);
-	sz = sizeof(int64_t);
+	// Signal cores to start crunching   //same as above, but does a WRITE instead or read
+	Mailbox.core.go = 1;   //REPETITION?
+	addr = offsetof(shared_buf_t, core.go);    //REPETITION?
+	sz = sizeof(int64_t);     //REPETITION?
 	e_write(pDRAM, 0, 0, addr, (void *) (&Mailbox.core.go), sz);
-
+	
 
 	// Wait until cores finished calculation
-	addr = offsetof(shared_buf_t, core.go);
-	sz = sizeof(int64_t);
-	Mailbox.core.go = 1;
+	addr = offsetof(shared_buf_t, core.go); //REPETITION?
+	sz = sizeof(int64_t);  //REPETITION?
+	Mailbox.core.go = 1;  //REPETITION?
 	while (Mailbox.core.go != 0)
 		e_read(pDRAM, 0, 0, addr, (void *) (&Mailbox.core.go), sz);
 
