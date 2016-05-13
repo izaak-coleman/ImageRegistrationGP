@@ -1,0 +1,6 @@
+This folder will include the compiled host code
+==================================================
+
+This placeholder file added to ensure that git does not ignore the folder, as
+it is required.
+==================================================
