@@ -13,7 +13,8 @@ Subdirectories:
   * nongauss:      Contains gpu ECC program without gauss opt. and timed
                    functinos - equivalent to withoutTimers exe but timed
 
-Makefiles all reference non standard path above for linking 
+Makefiles all reference non standard path above for linking.
+
 Generated executable requires commandline inputs in order
 1) template image 2) deformed image (will be registered) 3) f.name for warp
 matrix
