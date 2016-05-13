@@ -11,7 +11,6 @@
 #include <ctime>
 
 #include "findTransformV3Full.h"
-#include "main.cpp"
 
 //cuda include files
 #include "opencv2/cudacodec.hpp"

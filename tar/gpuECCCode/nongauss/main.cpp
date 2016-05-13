@@ -1,7 +1,6 @@
 #include <fstream>
 #include <string>
-// GPU Translation of findTransform.cpp
-// (12/05/16)
+// GPU Translation of findTransform.cpp // (12/05/16)
 // Original file by Anthony Flynn, annotated by Izaak Coleman and Zoe Vance
 // Input: <TemplateImage> <InputImage> <OutputWarp>
 // Takes a template image and input image as alignment, and outputs the
@@ -101,9 +100,6 @@ int main( int argc, char** argv )
   cv::imshow( "Deformed Image", deformed_image  );
   cv::imshow( "Corrected Image", corrected_image);
   cv::waitKey(0);
-
-  std::string ofname = "corrected_image.jpg";
-  cv::imwrite(ofname, corrected_image);
 
 	std::cout << "Writing corrected image..." << std::endl;
   std::string ofname = "corrected_image.jpg";

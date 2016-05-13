@@ -1,5 +1,5 @@
 OBJ=main.o findTransformV3Full.o
-EXE=gpuECC
+EXE=gpuECCFullDataBenchMark
 CXX=g++
 COMPFLAGS=-Wall -ggdb -MMD -I/vol/bitbucket/ic711/usr/local/include -L/vol/bitbucket/ic711/usr/local/lib
 LIBS=`pkg-config --libs opencv --cflags opencv`

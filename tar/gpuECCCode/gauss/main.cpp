@@ -7,8 +7,8 @@
 // Takes a template image and input image as alignment, and outputs the
 // warp matrix needed to transform the input image to the same coordinates
 // as the template image, and also applies the transform to the input image
-#include "opencv2/opencv.hpp"
 #include <ctime>
+#include "opencv2/opencv.hpp"
 
 #include "findTransformV3Gauss.h"
 
@@ -136,7 +136,7 @@ int main( int argc, char** argv )
 
 	std::cout << "Writing corrected image..." << std::endl;
   std::string ofname = "corrected_image.jpg";
-  cv::imwrite(ofname, corrected_image);
+  cv::imwrite(ofname, warped_image);
 
   return 0;
 }

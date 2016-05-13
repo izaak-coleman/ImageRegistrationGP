@@ -1,5 +1,5 @@
-OBJ=main.o findTransformV3Gauss.o
-EXE=gpuECC
+OBJ=findTransformV3Gauss.o main.o
+EXE=gpuGaussBenchMark
 CXX=g++
 COMPFLAGS=-Wall -ggdb -MMD -I/vol/bitbucket/ic711/usr/local/include -L/vol/bitbucket/ic711/usr/local/lib
 LIBS=`pkg-config --libs opencv --cflags opencv`
